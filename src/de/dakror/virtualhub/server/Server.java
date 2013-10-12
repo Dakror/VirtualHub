@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import de.dakror.virtualhub.net.ClientHandler;
+import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.settings.CFG;
 
 /**
@@ -90,7 +90,7 @@ public class Server extends Thread
 		frame.log("Client verbunden: " + s.getInetAddress().getHostAddress() + ":" + s.getPort());
 		clients.add(s);
 		
-		new ClientHandler(s);
+		new NetHandler(s).start();
 	}
 	
 	public void removeClient(Socket s, String msg)

@@ -9,12 +9,13 @@ import java.net.Socket;
 
 import javax.swing.JOptionPane;
 
+import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.settings.CFG;
 
 /**
  * @author Dakror
  */
-public class Client
+public class Client extends Thread
 {
 	Socket socket;
 	
@@ -46,10 +47,19 @@ public class Client
 		catch (ConnectException e)
 		{
 			JOptionPane.showMessageDialog(frame, "Kann Server unter " + serverIP.getHostAddress() + " nicht erreichen!", "Fehler!", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+		
+		start();
+	}
+	
+	@Override
+	public void run()
+	{
+		new NetHandler(socket).run();
 	}
 }

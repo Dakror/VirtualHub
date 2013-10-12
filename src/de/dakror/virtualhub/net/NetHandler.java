@@ -10,17 +10,17 @@ import java.net.SocketException;
 import de.dakror.virtualhub.server.Server;
 
 /**
+ * Both Client- and Serversided
+ * 
  * @author Dakror
  */
-public class ClientHandler extends Thread
+public class NetHandler extends Thread
 {
-	Socket client;
+	Socket socket;
 	
-	public ClientHandler(Socket client)
+	public NetHandler(Socket socket)
 	{
-		this.client = client;
-		
-		start();
+		this.socket = socket;
 	}
 	
 	@Override
@@ -30,15 +30,15 @@ public class ClientHandler extends Thread
 		DataOutputStream dos = null;
 		try
 		{
-			dis = new DataInputStream(client.getInputStream());
-			dos = new DataOutputStream(client.getOutputStream());
+			dis = new DataInputStream(socket.getInputStream());
+			dos = new DataOutputStream(socket.getOutputStream());
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 		
-		while (!client.isClosed())
+		while (!socket.isClosed())
 		{
 			try
 			{
@@ -54,7 +54,7 @@ public class ClientHandler extends Thread
 				{
 					dis.close();
 					dos.close();
-					Server.currentServer.removeClient(client, "Verbindung verloren");
+					if (isServerSided()) Server.currentServer.removeClient(socket, "Verbindung verloren");
 					return;
 				}
 				catch (IOException e1)
@@ -68,7 +68,7 @@ public class ClientHandler extends Thread
 				{
 					dis.close();
 					dos.close();
-					Server.currentServer.removeClient(client, "Verbindung getrennt");
+					if (isServerSided()) Server.currentServer.removeClient(socket, "Verbindung getrennt");
 					return;
 				}
 				catch (IOException e1)
@@ -81,5 +81,10 @@ public class ClientHandler extends Thread
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public boolean isServerSided()
+	{
+		return Server.currentServer != null;
 	}
 }

@@ -57,4 +57,9 @@ public class ServerFrame extends JFrame
 	{
 		logArea.append("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "]: " + line + "\r\n");
 	}
+	
+	public void showSettingsDialog()
+	{	
+		
+	}
 }
