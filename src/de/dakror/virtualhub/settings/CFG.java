@@ -9,8 +9,8 @@ import java.util.Arrays;
 public class CFG
 {
 	// -- UniVersion -- //
-	public static final int VERSION = 0;
-	public static final int PHASE = 0;
+	public static final int VERSION = 2013101120;
+	public static final int PHASE = 2;
 	
 	public static boolean INTERNET;
 	
