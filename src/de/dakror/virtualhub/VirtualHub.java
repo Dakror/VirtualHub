@@ -1,5 +1,7 @@
 package de.dakror.virtualhub;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -9,6 +11,8 @@ import javax.swing.UIManager;
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
 import de.dakror.universion.UniVersion;
+import de.dakror.virtualhub.client.Client;
+import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -42,8 +46,14 @@ public class VirtualHub
 		
 		// Reporter.init(new File(CFG.DIR, "Logs"));
 		
-		if (args.length == 0) new Client();
-		
-		else if (args[0].equals("-s")) ;//
+		if (args.length == 0) try
+		{
+			new Client(InetAddress.getLocalHost());
+		}
+		catch (UnknownHostException e)
+		{
+			e.printStackTrace();
+		}
+		else if (args[0].equals("-s")) new Server();
 	}
 }

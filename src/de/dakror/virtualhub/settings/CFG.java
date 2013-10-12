@@ -16,6 +16,7 @@ public class CFG
 	
 	public static final File DIR = new File(System.clearProperty("user.home") + "/.dakror/VirtualHub");
 	
+	public static final int SERVER_PORT = 4444;
 	
 	public static void p(Object... p)
 	{
