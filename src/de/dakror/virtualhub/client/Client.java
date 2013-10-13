@@ -10,6 +10,8 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
+import de.dakror.virtualhub.client.dialog.ChooseCatalogDialog;
+import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.net.PacketHandler;
 import de.dakror.virtualhub.net.packet.Packet;
@@ -26,6 +28,8 @@ public class Client extends Thread implements PacketHandler
 	Socket socket;
 	NetHandler netHandler;
 	ClientFrame frame;
+	Catalog catalog;
+	
 	public Properties properties;
 	
 	public static File dir;
@@ -43,18 +47,11 @@ public class Client extends Thread implements PacketHandler
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				if (socket == null) return;
-				try
-				{
-					socket.close();
-				}
-				catch (IOException e1)
-				{
-					e1.printStackTrace();
-				}
+				disconnect();
 			}
 		});
 		
+		frame.setVisible(true);
 		try
 		{
 			socket = new Socket(properties.getProperty("server"), CFG.SERVER_PORT);
@@ -89,12 +86,27 @@ public class Client extends Thread implements PacketHandler
 				break;
 			case KATALOGS:
 				Packet0Katalogs p = new Packet0Katalogs(data);
-				CFG.p(p.getKatalogs());
+				ChooseCatalogDialog.show(frame, p.getKatalogs());
 				break;
+		}
+	}
+	
+	public void disconnect()
+	{
+		if (socket == null) return;
+		try
+		{
+			socket.close();
+		}
+		catch (IOException e1)
+		{
+			e1.printStackTrace();
 		}
 	}
 	
 	@Override
 	public void sendPacket(Packet p) throws IOException
-	{}
+	{
+		netHandler.sendPacket(p);
+	}
 }

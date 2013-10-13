@@ -26,7 +26,7 @@ public class Server extends Thread
 	public static Server currentServer;
 	
 	public ServerFrame frame;
-	public JSONArray katalogs;
+	public JSONArray catalogs;
 	
 	public static File dir;
 	
@@ -69,7 +69,7 @@ public class Server extends Thread
 		}
 		catch (BindException e)
 		{
-			frame.log("Es läuft bereits ein Server auf diesem Port!");
+			frame.log("Es l\u00e4uft bereits ein Server auf diesem Port!");
 			shutdown();
 			return;
 		}
@@ -116,7 +116,9 @@ public class Server extends Thread
 	{
 		try
 		{
+			
 			if (socket != null) socket.close();
+			frame.save();
 			frame.log("Server geschlossen\r\n");
 		}
 		catch (IOException e)

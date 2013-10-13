@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import de.dakror.virtualhub.net.packet.Packet;
+import de.dakror.virtualhub.net.packet.Packet.PacketTypes;
 import de.dakror.virtualhub.net.packet.Packet0Katalogs;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.util.Assistant;
@@ -39,7 +40,7 @@ public class NetHandler extends Thread implements PacketHandler
 			dis = new DataInputStream(socket.getInputStream());
 			dos = new DataOutputStream(socket.getOutputStream());
 			
-			if (handler == null) sendPacket(new Packet0Katalogs(Server.currentServer.katalogs));
+			if (handler == null) sendPacket(new Packet0Katalogs(Server.currentServer.catalogs));
 		}
 		catch (IOException e)
 		{
@@ -99,15 +100,17 @@ public class NetHandler extends Thread implements PacketHandler
 	@Override
 	public void parsePacket(byte[] data)
 	{
-		switch (Packet.lookupPacket(data[0]))
+		PacketTypes t = Packet.lookupPacket(data[0]);
+		Server.currentServer.frame.log("< " + Assistant.getSocketAddress(socket) + " : " + t.name());
+		switch (t)
 		{
 			case INVALID:
-				Server.currentServer.frame.log("Empfing ungültiges Packet");
+				Server.currentServer.frame.log("Empfing ung\u00fcltiges Paket");
 				break;
 			case KATALOGS:
 				Packet0Katalogs p = new Packet0Katalogs(data);
-				Server.currentServer.katalogs = p.getKatalogs();
-				Server.currentServer.frame.log("Kataloge geändert von: " + Assistant.getSocketAddress(socket));
+				Server.currentServer.catalogs = p.getKatalogs();
+				Server.currentServer.frame.log("Kataloge ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
 				break;
 		}
 	}
@@ -115,7 +118,7 @@ public class NetHandler extends Thread implements PacketHandler
 	@Override
 	public void sendPacket(Packet p) throws IOException
 	{
-		if (isServerSided()) Server.currentServer.frame.log("Sende " + p.getClass().getSimpleName() + " an " + Assistant.getSocketAddress(socket));
+		if (isServerSided()) Server.currentServer.frame.log("> " + Assistant.getSocketAddress(socket) + " : " + p.getType().name());
 		dos.write(p.getData());
 	}
 	

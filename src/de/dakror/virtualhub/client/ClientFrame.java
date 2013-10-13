@@ -58,7 +58,7 @@ public class ClientFrame extends JFrame
 				Properties properties = new Properties();
 				properties.put("server", InetAddress.getLocalHost().getHostAddress());
 				Client.currentClient.properties = properties;
-				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software läuft\r\n");
+				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software l\u00e4uft\r\n");
 			}
 			else
 			{

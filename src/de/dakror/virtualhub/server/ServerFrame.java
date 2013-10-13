@@ -65,19 +65,25 @@ public class ServerFrame extends JFrame
 		try
 		{
 			// katalogs file
-			File katalogs = new File(Server.dir, "katalogs.json");
+			File catalogs = new File(Server.dir, "catalogs.json");
 			
-			if (!katalogs.exists())
+			if (!catalogs.exists())
 			{
-				Assistant.setFileContent(katalogs, new JSONArray().toString());
-				Server.currentServer.katalogs = new JSONArray();
+				Assistant.setFileContent(catalogs, new JSONArray().toString());
+				Server.currentServer.catalogs = new JSONArray();
 			}
-			else Server.currentServer.katalogs = new JSONArray(Assistant.getFileContent(katalogs));
+			else Server.currentServer.catalogs = new JSONArray(Assistant.getFileContent(catalogs));
 		}
 		catch (JSONException e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public void save()
+	{
+		File catalogs = new File(Server.dir, "catalogs.json");
+		Assistant.setFileContent(catalogs, Server.currentServer.catalogs.toString());
 	}
 	
 	public void log(String line)
