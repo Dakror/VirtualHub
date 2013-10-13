@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -150,5 +151,10 @@ public class Assistant
 		}
 		in.close();
 		out.close();
+	}
+	
+	public static String getSocketAddress(Socket s)
+	{
+		return s.getInetAddress() + ":" + s.getPort();
 	}
 }

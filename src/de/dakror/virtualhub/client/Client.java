@@ -10,15 +10,18 @@ import java.net.Socket;
 import javax.swing.JOptionPane;
 
 import de.dakror.virtualhub.net.NetHandler;
+import de.dakror.virtualhub.net.PacketHandler;
+import de.dakror.virtualhub.net.packet.Packet;
+import de.dakror.virtualhub.net.packet.Packet0Katalogs;
 import de.dakror.virtualhub.settings.CFG;
 
 /**
  * @author Dakror
  */
-public class Client extends Thread
+public class Client extends Thread implements PacketHandler
 {
 	Socket socket;
-	
+	NetHandler netHandler;
 	ClientFrame frame;
 	
 	public Client(InetAddress serverIP)
@@ -60,6 +63,26 @@ public class Client extends Thread
 	@Override
 	public void run()
 	{
-		new NetHandler(socket).run();
+		netHandler = new NetHandler(this, socket);
+		netHandler.run();
 	}
+	
+	@Override
+	public void parsePacket(byte[] data)
+	{
+		switch (Packet.lookupPacket(data[0]))
+		{
+			case INVALID:
+				CFG.p("Received invalid packet");
+				break;
+			case KATALOGS:
+				Packet0Katalogs p = new Packet0Katalogs(data);
+				CFG.p(p.getKatalogs());
+				break;
+		}
+	}
+	
+	@Override
+	public void sendPacket(Packet p) throws IOException
+	{}
 }

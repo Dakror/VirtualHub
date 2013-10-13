@@ -2,34 +2,44 @@ package de.dakror.virtualhub.server;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.json.JSONArray;
 
 import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.settings.CFG;
+import de.dakror.virtualhub.util.Assistant;
 
 /**
  * @author Dakror
  */
 public class Server extends Thread
 {
-	public static final int PACKETSIZE = 65536;
-	
 	public static Server currentServer;
 	
 	public ServerFrame frame;
+	public JSONArray katalogs;
 	
-	ArrayList<Socket> clients = new ArrayList<Socket>();
+	public static File dir;
+	
+	HashMap<Socket, NetHandler> clients = new HashMap<Socket, NetHandler>();
 	
 	ServerSocket socket;
 	
 	public Server()
 	{
 		currentServer = this;
+		
+		dir = new File(CFG.DIR, "Server");
+		dir.mkdir();
 		
 		frame = new ServerFrame();
 		frame.addWindowListener(new WindowAdapter()
@@ -46,7 +56,9 @@ public class Server extends Thread
 			@Override
 			public void uncaughtException(Thread t, Throwable e)
 			{
-				frame.log("ERROR: " + e.toString());
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				frame.log("ERROR: " + sw.toString());
 			}
 		});
 		
@@ -87,16 +99,17 @@ public class Server extends Thread
 	
 	public void handleConnection(Socket s)
 	{
-		frame.log("Client verbunden: " + s.getInetAddress().getHostAddress() + ":" + s.getPort());
-		clients.add(s);
+		frame.log("Client verbunden: " + Assistant.getSocketAddress(s));
+		NetHandler netHandler = new NetHandler(null, s);
+		clients.put(s, netHandler);
 		
-		new NetHandler(s).start();
+		netHandler.start();
 	}
 	
 	public void removeClient(Socket s, String msg)
 	{
 		clients.remove(s);
-		frame.log("Client getrennt: " + s.getInetAddress().getHostAddress() + ":" + s.getPort() + ((!msg.equals("Verbindung getrennt")) ? " (" + msg + ")" : ""));
+		frame.log("Client getrennt: " + Assistant.getSocketAddress(s) + ((!msg.equals("Verbindung getrennt")) ? " (" + msg + ")" : ""));
 	}
 	
 	public void shutdown()
