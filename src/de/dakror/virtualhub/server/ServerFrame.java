@@ -67,7 +67,11 @@ public class ServerFrame extends JFrame
 			// katalogs file
 			File katalogs = new File(Server.dir, "katalogs.json");
 			
-			if (!katalogs.exists()) Assistant.setFileContent(katalogs, new JSONArray().toString());
+			if (!katalogs.exists())
+			{
+				Assistant.setFileContent(katalogs, new JSONArray().toString());
+				Server.currentServer.katalogs = new JSONArray();
+			}
 			else Server.currentServer.katalogs = new JSONArray(Assistant.getFileContent(katalogs));
 		}
 		catch (JSONException e)

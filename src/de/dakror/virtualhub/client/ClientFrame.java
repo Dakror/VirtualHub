@@ -1,7 +1,12 @@
 package de.dakror.virtualhub.client;
 
 import java.awt.Dimension;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -39,7 +44,32 @@ public class ClientFrame extends JFrame
 	
 	public void init()
 	{
+		initFiles();
 		initMenu();
+	}
+	
+	public void initFiles()
+	{
+		try
+		{
+			if (!new File(Client.dir, "settings.properties").exists())
+			{
+				// properties file
+				Properties properties = new Properties();
+				properties.put("server", InetAddress.getLocalHost().getHostAddress());
+				Client.currentClient.properties = properties;
+				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software läuft\r\n");
+			}
+			else
+			{
+				Client.currentClient.properties = new Properties();
+				Client.currentClient.properties.load(new FileInputStream(new File(Client.dir, "settings.properties")));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public void initMenu()

@@ -155,6 +155,6 @@ public class Assistant
 	
 	public static String getSocketAddress(Socket s)
 	{
-		return s.getInetAddress() + ":" + s.getPort();
+		return s.getInetAddress().getHostAddress() + ":" + s.getPort();
 	}
 }

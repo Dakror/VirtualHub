@@ -1,7 +1,5 @@
 package de.dakror.virtualhub;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -46,14 +44,7 @@ public class VirtualHub
 		
 		// Reporter.init(new File(CFG.DIR, "Logs"));
 		
-		if (args.length == 0) try
-		{
-			new Client(InetAddress.getLocalHost());
-		}
-		catch (UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
+		if (args.length == 0) new Client();
 		else if (args[0].equals("-s")) new Server();
 	}
 }
