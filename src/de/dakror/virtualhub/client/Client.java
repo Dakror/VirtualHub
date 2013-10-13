@@ -27,7 +27,7 @@ public class Client extends Thread implements PacketHandler
 	
 	Socket socket;
 	NetHandler netHandler;
-	ClientFrame frame;
+	public ClientFrame frame;
 	Catalog catalog;
 	
 	public Properties properties;
@@ -108,5 +108,15 @@ public class Client extends Thread implements PacketHandler
 	public void sendPacket(Packet p) throws IOException
 	{
 		netHandler.sendPacket(p);
+	}
+	
+	public Catalog getCatalog()
+	{
+		return catalog;
+	}
+	
+	public void setCatalog(Catalog catalog)
+	{
+		this.catalog = catalog;
 	}
 }

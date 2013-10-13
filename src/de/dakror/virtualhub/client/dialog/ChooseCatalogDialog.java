@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.client.ClientFrame;
+import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.packet.Packet0Katalogs;
 
 /**
@@ -169,7 +170,21 @@ public class ChooseCatalogDialog
 			
 			@Override
 			public void actionPerformed(ActionEvent e)
-			{}
+			{
+				if (catalogs.getSelectedIndex() != -1)
+				{
+					try
+					{
+						Client.currentClient.setCatalog(new Catalog(data.getJSONObject(catalogs.getSelectedIndex())));
+						Client.currentClient.frame.setTitle("- " + Client.currentClient.getCatalog().getName());
+						dialog.dispose();
+					}
+					catch (JSONException e1)
+					{
+						e1.printStackTrace();
+					}
+				}
+			}
 		}));
 		
 		dialog.add(buttons);

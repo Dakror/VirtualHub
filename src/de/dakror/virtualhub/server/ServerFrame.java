@@ -1,13 +1,18 @@
 package de.dakror.virtualhub.server;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -58,6 +63,22 @@ public class ServerFrame extends JFrame
 		
 		JScrollPane jsp = new JScrollPane(logArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		setContentPane(jsp);
+		
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu = new JMenu("Aktionen");
+		menu.add(new JMenuItem(new AbstractAction("Log leeren")
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				logArea.setText("");
+				log("Log geleert.");
+			}
+		}));
+		menuBar.add(menu);
+		setJMenuBar(menuBar);
 	}
 	
 	public void initFiles()

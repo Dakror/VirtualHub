@@ -26,13 +26,13 @@ public class VirtualHub
 		
 		try
 		{
-			UIManager.put("ProgressBar.cycleTime", new Integer(6000));
-			UIManager.put("Tree.collapsedIcon", new ImageIcon(ImageIO.read(VirtualHub.class.getResourceAsStream("/com/jtattoo/plaf/icons/RightArrowInverse.gif"))));
-			UIManager.put("Tree.expandedIcon", new ImageIcon(ImageIO.read(VirtualHub.class.getResourceAsStream("/com/jtattoo/plaf/icons/DownArrowInverse.gif"))));
 			Properties props = new Properties();
 			props.put("logoString", "");
 			AcrylLookAndFeel.setCurrentTheme(props);
 			UIManager.setLookAndFeel(new AcrylLookAndFeel());
+			UIManager.put("ProgressBar.cycleTime", new Integer(6000));
+			UIManager.put("Tree.collapsedIcon", new ImageIcon(ImageIO.read(VirtualHub.class.getResourceAsStream("/img/RightArrow.gif"))));
+			UIManager.put("Tree.expandedIcon", new ImageIcon(ImageIO.read(VirtualHub.class.getResourceAsStream("/img/DownArrow.gif"))));
 		}
 		catch (Exception e)
 		{
