@@ -16,7 +16,7 @@ import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.net.PacketHandler;
 import de.dakror.virtualhub.net.packet.Packet;
-import de.dakror.virtualhub.net.packet.Packet0Katalogs;
+import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -88,9 +88,11 @@ public class Client extends Thread implements PacketHandler
 			case INVALID:
 				CFG.p("Received invalid packet");
 				break;
-			case KATALOGS:
-				Packet0Katalogs p = new Packet0Katalogs(data);
-				ChooseCatalogDialog.show(frame, p.getKatalogs());
+			case CATALOGS:
+				Packet0Catalogs p = new Packet0Catalogs(data);
+				ChooseCatalogDialog.show(frame, p.getCatalogs());
+				break;
+			default:
 				break;
 		}
 	}
@@ -122,5 +124,6 @@ public class Client extends Thread implements PacketHandler
 	public void setCatalog(Catalog catalog)
 	{
 		this.catalog = catalog;
+		frame.loadCatalog(catalog);
 	}
 }

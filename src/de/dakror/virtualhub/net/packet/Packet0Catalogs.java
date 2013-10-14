@@ -6,23 +6,23 @@ import org.json.JSONException;
 /**
  * @author Dakror
  */
-public class Packet0Katalogs extends Packet
+public class Packet0Catalogs extends Packet
 {
-	JSONArray katalogs;
+	JSONArray catalogs;
 	
-	public Packet0Katalogs(JSONArray katalogs)
+	public Packet0Catalogs(JSONArray catalogs)
 	{
 		super(0);
-		this.katalogs = katalogs;
+		this.catalogs = catalogs;
 	}
 	
 	
-	public Packet0Katalogs(byte[] data)
+	public Packet0Catalogs(byte[] data)
 	{
 		super(0);
 		try
 		{
-			katalogs = new JSONArray(new String(readData(data)));
+			catalogs = new JSONArray(new String(readData(data)));
 		}
 		catch (JSONException e)
 		{
@@ -30,14 +30,14 @@ public class Packet0Katalogs extends Packet
 		}
 	}
 	
-	public JSONArray getKatalogs()
+	public JSONArray getCatalogs()
 	{
-		return katalogs;
+		return catalogs;
 	}
 	
 	@Override
 	protected byte[] getPacketData()
 	{
-		return katalogs.toString().getBytes();
+		return catalogs.toString().getBytes();
 	}
 }

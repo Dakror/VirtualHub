@@ -15,11 +15,13 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -36,6 +38,8 @@ import com.jtattoo.plaf.BaseTreeUI;
 import com.jtattoo.plaf.acryl.AcrylBorderFactory;
 
 import de.dakror.universion.UniVersion;
+import de.dakror.virtualhub.data.Catalog;
+import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -115,7 +119,7 @@ public class ClientFrame extends JFrame
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
 		
-		initCatalogTree();
+		initTree();
 		
 		JScrollPane catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		catalogWrap.setBorder(null);
@@ -135,7 +139,7 @@ public class ClientFrame extends JFrame
 		setContentPane(contentPane);
 	}
 	
-	public void initCatalogTree()
+	public void initTree()
 	{
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
 		
@@ -158,7 +162,45 @@ public class ClientFrame extends JFrame
 			
 			@Override
 			public void actionPerformed(ActionEvent e)
-			{}
+			{
+				JFileChooser jfc = new JFileChooser(System.getProperty("user.home"));
+				jfc.setMultiSelectionEnabled(false);
+				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				jfc.setFileHidingEnabled(false);
+				
+				if (jfc.showOpenDialog(ClientFrame.this) == JFileChooser.APPROVE_OPTION)
+				{
+					File source = jfc.getSelectedFile();
+					
+					if (Client.currentClient.catalog.sources.contains(source))
+					{
+						JOptionPane.showMessageDialog(ClientFrame.this, "Dieser Ordner ist bereits eine Quelle in diesem Katalog!", "Bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
+						actionPerformed(e);
+						return;
+					}
+					else
+					{
+						Client.currentClient.catalog.sources.add(source);
+						DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
+						DefaultMutableTreeNode root = (DefaultMutableTreeNode) dtm.getRoot();
+						
+						DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(source.getPath().replace("\\", "/"));
+						dtm.insertNodeInto(dmtn, root, root.getChildCount());
+						addFolderSourceTree(dmtn);
+						
+						try
+						{
+							Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+						}
+						catch (IOException e1)
+						{
+							e1.printStackTrace();
+						}
+						
+						dtm.reload();
+					}
+				}
+			}
 		}));
 		catalog.addMouseListener(new MouseAdapter()
 		{
@@ -193,6 +235,21 @@ public class ClientFrame extends JFrame
 			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
 			{}
 		});
+	}
+	
+	public void loadCatalog(Catalog catalog)
+	{
+		// load tree sources
+		DefaultTreeModel dtm = (DefaultTreeModel) this.catalog.getModel();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) dtm.getRoot();
+		for (File file : Client.currentClient.catalog.sources)
+		{
+			DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(file.getPath().replace("\\", "/"));
+			dtm.insertNodeInto(dmtn, root, root.getChildCount());
+			addFolderSourceTree(dmtn);
+		}
+		
+		dtm.reload();
 	}
 	
 	public void addFolderSourceTree(DefaultMutableTreeNode folder)

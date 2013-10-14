@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.json.JSONException;
+
 import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet.PacketTypes;
-import de.dakror.virtualhub.net.packet.Packet0Katalogs;
+import de.dakror.virtualhub.net.packet.Packet0Catalogs;
+import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -40,7 +43,7 @@ public class NetHandler extends Thread implements PacketHandler
 			dis = new DataInputStream(socket.getInputStream());
 			dos = new DataOutputStream(socket.getOutputStream());
 			
-			if (handler == null) sendPacket(new Packet0Katalogs(Server.currentServer.catalogs));
+			if (handler == null) sendPacket(new Packet0Catalogs(Server.currentServer.catalogs));
 		}
 		catch (IOException e)
 		{
@@ -105,12 +108,39 @@ public class NetHandler extends Thread implements PacketHandler
 		switch (t)
 		{
 			case INVALID:
+			{
 				Server.currentServer.frame.log("Empfing ung\u00fcltiges Paket");
 				break;
-			case KATALOGS:
-				Packet0Katalogs p = new Packet0Katalogs(data);
-				Server.currentServer.catalogs = p.getKatalogs();
+			}
+			case CATALOGS:
+			{
+				Packet0Catalogs p = new Packet0Catalogs(data);
+				Server.currentServer.catalogs = p.getCatalogs();
 				Server.currentServer.frame.log("Kataloge ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
+				break;
+			}
+			case CATALOG:
+			{
+				Packet1Catalog p = new Packet1Catalog(data);
+				for (int i = 0; i < Server.currentServer.catalogs.length(); i++)
+				{
+					try
+					{
+						if (Server.currentServer.catalogs.getJSONObject(i).getString("name").equals(p.getCatalog().getName()))
+						{
+							Server.currentServer.catalogs.put(i, p.getCatalog().getJSONObject());
+							Server.currentServer.frame.log("Katalog " + p.getCatalog().getName() + " ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
+							break;
+						}
+					}
+					catch (JSONException e)
+					{
+						e.printStackTrace();
+					}
+				}
+				break;
+			}
+			default:
 				break;
 		}
 	}

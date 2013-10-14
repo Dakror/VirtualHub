@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.client.ClientFrame;
 import de.dakror.virtualhub.data.Catalog;
-import de.dakror.virtualhub.net.packet.Packet0Katalogs;
+import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 
 /**
  * @author Dakror
@@ -105,7 +105,7 @@ public class ChooseCatalogDialog
 						o.put("sources", new JSONArray());
 						o.put("tags", new JSONArray());
 						data.put(o);
-						Client.currentClient.sendPacket(new Packet0Katalogs(data));
+						Client.currentClient.sendPacket(new Packet0Catalogs(data));
 					}
 					catch (Exception e1)
 					{
@@ -130,7 +130,7 @@ public class ChooseCatalogDialog
 						dlm.remove(catalogs.getSelectedIndex());
 						try
 						{
-							Client.currentClient.sendPacket(new Packet0Katalogs(data));
+							Client.currentClient.sendPacket(new Packet0Catalogs(data));
 						}
 						catch (IOException e1)
 						{
