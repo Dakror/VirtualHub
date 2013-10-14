@@ -5,6 +5,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Properties;
 
@@ -17,6 +18,7 @@ import de.dakror.virtualhub.net.PacketHandler;
 import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet0Katalogs;
 import de.dakror.virtualhub.settings.CFG;
+import de.dakror.virtualhub.util.Assistant;
 
 /**
  * @author Dakror
@@ -40,7 +42,6 @@ public class Client extends Thread implements PacketHandler
 		
 		dir = new File(CFG.DIR, "Client");
 		dir.mkdir();
-		
 		frame = new ClientFrame();
 		frame.addWindowListener(new WindowAdapter()
 		{
@@ -51,14 +52,16 @@ public class Client extends Thread implements PacketHandler
 			}
 		});
 		
+		Assistant.setJFrameComponentsEnabled(frame, false);
 		frame.setVisible(true);
 		try
 		{
-			socket = new Socket(properties.getProperty("server"), CFG.SERVER_PORT);
+			socket = new Socket(InetAddress.getByName(properties.getProperty("server")), CFG.SERVER_PORT);
 		}
 		catch (ConnectException e)
 		{
 			JOptionPane.showMessageDialog(frame, "Kann Server unter " + properties.getProperty("server") + " nicht erreichen!", "Fehler!", JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
 			return;
 		}
 		catch (Exception e)
@@ -66,6 +69,7 @@ public class Client extends Thread implements PacketHandler
 			e.printStackTrace();
 		}
 		
+		Assistant.setJFrameComponentsEnabled(frame, true);
 		start();
 	}
 	

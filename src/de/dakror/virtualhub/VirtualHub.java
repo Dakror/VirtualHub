@@ -2,8 +2,6 @@ package de.dakror.virtualhub;
 
 import java.util.Properties;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
@@ -31,8 +29,6 @@ public class VirtualHub
 			AcrylLookAndFeel.setCurrentTheme(props);
 			UIManager.setLookAndFeel(new AcrylLookAndFeel());
 			UIManager.put("ProgressBar.cycleTime", new Integer(6000));
-			UIManager.put("Tree.collapsedIcon", new ImageIcon(ImageIO.read(VirtualHub.class.getResourceAsStream("/img/RightArrow.gif"))));
-			UIManager.put("Tree.expandedIcon", new ImageIcon(ImageIO.read(VirtualHub.class.getResourceAsStream("/img/DownArrow.gif"))));
 		}
 		catch (Exception e)
 		{

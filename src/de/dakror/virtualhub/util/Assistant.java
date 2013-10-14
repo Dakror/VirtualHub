@@ -1,5 +1,7 @@
 package de.dakror.virtualhub.util;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +18,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+
+import javax.swing.JFrame;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 
@@ -156,5 +162,44 @@ public class Assistant
 	public static String getSocketAddress(Socket s)
 	{
 		return s.getInetAddress().getHostAddress() + ":" + s.getPort();
+	}
+	
+	public static void setJFrameComponentsEnabled(JFrame frame, boolean enabled)
+	{
+		setContainerComponentsEnabled(frame.getContentPane(), enabled);
+		if (frame.getJMenuBar() != null) setContainerComponentsEnabled(frame.getJMenuBar(), enabled);
+		
+		frame.repaint();
+	}
+	
+	private static void setContainerComponentsEnabled(Container c, boolean enabled)
+	{
+		for (Component component : c.getComponents())
+		{
+			if (component instanceof Container) setContainerComponentsEnabled((Container) component, enabled);
+			component.setEnabled(enabled);
+		}
+		
+		c.repaint();
+	}
+	
+	public static boolean hasSubDirectories(File dir)
+	{
+		for (File f : dir.listFiles())
+			if (f.isDirectory()) return true;
+		return false;
+	}
+	
+	public static String getNodePath(DefaultMutableTreeNode node)
+	{
+		String res = "";
+		TreeNode[] path = node.getPath();
+		for (int i = 1; i < path.length; i++)
+		{
+			DefaultMutableTreeNode tn = (DefaultMutableTreeNode) path[i];
+			res += tn.getUserObject() + "/";
+		}
+		if (res.length() == 0) return "";
+		return res.substring(0, res.length() - 1);
 	}
 }

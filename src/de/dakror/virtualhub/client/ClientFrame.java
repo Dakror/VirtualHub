@@ -3,6 +3,9 @@ package de.dakror.virtualhub.client;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,20 +14,30 @@ import java.net.InetAddress;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
 
 import com.jtattoo.plaf.BaseTreeUI;
 import com.jtattoo.plaf.acryl.AcrylBorderFactory;
 
 import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.settings.CFG;
+import de.dakror.virtualhub.util.Assistant;
 
 /**
  * @author Dakror
@@ -53,7 +66,6 @@ public class ClientFrame extends JFrame
 		
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setVisible(true);
 	}
 	
 	public void init()
@@ -99,7 +111,6 @@ public class ClientFrame extends JFrame
 	public void initComponents()
 	{
 		JPanel contentPane = new JPanel(new BorderLayout(0, 0));
-		// contentPane.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
 		
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
@@ -107,9 +118,11 @@ public class ClientFrame extends JFrame
 		initCatalogTree();
 		
 		JScrollPane catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		catalogWrap.setBorder(null);
 		
 		tabs.addTab("Katalog", catalogWrap);
 		tabs.addTab("Kategorien", new JPanel());
+		
 		tabs.setPreferredSize(new Dimension(270, 670));
 		
 		contentPane.add(tabs, BorderLayout.WEST);
@@ -124,7 +137,10 @@ public class ClientFrame extends JFrame
 	
 	public void initCatalogTree()
 	{
-		catalog = new JTree();
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
+		
+		DefaultTreeModel dtm = new DefaultTreeModel(root);
+		catalog = new JTree(dtm);
 		catalog.setShowsRootHandles(true);
 		catalog.setRootVisible(false);
 		catalog.setCellRenderer(new CatalogTreeCellRenderer());
@@ -133,6 +149,63 @@ public class ClientFrame extends JFrame
 			BaseTreeUI ui = (BaseTreeUI) catalog.getUI();
 			ui.paintHorizontalLine = false;
 			ui.paintVerticalLine = false;
+		}
+		
+		final JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzuf\u00fcgen")
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{}
+		}));
+		catalog.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseReleased(MouseEvent e)
+			{
+				if (e.isPopupTrigger())
+				{
+					int row = catalog.getRowForLocation(e.getX(), e.getY());
+					if (row != -1)
+					{
+						catalog.setSelectionRow(row);
+					}
+					else popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
+		catalog.addTreeWillExpandListener(new TreeWillExpandListener()
+		{
+			@Override
+			public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException
+			{
+				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
+				if (((DefaultMutableTreeNode) dmtn.getChildAt(0)).getUserObject().equals("CONTENT"))
+				{
+					dmtn.removeAllChildren();
+					addFolderSourceTree(dmtn);
+				}
+			}
+			
+			@Override
+			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
+			{}
+		});
+	}
+	
+	public void addFolderSourceTree(DefaultMutableTreeNode folder)
+	{
+		File f = new File(Assistant.getNodePath(folder));
+		for (File file : f.listFiles())
+		{
+			if (file.isDirectory() && !file.isHidden())
+			{
+				DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(file.getName());
+				if (Assistant.hasSubDirectories(file)) dmtn.add(new DefaultMutableTreeNode("CONTENT"));
+				folder.add(dmtn);
+			}
 		}
 	}
 	
@@ -156,7 +229,8 @@ public class ClientFrame extends JFrame
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
 		{
-			return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			JLabel tce = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			return tce;
 		}
 	}
 }
