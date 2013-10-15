@@ -250,7 +250,7 @@ public class ClientFrame extends JFrame
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{
-				if (e.isPopupTrigger())
+				if (e.getButton() == MouseEvent.BUTTON3)
 				{
 					int row = catalog.getRowForLocation(e.getX(), e.getY());
 					if (row != -1)
