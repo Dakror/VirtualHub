@@ -54,6 +54,7 @@ public class Client extends Thread implements PacketHandler
 		
 		Assistant.setJFrameComponentsEnabled(frame, false);
 		frame.setVisible(true);
+		frame.directoryLoader = new DirectoryLoader();
 		try
 		{
 			socket = new Socket(InetAddress.getByName(properties.getProperty("server")), CFG.SERVER_PORT);

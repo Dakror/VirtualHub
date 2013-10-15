@@ -1,7 +1,12 @@
 package de.dakror.virtualhub.client;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,6 +19,7 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,20 +34,24 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 
+import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.BaseTreeUI;
-import com.jtattoo.plaf.acryl.AcrylBorderFactory;
+import com.jtattoo.plaf.ColorHelper;
 
 import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.WrapLayout;
 
 /**
  * @author Dakror
@@ -51,6 +61,12 @@ public class ClientFrame extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	JTree catalog;
+	JPanel fileView, fileInfo;
+	JScrollPane fileViewWrap;
+	
+	DirectoryLoader directoryLoader;
+	
+	Color borderColor = ColorHelper.brighter(AbstractLookAndFeel.getTheme().getFrameColor(), 50);
 	
 	public ClientFrame()
 	{
@@ -115,25 +131,26 @@ public class ClientFrame extends JFrame
 	public void initComponents()
 	{
 		JTabbedPane tabs = new JTabbedPane();
-		tabs.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
-		
+		tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
 		initTree();
 		
 		JScrollPane catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		catalogWrap.setBorder(null);
 		
 		tabs.addTab("Katalog", catalogWrap);
-		tabs.addTab("Kategorien", new JPanel());
+		tabs.addTab("Kategorien", new JLabel("Not implemented yet", JLabel.CENTER));
 		
 		tabs.setMinimumSize(new Dimension(1, 670));
 		tabs.setPreferredSize(new Dimension(270, 670));
 		
-		JPanel viewSuper = new JPanel();
-		viewSuper.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
+		JPanel viewSuper = initView();
+		
+		viewSuper.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, borderColor));
 		viewSuper.setPreferredSize(new Dimension(801, 670));
 		viewSuper.setMinimumSize(new Dimension(1, 670));
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabs, viewSuper);
+		splitPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, borderColor));
 		splitPane.setDividerLocation(270);
 		splitPane.setOneTouchExpandable(true);
 		setContentPane(splitPane);
@@ -141,7 +158,7 @@ public class ClientFrame extends JFrame
 	
 	public void initTree()
 	{
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
 		
 		DefaultTreeModel dtm = new DefaultTreeModel(root);
 		catalog = new JTree(dtm);
@@ -155,8 +172,8 @@ public class ClientFrame extends JFrame
 			ui.paintVerticalLine = false;
 		}
 		
-		final JPopupMenu popupMenu = new JPopupMenu();
-		popupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzuf\u00fcgen")
+		final JPopupMenu generalPopupMenu = new JPopupMenu();
+		generalPopupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzuf\u00fcgen")
 		{
 			private static final long serialVersionUID = 1L;
 			
@@ -202,6 +219,32 @@ public class ClientFrame extends JFrame
 				}
 			}
 		}));
+		final JPopupMenu sourcePopupMenu = new JPopupMenu();
+		sourcePopupMenu.add(new JMenuItem(new AbstractAction("Quelle entfernen")
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
+				
+				Client.currentClient.catalog.sources.remove(new File(dmtn.getUserObject().toString()));
+				
+				try
+				{
+					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				
+				dtm.removeNodeFromParent(dmtn);
+			}
+		}));
+		
 		catalog.addMouseListener(new MouseAdapter()
 		{
 			@Override
@@ -213,8 +256,13 @@ public class ClientFrame extends JFrame
 					if (row != -1)
 					{
 						catalog.setSelectionRow(row);
+						DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+						if (((DefaultMutableTreeNode) dmtn.getParent()).getUserObject().equals("ROOT"))
+						{
+							sourcePopupMenu.show(e.getComponent(), e.getX(), e.getY());
+						}
 					}
-					else popupMenu.show(e.getComponent(), e.getX(), e.getY());
+					else generalPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
@@ -235,11 +283,57 @@ public class ClientFrame extends JFrame
 			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
 			{}
 		});
+		catalog.addTreeSelectionListener(new TreeSelectionListener()
+		{
+			@Override
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				directoryLoader.updateFired = true;
+			}
+		});
+	}
+	
+	public JPanel initView()
+	{
+		GridBagLayout gbl = new GridBagLayout();
+		JPanel viewSuper = new JPanel(gbl);
+		
+		JPanel settings = new JPanel();
+		settings.add(new JLabel("Not implemented yet"));
+		settings.setPreferredSize(new Dimension(0, 26));
+		addGridBagLayoutComponent(viewSuper, gbl, settings, 0, 0, 1, 1, 1, 0);
+		
+		fileView = new JPanel(new WrapLayout(FlowLayout.LEFT, 5, 5));
+		fileViewWrap = new JScrollPane(fileView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		fileViewWrap.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, borderColor));
+		fileViewWrap.setPreferredSize(new Dimension(1, 1));
+		fileViewWrap.getVerticalScrollBar().setUnitIncrement(100);
+		fileView.setSize(new Dimension(fileViewWrap.getSize().width, 0));
+		addGridBagLayoutComponent(viewSuper, gbl, fileViewWrap, 0, 1, 1, 1, 1, 1);
+		
+		fileInfo = new JPanel();
+		fileInfo.setPreferredSize(new Dimension(0, 80));
+		addGridBagLayoutComponent(viewSuper, gbl, fileInfo, 0, 2, 1, 1, 1, 0);
+		
+		return viewSuper;
+	}
+	
+	public void addGridBagLayoutComponent(Container parent, GridBagLayout gbl, Component c, int x, int y, int width, int height, double wx, double wy)
+	{
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = x;
+		gbc.gridy = y;
+		gbc.gridwidth = width;
+		gbc.gridheight = height;
+		gbc.weightx = wx;
+		gbc.weighty = wy;
+		gbl.setConstraints(c, gbc);
+		parent.add(c);
 	}
 	
 	public void loadCatalog(Catalog catalog)
 	{
-		// load tree sources
 		DefaultTreeModel dtm = (DefaultTreeModel) this.catalog.getModel();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) dtm.getRoot();
 		
