@@ -242,11 +242,25 @@ public class ClientFrame extends JFrame
 		// load tree sources
 		DefaultTreeModel dtm = (DefaultTreeModel) this.catalog.getModel();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) dtm.getRoot();
+		
+		String notFound = "";
+		String sep = ",\r\n ";
 		for (File file : Client.currentClient.catalog.sources)
 		{
+			if (!file.exists())
+			{
+				notFound += file.getPath().replace("\\", "/") + sep;
+				continue;
+			}
 			DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(file.getPath().replace("\\", "/"));
 			dtm.insertNodeInto(dmtn, root, root.getChildCount());
 			addFolderSourceTree(dmtn);
+		}
+		
+		if (notFound.length() > 0)
+		{
+			notFound = notFound.substring(0, notFound.length() - sep.length());
+			JOptionPane.showMessageDialog(this, "Die folgenden Quellordner konnten nicht gefunden werden:\r\n" + notFound, "Quellordner nicht gefunden!", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		dtm.reload();
