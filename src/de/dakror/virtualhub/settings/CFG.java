@@ -17,7 +17,7 @@ public class CFG
 	
 	public static boolean INTERNET;
 	
-	public static final File DIR = new File(System.clearProperty("user.home") + "/.dakror/VirtualHub");
+	public static final File DIR = new File(System.getProperty("user.home") + "/.dakror/VirtualHub");
 	public static final Icon FOLDER = FileSystemView.getFileSystemView().getSystemIcon(DIR);
 	
 	public static final int SERVER_PORT = 4444;

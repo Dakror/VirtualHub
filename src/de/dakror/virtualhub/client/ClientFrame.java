@@ -1,6 +1,5 @@
 package de.dakror.virtualhub.client;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -25,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
@@ -106,7 +106,7 @@ public class ClientFrame extends JFrame
 	public void initMenu()
 	{
 		JMenuBar menu = new JMenuBar();
-		JMenu main = new JMenu("VirtualHub");
+		JMenu main = new JMenu("Aktionen");
 		menu.add(main);
 		
 		setJMenuBar(menu);
@@ -114,8 +114,6 @@ public class ClientFrame extends JFrame
 	
 	public void initComponents()
 	{
-		JPanel contentPane = new JPanel(new BorderLayout(0, 0));
-		
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
 		
@@ -127,16 +125,18 @@ public class ClientFrame extends JFrame
 		tabs.addTab("Katalog", catalogWrap);
 		tabs.addTab("Kategorien", new JPanel());
 		
+		tabs.setMinimumSize(new Dimension(1, 670));
 		tabs.setPreferredSize(new Dimension(270, 670));
-		
-		contentPane.add(tabs, BorderLayout.WEST);
 		
 		JPanel viewSuper = new JPanel();
 		viewSuper.setBorder(AcrylBorderFactory.getInstance().getScrollPaneBorder());
 		viewSuper.setPreferredSize(new Dimension(801, 670));
-		contentPane.add(viewSuper, BorderLayout.EAST);
+		viewSuper.setMinimumSize(new Dimension(1, 670));
 		
-		setContentPane(contentPane);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabs, viewSuper);
+		splitPane.setDividerLocation(270);
+		splitPane.setOneTouchExpandable(true);
+		setContentPane(splitPane);
 	}
 	
 	public void initTree()
