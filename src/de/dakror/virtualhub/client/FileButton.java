@@ -88,14 +88,10 @@ public class FileButton extends JButton
 				e1.printStackTrace();
 			}
 		}
-		else if (e.equals("tif") || e.equals("tiff"))
-		{
-			preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readTIF(file))));
-		}
-		else if (e.equals("psd"))
-		{
-			preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPSD(file))));
-		}
+		else if (e.equals("tif") || e.equals("tiff")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readTIF(file))));
+		else if (e.equals("psd")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPSD(file))));
+		else if (e.equals("pdf")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPDF(file))));
+		
 	}
 	
 	@Override

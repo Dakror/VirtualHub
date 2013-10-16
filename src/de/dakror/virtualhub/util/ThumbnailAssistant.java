@@ -1,9 +1,11 @@
 package de.dakror.virtualhub.util;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -22,6 +24,8 @@ import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 import com.sun.media.jai.codec.ByteArraySeekableStream;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.SeekableStream;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
 
 import de.dakror.virtualhub.settings.CFG;
 
@@ -124,6 +128,29 @@ public class ThumbnailAssistant
 			return psd.getImage();
 		}
 		catch (IOException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static Image readPDF(File f)
+	{
+		try
+		{
+			RandomAccessFile raf = new RandomAccessFile(f, "r");
+			FileChannel channel = raf.getChannel();
+			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+			PDFFile pdf = new PDFFile(buf);
+			PDFPage page = pdf.getPage(0);
+			
+			Rectangle rect = new Rectangle(0, 0, (int) page.getBBox().getWidth(), (int) page.getBBox().getHeight());
+			
+			Image image = page.getImage(rect.width, rect.height, rect, null, true, true);
+			raf.close();
+			return image;
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			return null;
