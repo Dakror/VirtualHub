@@ -51,7 +51,7 @@ public class DirectoryLoader extends Thread
 				}
 				
 				updateFired = false;
-				// frame.validate();
+				frame.validate();
 				frame.repaint();
 			}
 			try

@@ -311,7 +311,7 @@ public class ClientFrame extends JFrame
 		fileViewWrap = new JScrollPane(fileView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		fileViewWrap.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, borderColor));
 		fileViewWrap.setPreferredSize(new Dimension(1, 1));
-		fileViewWrap.getVerticalScrollBar().setUnitIncrement(100);
+		fileViewWrap.getVerticalScrollBar().setUnitIncrement(50);
 		fileView.setSize(new Dimension(fileViewWrap.getSize().width, 0));
 		addGridBagLayoutComponent(viewSuper, gbl, fileViewWrap, 0, 1, 1, 1, 1, 1);
 		

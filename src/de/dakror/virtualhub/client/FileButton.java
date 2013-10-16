@@ -10,12 +10,14 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
+import com.jtattoo.plaf.LazyImageIcon;
 
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
@@ -46,7 +48,12 @@ public class FileButton extends JButton
 		preview.setPreferredSize(CFG.PREVIEWSIZE);
 		preview.setHorizontalAlignment(JLabel.CENTER);
 		preview.setVerticalAlignment(JLabel.CENTER);
-		preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(((ImageIcon) ThumbnailAssistant.getFileSystemIcon(file)).getImage(), CFG.PREVIEWSIZE.width / 2f, CFG.PREVIEWSIZE.height / 2f)));
+		
+		Icon sysIcon = ThumbnailAssistant.getFileSystemIcon(file);
+		
+		if (sysIcon instanceof LazyImageIcon) sysIcon = ((LazyImageIcon) sysIcon).getIcon();
+		
+		preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(((ImageIcon) sysIcon).getImage(), CFG.PREVIEWSIZE.width / 2f, CFG.PREVIEWSIZE.height / 2f)));
 		add(preview);
 		
 		JLabel textLabel = new JLabel("<html><body style='text-align:center;'><br>" + Assistant.shortenFileName(file, 35, 2) + "</body></html>");
