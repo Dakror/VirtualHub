@@ -15,13 +15,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-import com.apple.laf.AquaIcon;
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
+import com.jtattoo.plaf.JTattooUtilities;
 import com.jtattoo.plaf.LazyImageIcon;
 
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.MacOSXHandler;
 import de.dakror.virtualhub.util.ThumbnailAssistant;
 
 /**
@@ -54,7 +55,7 @@ public class FileButton extends JButton
 		
 		if (sysIcon instanceof LazyImageIcon) sysIcon = ((LazyImageIcon) sysIcon).getIcon();
 		
-		if (sysIcon.getClass().getName().equals("com.apple.laf.AquaIcon$FileIcon")) sysIcon = new ImageIcon(AquaIcon.getImageForIcon(sysIcon));
+		if (JTattooUtilities.isMac()) sysIcon = MacOSXHandler.getIcon(sysIcon);
 		
 		preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(((ImageIcon) sysIcon).getImage(), CFG.PREVIEWSIZE.width / 2f, CFG.PREVIEWSIZE.height / 2f)));
 		add(preview);
