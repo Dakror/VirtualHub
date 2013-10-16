@@ -35,13 +35,13 @@ public class FileButton extends JButton
 	File file;
 	JLabel preview;
 	
-	Color eticet = Color.green;
+	Color eticet;
 	
 	public FileButton(File file)
 	{
 		this.file = file;
 		
-		setContentAreaFilled(false);
+		// setContentAreaFilled(false);
 		setFocusPainted(false);
 		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		setPreferredSize(new Dimension(250, 250));

@@ -1,8 +1,8 @@
 package de.dakror.virtualhub.client;
 
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -52,33 +52,36 @@ public class DirectoryLoader extends Thread
 					for (File f : files)
 					{
 						final FileButton fb = new FileButton(f);
-						fb.addActionListener(new ActionListener()
+						fb.addMouseListener(new MouseAdapter()
 						{
 							@Override
-							public void actionPerformed(ActionEvent e)
+							public void mousePressed(MouseEvent e)
 							{
-								if (fb.file.isDirectory())
+								if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
 								{
-									frame.catalog.expandPath(new TreePath(dmtn.getPath()));
-									for (int i = 0; i < dmtn.getChildCount(); i++)
+									if (fb.file.isDirectory())
 									{
-										if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
+										frame.catalog.expandPath(new TreePath(dmtn.getPath()));
+										for (int i = 0; i < dmtn.getChildCount(); i++)
 										{
-											frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
+											if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
+											{
+												frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
+											}
 										}
 									}
-								}
-								else
-								{
-									if (Desktop.isDesktopSupported())
+									else
 									{
-										try
+										if (Desktop.isDesktopSupported())
 										{
-											Desktop.getDesktop().open(fb.file);
-										}
-										catch (IOException e1)
-										{
-											e1.printStackTrace();
+											try
+											{
+												Desktop.getDesktop().browse(fb.file.toURI());
+											}
+											catch (IOException e1)
+											{
+												e1.printStackTrace();
+											}
 										}
 									}
 								}
