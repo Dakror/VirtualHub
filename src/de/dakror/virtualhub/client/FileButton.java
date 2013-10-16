@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import com.apple.laf.AquaIcon;
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
 import com.jtattoo.plaf.LazyImageIcon;
@@ -52,6 +53,8 @@ public class FileButton extends JButton
 		Icon sysIcon = ThumbnailAssistant.getFileSystemIcon(file);
 		
 		if (sysIcon instanceof LazyImageIcon) sysIcon = ((LazyImageIcon) sysIcon).getIcon();
+		
+		if (sysIcon.getClass().getName().equals("com.apple.laf.AquaIcon$FileIcon")) sysIcon = new ImageIcon(AquaIcon.getImageForIcon(sysIcon));
 		
 		preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(((ImageIcon) sysIcon).getImage(), CFG.PREVIEWSIZE.width / 2f, CFG.PREVIEWSIZE.height / 2f)));
 		add(preview);

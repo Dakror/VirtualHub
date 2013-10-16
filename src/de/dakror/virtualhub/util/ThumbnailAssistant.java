@@ -9,10 +9,14 @@ import java.nio.channels.FileChannel;
 import javax.media.jai.PlanarImage;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
 import sun.awt.shell.ShellFolder;
 
+import com.jtattoo.plaf.JTattooUtilities;
+import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 import com.sun.media.jai.codec.ByteArraySeekableStream;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.SeekableStream;
@@ -59,6 +63,23 @@ public class ThumbnailAssistant
 	
 	public static Icon getFileSystemIcon(File f)
 	{
+		if (JTattooUtilities.isMac())
+		{
+			try
+			{
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				Icon icon = new JFileChooser().getIcon(f);
+				UIManager.setLookAndFeel(new AcrylLookAndFeel());
+				
+				return icon;
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				
+				return null;
+			}
+		}
 		try
 		{
 			ShellFolder shellFolder = ShellFolder.getShellFolder(f);
@@ -67,6 +88,7 @@ public class ThumbnailAssistant
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			return FileSystemView.getFileSystemView().getSystemIcon(f);
 		}
 	}
