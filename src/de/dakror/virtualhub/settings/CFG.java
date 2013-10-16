@@ -1,5 +1,6 @@
 package de.dakror.virtualhub.settings;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.Arrays;
 
@@ -21,6 +22,8 @@ public class CFG
 	public static final Icon FOLDER = FileSystemView.getFileSystemView().getSystemIcon(DIR);
 	
 	public static final int SERVER_PORT = 4444;
+	
+	public static final Dimension PREVIEWSIZE = new Dimension(244, 183);
 	
 	public static void p(Object... p)
 	{

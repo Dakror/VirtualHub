@@ -1,13 +1,14 @@
 package de.dakror.virtualhub.client;
 
-import java.awt.Dimension;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.FileComparator;
 
 /**
  * @author Dakror
@@ -40,12 +41,12 @@ public class DirectoryLoader extends Thread
 					
 					File folder = new File(Assistant.getNodePath(dmtn));
 					
-					for (File f : folder.listFiles())
+					List<File> files = Arrays.asList(folder.listFiles());
+					Collections.sort(files, new FileComparator());
+					
+					for (File f : files)
 					{
-						JLabel file = new JLabel(f.getName(), JLabel.CENTER);
-						file.setBorder(BorderFactory.createLineBorder(frame.borderColor));
-						file.setPreferredSize(new Dimension(250, 250));
-						frame.fileView.add(file);
+						frame.fileView.add(new FileButton(f));
 					}
 					
 					frame.validate();

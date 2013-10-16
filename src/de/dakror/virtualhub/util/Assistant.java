@@ -202,4 +202,42 @@ public class Assistant
 		if (res.length() == 0) return "";
 		return res.substring(0, res.length() - 1);
 	}
+	
+	public static String getFileExtension(File f)
+	{
+		if (!f.isFile()) return "";
+		if (f.getName().split(".").length == 1) return "";
+		return f.getPath().substring(f.getPath().lastIndexOf(".") + 1).toLowerCase();
+	}
+	
+	public static String wrap(String in, int len)
+	{
+		String result = "";
+		for (int i = 0; i < in.length(); i++)
+		{
+			if (i % len == 0 && i > 0) result += "<br>";
+			result += in.charAt(i);
+		}
+		return result;
+	}
+	
+	public static String shortenFileName(File f, int len, int l)
+	{
+		String s = f.getName();
+		String[] lines = wrap(s, len).split("<br>");
+		if (lines.length <= l)
+		{
+			String wrapped = wrap(s, len);
+			if (f.isDirectory()) return wrapped;
+			if (wrapped.lastIndexOf(".") == -1) return wrapped;
+			return wrapped.substring(0, wrapped.lastIndexOf(".") + 1) + getFileExtension(f);
+		}
+		String ext = getFileExtension(f);
+		String result = "";
+		for (int i = 0; i < l - 1; i++)
+			result += lines[i] + "<br>";
+		String lastline = lines[l - 1];
+		result += "..." + lastline.substring(3, lastline.length() - 3) + ((ext.length() > 0) ? ("." + ext) : "");
+		return result;
+	}
 }
