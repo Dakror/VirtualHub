@@ -5,15 +5,26 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Polygon;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Area;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
@@ -31,11 +42,27 @@ import de.dakror.virtualhub.util.ThumbnailAssistant;
 public class FileButton extends JButton
 {
 	private static final long serialVersionUID = 1L;
+	public static final String[] names = { "Kein Etikett", "Rot", "Orange", "Gelb", "Gr\u00fcn", "Blau", "Violett", "Grau", };
+	public static final Color[] colors = { new Color(0, 0, 0, 0), Color.red, Color.orange, Color.yellow, Color.green, Color.blue, Color.magenta, Color.gray };
+	
+	public static Polygon eticetPolygon;
+	static
+	{
+		eticetPolygon = new Polygon();
+		int size = 25;
+		
+		eticetPolygon.addPoint(0, 0);
+		eticetPolygon.addPoint(size, 0);
+		eticetPolygon.addPoint(0, size);
+	}
+	
 	
 	File file;
 	JLabel preview;
 	
-	Color eticet;
+	
+	Color eticet = new Color(0, 0, 0, 0);
+	
 	
 	public FileButton(File file)
 	{
@@ -63,6 +90,35 @@ public class FileButton extends JButton
 		JLabel textLabel = new JLabel("<html><body style='text-align:center;'><br>" + Assistant.shortenFileName(file, 35, 2) + "</body></html>");
 		add(textLabel);
 		
+		final JPopupMenu eticet = new JPopupMenu();
+		for (int i = 0; i < names.length; i++)
+		{
+			JMenuItem jmi = new JMenuItem(new AbstractAction(names[i], generateEticetIcon(colors[i]))
+			{
+				
+				private static final long serialVersionUID = 1L;
+				
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					JMenuItem jmi = (JMenuItem) e.getSource();
+					FileButton.this.eticet = colors[Arrays.asList(names).indexOf(jmi.getText())];
+				}
+			});
+			eticet.add(jmi);
+		}
+		
+		
+		addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseReleased(MouseEvent e)
+			{
+				if (new Area(eticetPolygon).contains(e.getPoint())) eticet.show(e.getComponent(), e.getX(), e.getY());
+				
+			}
+		});
+		
 		new Thread()
 		{
 			@Override
@@ -71,6 +127,29 @@ public class FileButton extends JButton
 				setPreview();
 			};
 		}.start();
+	}
+	
+	public Icon generateEticetIcon(Color c)
+	{
+		try
+		{
+			BufferedImage bi = new BufferedImage(48, 48, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = (Graphics2D) bi.getGraphics();
+			g.setColor(c);
+			
+			int arc = 16;
+			
+			g.setClip(new RoundRectangle2D.Double(0, 0, 48, 48, arc, arc));
+			g.fillRect(0, 0, 48, 48);
+			g.drawImage(ImageIO.read(getClass().getResource("/img/Gradient.png")), 0, 0, null);
+			
+			return new ImageIcon(bi.getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public void setPreview()
@@ -106,22 +185,12 @@ public class FileButton extends JButton
 		
 		g2d.setColor(eticet);
 		
-		Polygon p = new Polygon();
-		
-		
-		
-		int size = 25;
-		
-		p.addPoint(0, 0);
-		p.addPoint(size, 0);
-		p.addPoint(0, size);
-		
-		g2d.fillPolygon(p);
+		g2d.fillPolygon(eticetPolygon);
 		
 		// very laf specific
 		g2d.setColor(getModel().isRollover() ? AbstractLookAndFeel.getTheme().getRolloverColorDark() : ColorHelper.brighter(AbstractLookAndFeel.getTheme().getFrameColor(), 50));
 		
-		g2d.drawPolygon(p);
+		g2d.drawPolygon(eticetPolygon);
 		
 		g2d.setColor(oldColor);
 	}
