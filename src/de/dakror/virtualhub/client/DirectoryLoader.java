@@ -59,6 +59,7 @@ public class DirectoryLoader extends Thread
 							{
 								if (fb.file.isDirectory())
 								{
+									frame.catalog.expandPath(new TreePath(dmtn.getPath()));
 									for (int i = 0; i < dmtn.getChildCount(); i++)
 									{
 										if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
