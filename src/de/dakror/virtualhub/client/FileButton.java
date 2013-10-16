@@ -77,7 +77,7 @@ public class FileButton extends JButton
 	{
 		String e = Assistant.getFileExtension(file);
 		
-		if (e.equals("jpg") || e.equals("png") || e.equals("gif") || e.equals("bmp"))
+		if (e.equals("jpg") || e.equals("jpeg") || e.equals("png") || e.equals("gif") || e.equals("bmp"))
 		{
 			try
 			{
@@ -87,6 +87,14 @@ public class FileButton extends JButton
 			{
 				e1.printStackTrace();
 			}
+		}
+		else if (e.equals("tif") || e.equals("tiff"))
+		{
+			preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readTIF(file))));
+		}
+		else if (e.equals("psd"))
+		{
+			preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPSD(file))));
 		}
 	}
 	

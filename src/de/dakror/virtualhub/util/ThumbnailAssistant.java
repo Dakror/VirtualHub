@@ -3,6 +3,7 @@ package de.dakror.virtualhub.util;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -13,6 +14,7 @@ import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
+import psd.model.Psd;
 import sun.awt.shell.ShellFolder;
 
 import com.jtattoo.plaf.JTattooUtilities;
@@ -108,6 +110,20 @@ public class ThumbnailAssistant
 			return image;
 		}
 		catch (Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static Image readPSD(File f)
+	{
+		try
+		{
+			Psd psd = new Psd(f);
+			return psd.getImage();
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 			return null;
