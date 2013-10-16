@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
@@ -61,7 +62,7 @@ public class Client extends Thread implements PacketHandler
 		}
 		catch (ConnectException e)
 		{
-			JOptionPane.showMessageDialog(frame, "Kann Server unter " + properties.getProperty("server") + " nicht erreichen!", "Fehler!", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(frame, "Kann Server unter " + properties.getProperty("server") + " nicht erreichen!", "Server nicht erreichbar!", JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 			return;
 		}
@@ -114,7 +115,15 @@ public class Client extends Thread implements PacketHandler
 	@Override
 	public void sendPacket(Packet p) throws IOException
 	{
-		netHandler.sendPacket(p);
+		try
+		{
+			netHandler.sendPacket(p);
+		}
+		catch (SocketException e)
+		{
+			JOptionPane.showMessageDialog(frame, "Server unter " + properties.getProperty("server") + " wurde geschlossen!", "Server geschlossen!", JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
+		}
 	}
 	
 	public Catalog getCatalog()

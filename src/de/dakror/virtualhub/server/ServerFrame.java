@@ -9,6 +9,7 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -30,6 +31,8 @@ public class ServerFrame extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	private JTextArea logArea;
+	
+	JCheckBoxMenuItem logEnabled;
 	
 	public ServerFrame()
 	{
@@ -77,6 +80,7 @@ public class ServerFrame extends JFrame
 				log("Log geleert.");
 			}
 		}));
+		menu.add(logEnabled = new JCheckBoxMenuItem("Log aktiviert", true));
 		menuBar.add(menu);
 		setJMenuBar(menuBar);
 	}
@@ -109,6 +113,8 @@ public class ServerFrame extends JFrame
 	
 	public void log(String line)
 	{
+		if (!logEnabled.isSelected()) return;
+		
 		logArea.append("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "]: " + line + "\r\n");
 	}
 	
