@@ -242,6 +242,10 @@ public class ClientFrame extends JFrame
 				}
 				
 				dtm.removeNodeFromParent(dmtn);
+				
+				dtm.reload();
+				
+				directoryLoader.updateFired = true;
 			}
 		}));
 		

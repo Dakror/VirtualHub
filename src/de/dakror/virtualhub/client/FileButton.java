@@ -7,7 +7,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -49,11 +51,32 @@ public class FileButton extends JButton
 		
 		JLabel textLabel = new JLabel("<html><body style='text-align:center;'><br>" + Assistant.shortenFileName(file, 35, 2) + "</body></html>");
 		add(textLabel);
+		
+		new Thread()
+		{
+			@Override
+			public void run()
+			{
+				setPreview();
+			};
+		}.start();
 	}
 	
 	public void setPreview()
-	{	
+	{
+		String e = Assistant.getFileExtension(file);
 		
+		if (e.equals("jpg") || e.equals("png") || e.equals("gif") || e.equals("bmp"))
+		{
+			try
+			{
+				preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ImageIO.read(file))));
+			}
+			catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
 	}
 	
 	@Override

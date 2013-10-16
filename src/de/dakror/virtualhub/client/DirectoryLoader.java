@@ -33,10 +33,10 @@ public class DirectoryLoader extends Thread
 		{
 			if (updateFired)
 			{
+				frame.fileViewWrap.getVerticalScrollBar().setValue(0);
+				frame.fileView.removeAll();
 				if (frame.catalog.getSelectionPath() != null)
 				{
-					frame.fileViewWrap.getVerticalScrollBar().setValue(0);
-					frame.fileView.removeAll();
 					DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
 					
 					File folder = new File(Assistant.getNodePath(dmtn));
@@ -48,11 +48,11 @@ public class DirectoryLoader extends Thread
 					{
 						frame.fileView.add(new FileButton(f));
 					}
-					
-					frame.validate();
-					
-					updateFired = false;
 				}
+				
+				updateFired = false;
+				// frame.validate();
+				frame.repaint();
 			}
 			try
 			{
