@@ -94,7 +94,6 @@ public class ThumbnailAssistant
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			return FileSystemView.getFileSystemView().getSystemIcon(f);
 		}
 	}

@@ -1,15 +1,18 @@
 package de.dakror.virtualhub.client;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -25,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
@@ -89,6 +93,43 @@ public class FileButton extends JButton
 		
 		JLabel textLabel = new JLabel("<html><body style='text-align:center;'><br>" + Assistant.shortenFileName(file, 35, 2) + "</body></html>");
 		add(textLabel);
+		
+		addMouseMotionListener(new MouseMotionAdapter()
+		{
+			@Override
+			public void mouseDragged(MouseEvent e)
+			{
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					int x = FileButton.this.getLocationOnScreen().x - Client.currentClient.frame.getContentPane().getLocationOnScreen().x + e.getX();
+					int y = FileButton.this.getLocationOnScreen().y - Client.currentClient.frame.getContentPane().getLocationOnScreen().y + e.getY();
+					
+					if (Client.currentClient.frame.catalogWrap.contains(x, y))
+					{
+						Client.currentClient.frame.copy = e.isControlDown();
+						Client.currentClient.frame.dragged = FileButton.this;
+						Client.currentClient.frame.mouse = new Point(x, y);
+						Client.currentClient.frame.catalog.repaint();
+					}
+					else
+					{
+						Client.currentClient.frame.setCursor(Cursor.getDefaultCursor());
+					}
+				}
+			}
+		});
+		addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseReleased(MouseEvent e)
+			{
+				if (Client.currentClient.frame.dragged != null && Client.currentClient.frame.dragged.file.equals(FileButton.this.file) && e.getButton() == 1)
+				{
+					Client.currentClient.frame.dragged = null;
+					Client.currentClient.frame.setCursor(Cursor.getDefaultCursor());
+				}
+			}
+		});
 		
 		final JPopupMenu eticet = new JPopupMenu();
 		for (int i = 0; i < names.length; i++)

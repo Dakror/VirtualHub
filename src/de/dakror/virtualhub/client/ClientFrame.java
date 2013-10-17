@@ -3,10 +3,13 @@ package de.dakror.virtualhub.client;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.dnd.DragSource;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -59,6 +62,13 @@ import de.dakror.virtualhub.util.WrapLayout;
 public class ClientFrame extends JFrame
 {
 	private static final long serialVersionUID = 1L;
+	
+	// -- DnD -- //
+	public FileButton dragged;
+	public Point mouse;
+	public boolean copy;
+	
+	public JScrollPane catalogWrap;
 	
 	JTree catalog;
 	JPanel fileView, fileInfo;
@@ -134,7 +144,7 @@ public class ClientFrame extends JFrame
 		tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
 		initTree();
 		
-		JScrollPane catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		catalogWrap.setBorder(null);
 		
 		tabs.addTab("Katalog", catalogWrap);
@@ -153,13 +163,13 @@ public class ClientFrame extends JFrame
 		splitPane.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, borderColor));
 		splitPane.setDividerLocation(270);
 		splitPane.setOneTouchExpandable(true);
+		
 		setContentPane(splitPane);
 	}
 	
 	public void initTree()
 	{
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
-		
 		DefaultTreeModel dtm = new DefaultTreeModel(root);
 		catalog = new JTree(dtm);
 		catalog.setShowsRootHandles(true);
@@ -399,7 +409,36 @@ public class ClientFrame extends JFrame
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
 		{
 			JLabel tce = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			
+			if (row < 0 || row >= tree.getRowCount()) return tce;
+			
+			DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getPathForRow(row).getLastPathComponent();
+			
+			if (dragged != null)
+			{
+				int mouseRow = (mouse.y + catalogWrap.getVerticalScrollBar().getValue() - tce.getPreferredSize().height * 2) / tce.getPreferredSize().height;
+				if (mouseRow == row)
+				{
+					setFrameCursor(dmtn);
+					
+					selected = true;
+					tce.setForeground(Color.white);
+					
+					if (!leaf && mouse.x < 20 * dmtn.getLevel() && mouse.x > 20 * dmtn.getLevel() - 20) tree.expandRow(row);
+					
+					this.hasFocus = true;
+				}
+			}
 			return tce;
 		}
+	}
+	
+	private void setFrameCursor(DefaultMutableTreeNode node)
+	{
+		boolean sameFile = new File(Assistant.getNodePath(node)).equals(dragged.file);
+		
+		Cursor c = copy ? sameFile ? DragSource.DefaultCopyNoDrop : DragSource.DefaultCopyDrop : sameFile ? DragSource.DefaultMoveNoDrop : DragSource.DefaultMoveDrop;
+		
+		ClientFrame.this.setCursor(c);
 	}
 }
