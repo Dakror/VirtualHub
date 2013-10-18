@@ -24,10 +24,10 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import com.jtattoo.plaf.AbstractLookAndFeel;
@@ -43,7 +43,7 @@ import de.dakror.virtualhub.util.ThumbnailAssistant;
 /**
  * @author Dakror
  */
-public class FileButton extends JButton
+public class FileButton extends JToggleButton
 {
 	private static final long serialVersionUID = 1L;
 	public static final String[] names = { "Kein Etikett", "Rot", "Orange", "Gelb", "Gr\u00fcn", "Blau", "Violett", "Grau", };
@@ -100,6 +100,8 @@ public class FileButton extends JButton
 			{
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
+					setSelected(true);
+					
 					int x = FileButton.this.getLocationOnScreen().x - Client.currentClient.frame.getContentPane().getLocationOnScreen().x + e.getX();
 					int y = FileButton.this.getLocationOnScreen().y - Client.currentClient.frame.getContentPane().getLocationOnScreen().y + e.getY();
 					
@@ -124,11 +126,8 @@ public class FileButton extends JButton
 			{
 				if (Client.currentClient.frame.dragged != null && Client.currentClient.frame.dragged.file.equals(FileButton.this.file) && e.getButton() == 1)
 				{
-					if (Client.currentClient.frame.targetNode != null)
-					{
-						File targetParent = new File(Assistant.getNodePath(Client.currentClient.frame.targetNode));
-						new FileMover(Client.currentClient.frame, Client.currentClient.frame.copy, targetParent, FileButton.this.file);
-					}
+					if (Client.currentClient.frame.targetNode != null) Client.currentClient.frame.moveOrCopySelectedFiles();
+					
 					Client.currentClient.frame.dragged = null;
 					Client.currentClient.frame.setCursor(Cursor.getDefaultCursor());
 				}

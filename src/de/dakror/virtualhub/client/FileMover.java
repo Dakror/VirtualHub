@@ -1,10 +1,12 @@
 package de.dakror.virtualhub.client;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
-import javax.swing.JFrame;
+import javax.swing.ProgressMonitor;
 
-import de.dakror.virtualhub.client.dialog.ProgressDialog;
+import de.dakror.virtualhub.util.Assistant;
 
 /**
  * @author Dakror
@@ -16,16 +18,20 @@ public class FileMover extends Thread
 	
 	boolean copy;
 	
-	ProgressDialog dialog;
+	ProgressMonitor monitor;
 	
-	public FileMover(final JFrame frame, final boolean copy, File targetParent, File... files)
+	ClientFrame frame;
+	
+	public FileMover(final ClientFrame frame, final boolean copy, File targetParent, File... files)
 	{
 		this.targetParent = targetParent;
 		this.files = files;
 		this.copy = copy;
+		this.frame = frame;
 		
-		dialog = new ProgressDialog(frame, (copy ? "Kopiere" : "Verschiebe") + " Dateien...", "", files.length);
-		dialog.setTitle((copy ? "Kopiere" : "Verschiebe") + "...");
+		monitor = new ProgressMonitor(frame, (copy ? "Kopiere" : "Verschiebe") + " Dateien...", "", 0, 50);
+		monitor.setMillisToDecideToPopup(0);
+		monitor.setMillisToPopup(0);
 		
 		start();
 	}
@@ -36,11 +42,26 @@ public class FileMover extends Thread
 		for (int i = 0; i < files.length; i++)
 		{
 			File target = new File(targetParent, files[i].getName());
-			dialog.setNote("Datei: " + files[i].getName());
-			files[i].renameTo(target);
-			dialog.setProgress(i + 1);
+			monitor.setNote("Datei: " + files[i].getName());
+			
+			if (!copy) files[i].renameTo(target);
+			else
+			{
+				try
+				{
+					target.createNewFile();
+					Assistant.copyInputStream(new FileInputStream(files[i]), new FileOutputStream(target));
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			monitor.setProgress(i + 1);
 		}
 		
-		dialog.dispose();
+		monitor.close();
+		frame.directoryLoader.fireUpdate();
+		
 	}
 }

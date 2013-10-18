@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -37,8 +38,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -256,7 +255,7 @@ public class ClientFrame extends JFrame
 				
 				dtm.reload();
 				
-				directoryLoader.updateFired = true;
+				directoryLoader.fireUpdate();
 			}
 		}));
 		
@@ -297,14 +296,6 @@ public class ClientFrame extends JFrame
 			@Override
 			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
 			{}
-		});
-		catalog.addTreeSelectionListener(new TreeSelectionListener()
-		{
-			@Override
-			public void valueChanged(TreeSelectionEvent e)
-			{
-				directoryLoader.updateFired = true;
-			}
 		});
 	}
 	
@@ -395,6 +386,26 @@ public class ClientFrame extends JFrame
 		super.setTitle("VirtualHub Client (" + UniVersion.prettyVersion() + ") " + s);
 	}
 	
+	public File[] getSelectedFiles()
+	{
+		ArrayList<File> files = new ArrayList<File>();
+		for (Component c : fileView.getComponents())
+		{
+			if (c instanceof FileButton)
+			{
+				FileButton fb = (FileButton) c;
+				if (fb.isSelected()) files.add(fb.file);
+			}
+		}
+		
+		return files.toArray(new File[] {});
+	}
+	
+	public void moveOrCopySelectedFiles()
+	{
+		new FileMover(this, copy, new File(Assistant.getNodePath(Client.currentClient.frame.targetNode)), getSelectedFiles());
+	}
+	
 	class CatalogTreeCellRenderer extends DefaultTreeCellRenderer
 	{
 		private static final long serialVersionUID = 1L;
@@ -439,7 +450,16 @@ public class ClientFrame extends JFrame
 	
 	private boolean setFrameCursor(DefaultMutableTreeNode node)
 	{
-		boolean sameFile = new File(Assistant.getNodePath(node)).getPath().replace("\\", "/").startsWith(dragged.file.getPath().replace("\\", "/"));
+		File nodeFile = new File(Assistant.getNodePath(node));
+		
+		File[] selected = getSelectedFiles();
+		boolean sameFile = false;
+		
+		for (File f : selected)
+		{
+			if (nodeFile.getPath().replace("\\", "/").startsWith(f.getPath().replace("\\", "/"))) sameFile = true;
+			if (nodeFile.equals(f.getParentFile())) sameFile = true;
+		}
 		
 		Cursor c = copy ? sameFile ? DragSource.DefaultCopyNoDrop : DragSource.DefaultCopyDrop : sameFile ? DragSource.DefaultMoveNoDrop : DragSource.DefaultMoveDrop;
 		

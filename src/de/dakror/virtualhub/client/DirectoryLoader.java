@@ -21,8 +21,11 @@ import de.dakror.virtualhub.util.FileComparator;
  */
 public class DirectoryLoader extends Thread
 {
-	ClientFrame frame;
-	boolean updateFired;
+	static DirectoryLoader loader;
+	
+	private ClientFrame frame;
+	
+	DefaultMutableTreeNode selectedNode;
 	
 	public DirectoryLoader()
 	{
@@ -37,71 +40,97 @@ public class DirectoryLoader extends Thread
 	{
 		while (true)
 		{
-			if (updateFired)
+			try
 			{
-				frame.fileViewWrap.getVerticalScrollBar().setValue(0);
-				frame.fileView.removeAll();
-				if (frame.catalog.getSelectionPath() != null)
+				Thread.sleep(1);
+			}
+			catch (InterruptedException e2)
+			{
+				e2.printStackTrace();
+			}
+			
+			if (frame.catalog.getSelectionPath() == null)
+			{
+				if (selectedNode == null)
 				{
-					final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
-					
-					File folder = new File(Assistant.getNodePath(dmtn));
-					
-					List<File> files = Arrays.asList(folder.listFiles());
-					Collections.sort(files, new FileComparator());
-					
-					for (File f : files)
+					continue;
+				}
+				
+				frame.fileView.removeAll();
+				frame.validate();
+				frame.repaint();
+				selectedNode = null;
+				continue;
+			}
+			
+			final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+			if (selectedNode == null || !dmtn.equals(selectedNode)) selectedNode = dmtn;
+			else continue;
+			
+			frame.fileViewWrap.getVerticalScrollBar().setValue(0);
+			frame.fileView.removeAll();
+			
+			File folder = new File(Assistant.getNodePath(dmtn));
+			
+			List<File> files = Arrays.asList(folder.listFiles());
+			Collections.sort(files, new FileComparator());
+			
+			for (File f : files)
+			{
+				if (f.isHidden()) continue;
+				
+				if (!((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
+				
+				
+				final FileButton fb = new FileButton(f);
+				fb.addMouseListener(new MouseAdapter()
+				{
+					@Override
+					public void mousePressed(MouseEvent e)
 					{
-						final FileButton fb = new FileButton(f);
-						fb.addMouseListener(new MouseAdapter()
+						if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
 						{
-							@Override
-							public void mousePressed(MouseEvent e)
+							if (fb.file.isDirectory())
 							{
-								if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
+								frame.catalog.expandPath(new TreePath(dmtn.getPath()));
+								for (int i = 0; i < dmtn.getChildCount(); i++)
 								{
-									if (fb.file.isDirectory())
+									if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
 									{
-										frame.catalog.expandPath(new TreePath(dmtn.getPath()));
-										for (int i = 0; i < dmtn.getChildCount(); i++)
-										{
-											if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
-											{
-												frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
-											}
-										}
-									}
-									else
-									{
-										if (Desktop.isDesktopSupported())
-										{
-											try
-											{
-												Desktop.getDesktop().browse(fb.file.toURI());
-											}
-											catch (IOException e1)
-											{
-												JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
-											}
-										}
+										frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
 									}
 								}
 							}
-						});
-						frame.fileView.add(fb);
+							else
+							{
+								if (Desktop.isDesktopSupported())
+								{
+									try
+									{
+										Desktop.getDesktop().browse(fb.file.toURI());
+									}
+									catch (IOException e1)
+									{
+										JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
+									}
+								}
+							}
+						}
 					}
-				}
+				});
+				frame.fileView.add(fb);
 				
-				updateFired = false;
 				frame.validate();
 				frame.repaint();
 			}
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{}
+			
+			frame.validate();
+			frame.repaint();
 		}
+	}
+	
+	public void fireUpdate()
+	{
+		selectedNode = null;
 	}
 }
