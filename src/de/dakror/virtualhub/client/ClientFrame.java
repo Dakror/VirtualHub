@@ -75,6 +75,7 @@ public class ClientFrame extends JFrame
 	JScrollPane fileViewWrap;
 	
 	DirectoryLoader directoryLoader;
+	Synchronizer synchronizer;
 	
 	Color borderColor = ColorHelper.brighter(AbstractLookAndFeel.getTheme().getFrameColor(), 50);
 	
@@ -403,7 +404,37 @@ public class ClientFrame extends JFrame
 	
 	public void moveOrCopySelectedFiles()
 	{
-		new FileMover(this, copy, new File(Assistant.getNodePath(Client.currentClient.frame.targetNode)), getSelectedFiles());
+		// catalog.expandPath(new TreePath(targetNode.getPath()));
+		//
+		// DefaultMutableTreeNode parent = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+		//
+		File[] selected = getSelectedFiles();
+		//
+		// DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
+		//
+		// for (int i = 0; i < parent.getChildCount(); i++)
+		// {
+		// DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) parent.getChildAt(i);
+		// if(dmtn.getUserObject().equals())
+		// }
+		//
+		// for (File f : selected)
+		// {
+		// if (f.isDirectory())
+		// {
+		// DefaultMutableTreeNode dmtn = parent.get;
+		// dtm.removeNodeFromParent(dmtn);
+		// dtm.insertNodeInto(dmtn, targetNode, targetNode.getChildCount());
+		// }
+		// }
+		
+		new FileMover(this, copy, new File(Assistant.getNodePath(Client.currentClient.frame.targetNode)), selected);
+	}
+	
+	public File getSelectedTreeFile()
+	{
+		if (catalog.getSelectionPath() == null) return null;
+		return new File(Assistant.getNodePath((DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
 	}
 	
 	class CatalogTreeCellRenderer extends DefaultTreeCellRenderer

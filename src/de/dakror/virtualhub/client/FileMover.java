@@ -52,7 +52,7 @@ public class FileMover extends Thread
 				{
 					try
 					{
-						target.mkdir();
+						target.createNewFile();
 						Assistant.copyInputStream(new FileInputStream(files[i]), new FileOutputStream(target));
 					}
 					catch (Exception e)

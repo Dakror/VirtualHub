@@ -27,10 +27,14 @@ public class DirectoryLoader extends Thread
 	
 	DefaultMutableTreeNode selectedNode;
 	
+	boolean synced;
+	
 	public DirectoryLoader()
 	{
 		frame = Client.currentClient.frame;
 		setName("DirectoryLoader");
+		
+		synced = true;
 		
 		start();
 	}
@@ -64,7 +68,11 @@ public class DirectoryLoader extends Thread
 			}
 			
 			final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
-			if (selectedNode == null || !dmtn.equals(selectedNode)) selectedNode = dmtn;
+			if (selectedNode == null || !dmtn.equals(selectedNode))
+			{
+				selectedNode = dmtn;
+				synced = false;
+			}
 			else continue;
 			
 			frame.fileViewWrap.getVerticalScrollBar().setValue(0);
@@ -126,11 +134,14 @@ public class DirectoryLoader extends Thread
 			
 			frame.validate();
 			frame.repaint();
+			
+			synced = true;
 		}
 	}
 	
 	public void fireUpdate()
 	{
+		synced = false;
 		selectedNode = null;
 	}
 }
