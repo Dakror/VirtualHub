@@ -5,44 +5,16 @@ import java.util.Comparator;
 
 public class FileComparator implements Comparator<File>
 {
-  @Override
-  public int compare(File f1, File f2)
-  {
-    if (f1.isDirectory() && f2.isDirectory())
-      return f1.compareTo(f2);
-    else if (f1.isDirectory())
-      return compareToFile(f1, f2);
-    else if (f2.isDirectory())
-      return -compareToFile(f2, f1);
-    else return compareFiles(f1, f2);
-  }
-  
-  private int compareFiles(File f1, File f2)
-  {
-    File parentFile1 = f1.getParentFile();
-    File parentFile2 = f2.getParentFile();
-    if (isSubDir(parentFile1, parentFile2))
-      return -1;
-    else if (isSubDir(parentFile2, parentFile1))
-      return 1;
-    else return f1.compareTo(f2);
-  }
-  
-  private int compareToFile(File directory, File file)
-  {
-    File fileParent = file.getParentFile();
-    if (directory.equals(fileParent))
-      return -1;
-    else if (isSubDir(directory, fileParent))
-      return -1;
-    else return directory.compareTo(file);
-  }
-  
-  private boolean isSubDir(File directory, File subDir)
-  {
-    for (File parentDir = directory.getParentFile(); parentDir != null; parentDir = parentDir.getParentFile())
-      if (subDir.equals(parentDir))
-        return true;
-    return false;
-  }
+	@Override
+	public int compare(File f1, File f2)
+	{
+		String ext1 = Assistant.getFileExtension(f1);
+		String ext2 = Assistant.getFileExtension(f2);
+		
+		String name1 = f1.getName().substring(0, f1.getName().indexOf(".") > -1 ? f1.getName().lastIndexOf(".") : f1.getName().length());
+		String name2 = f2.getName().substring(0, f2.getName().indexOf(".") > -1 ? f2.getName().lastIndexOf(".") : f2.getName().length());
+		
+		if (ext1.equals(ext2)) return name1.compareTo(name2);
+		else return ext1.compareTo(ext2);
+	}
 }
