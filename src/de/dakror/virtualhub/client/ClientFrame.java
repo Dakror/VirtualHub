@@ -66,6 +66,7 @@ public class ClientFrame extends JFrame
 	// -- DnD -- //
 	public FileButton dragged;
 	public Point mouse;
+	public DefaultMutableTreeNode targetNode;
 	public boolean copy;
 	
 	public JScrollPane catalogWrap;
@@ -419,7 +420,10 @@ public class ClientFrame extends JFrame
 				int mouseRow = (mouse.y + catalogWrap.getVerticalScrollBar().getValue() - tce.getPreferredSize().height * 2) / tce.getPreferredSize().height;
 				if (mouseRow == row)
 				{
-					setFrameCursor(dmtn);
+					if (!setFrameCursor(dmtn))
+					{
+						targetNode = dmtn;
+					}
 					
 					selected = true;
 					tce.setForeground(Color.white);
@@ -433,12 +437,14 @@ public class ClientFrame extends JFrame
 		}
 	}
 	
-	private void setFrameCursor(DefaultMutableTreeNode node)
+	private boolean setFrameCursor(DefaultMutableTreeNode node)
 	{
-		boolean sameFile = new File(Assistant.getNodePath(node)).equals(dragged.file);
+		boolean sameFile = new File(Assistant.getNodePath(node)).getPath().replace("\\", "/").startsWith(dragged.file.getPath().replace("\\", "/"));
 		
 		Cursor c = copy ? sameFile ? DragSource.DefaultCopyNoDrop : DragSource.DefaultCopyDrop : sameFile ? DragSource.DefaultMoveNoDrop : DragSource.DefaultMoveDrop;
 		
 		ClientFrame.this.setCursor(c);
+		
+		return sameFile;
 	}
 }

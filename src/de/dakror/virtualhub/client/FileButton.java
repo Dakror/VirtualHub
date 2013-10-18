@@ -72,7 +72,6 @@ public class FileButton extends JButton
 	{
 		this.file = file;
 		
-		// setContentAreaFilled(false);
 		setFocusPainted(false);
 		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		setPreferredSize(new Dimension(250, 250));
@@ -125,6 +124,11 @@ public class FileButton extends JButton
 			{
 				if (Client.currentClient.frame.dragged != null && Client.currentClient.frame.dragged.file.equals(FileButton.this.file) && e.getButton() == 1)
 				{
+					if (Client.currentClient.frame.targetNode != null)
+					{
+						File targetParent = new File(Assistant.getNodePath(Client.currentClient.frame.targetNode));
+						new FileMover(Client.currentClient.frame, Client.currentClient.frame.copy, targetParent, FileButton.this.file);
+					}
 					Client.currentClient.frame.dragged = null;
 					Client.currentClient.frame.setCursor(Cursor.getDefaultCursor());
 				}
@@ -156,7 +160,6 @@ public class FileButton extends JButton
 			public void mouseReleased(MouseEvent e)
 			{
 				if (new Area(eticetPolygon).contains(e.getPoint())) eticet.show(e.getComponent(), e.getX(), e.getY());
-				
 			}
 		});
 		

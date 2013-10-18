@@ -10,7 +10,6 @@ import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.settings.CFG;
-import de.dakror.virtualhub.util.Assistant;
 
 
 /**
@@ -20,7 +19,7 @@ public class VirtualHub
 {
 	public static void main(String[] args)
 	{
-		CFG.INTERNET = Assistant.isInternetReachable();
+		CFG.INTERNET = false;// Assistant.isInternetReachable();
 		
 		try
 		{
