@@ -47,14 +47,18 @@ public class FileMover extends Thread
 			if (!copy) files[i].renameTo(target);
 			else
 			{
-				try
+				if (files[i].isDirectory()) moveOrCopyFolder(files[i], target, copy);
+				else
 				{
-					target.createNewFile();
-					Assistant.copyInputStream(new FileInputStream(files[i]), new FileOutputStream(target));
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
+					try
+					{
+						target.mkdir();
+						Assistant.copyInputStream(new FileInputStream(files[i]), new FileOutputStream(target));
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 			monitor.setProgress(i + 1);
@@ -62,6 +66,29 @@ public class FileMover extends Thread
 		
 		monitor.close();
 		frame.directoryLoader.fireUpdate();
-		
+	}
+	
+	public void moveOrCopyFolder(File folder, File targetParent, boolean copy)
+	{
+		for (File f : folder.listFiles())
+		{
+			if (f.isDirectory())
+			{
+				File newFolder = new File(targetParent, f.getName());
+				newFolder.mkdir();
+				moveOrCopyFolder(f, newFolder, copy);
+			}
+			
+			File newFile = new File(targetParent, f.getName());
+			try
+			{
+				newFile.mkdir();
+				Assistant.copyInputStream(new FileInputStream(f), new FileOutputStream(newFile));
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

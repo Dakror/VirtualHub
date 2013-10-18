@@ -17,7 +17,6 @@ import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
@@ -190,7 +189,6 @@ public class FileButton extends JToggleButton
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -205,10 +203,8 @@ public class FileButton extends JToggleButton
 			{
 				preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ImageIO.read(file))));
 			}
-			catch (IOException e1)
-			{
-				e1.printStackTrace();
-			}
+			catch (Exception e1)
+			{}
 		}
 		else if (e.equals("tif") || e.equals("tiff")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readTIF(file))));
 		else if (e.equals("psd")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPSD(file))));
