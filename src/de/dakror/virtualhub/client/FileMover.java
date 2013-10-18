@@ -72,22 +72,27 @@ public class FileMover extends Thread
 	{
 		for (File f : folder.listFiles())
 		{
+			if (f.isHidden()) continue;
+			
 			if (f.isDirectory())
 			{
 				File newFolder = new File(targetParent, f.getName());
 				newFolder.mkdir();
 				moveOrCopyFolder(f, newFolder, copy);
 			}
-			
-			File newFile = new File(targetParent, f.getName());
-			try
+			else if (f.isFile())
 			{
-				newFile.mkdir();
-				Assistant.copyInputStream(new FileInputStream(f), new FileOutputStream(newFile));
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
+				File newFile = new File(targetParent, f.getName());
+				try
+				{
+					newFile.getParentFile().mkdirs();
+					newFile.createNewFile();
+					Assistant.copyInputStream(new FileInputStream(f), new FileOutputStream(newFile));
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 	}
