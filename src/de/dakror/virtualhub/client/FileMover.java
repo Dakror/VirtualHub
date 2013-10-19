@@ -65,7 +65,6 @@ public class FileMover extends Thread
 		}
 		
 		monitor.close();
-		frame.directoryLoader.fireUpdate();
 	}
 	
 	public void moveOrCopyFolder(File folder, File targetParent, boolean copy)

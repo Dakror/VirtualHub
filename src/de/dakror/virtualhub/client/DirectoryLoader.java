@@ -87,8 +87,7 @@ public class DirectoryLoader extends Thread
 			{
 				if (f.isHidden()) continue;
 				
-				if (!((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
-				
+				if (frame.catalog.getSelectionPath() == null || !((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
 				
 				final FileButton fb = new FileButton(f);
 				fb.addMouseListener(new MouseAdapter()

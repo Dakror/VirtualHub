@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -370,6 +372,7 @@ public class ClientFrame extends JFrame
 	public void addFolderSourceTree(DefaultMutableTreeNode folder)
 	{
 		File f = new File(Assistant.getNodePath(folder));
+		
 		for (File file : f.listFiles())
 		{
 			if (file.isDirectory() && !file.isHidden())
@@ -404,31 +407,57 @@ public class ClientFrame extends JFrame
 	
 	public void moveOrCopySelectedFiles()
 	{
-		// catalog.expandPath(new TreePath(targetNode.getPath()));
-		//
-		// DefaultMutableTreeNode parent = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
-		//
+		DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 		File[] selected = getSelectedFiles();
-		//
-		// DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
-		//
-		// for (int i = 0; i < parent.getChildCount(); i++)
-		// {
-		// DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) parent.getChildAt(i);
-		// if(dmtn.getUserObject().equals())
-		// }
-		//
-		// for (File f : selected)
-		// {
-		// if (f.isDirectory())
-		// {
-		// DefaultMutableTreeNode dmtn = parent.get;
-		// dtm.removeNodeFromParent(dmtn);
-		// dtm.insertNodeInto(dmtn, targetNode, targetNode.getChildCount());
-		// }
-		// }
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
 		
-		new FileMover(this, copy, new File(Assistant.getNodePath(Client.currentClient.frame.targetNode)), selected);
+		new FileMover(this, copy, new File(Assistant.getNodePath(targetNode)), selected);
+		
+		for (int i = 0; i < parent.getChildCount(); i++)
+		{
+			for (File f : selected)
+				if (f.getName().equals(((DefaultMutableTreeNode) parent.getChildAt(i)).getUserObject())) parent.remove(i);
+		}
+		
+		ArrayList<DefaultMutableTreeNode> targetChildren = new ArrayList<DefaultMutableTreeNode>();
+		for (int i = 0; i < targetNode.getChildCount(); i++)
+			targetChildren.add((DefaultMutableTreeNode) targetNode.getChildAt(i));
+		
+		
+		for (File f : selected)
+		{
+			boolean exists = false;
+			for (int i = 0; i < targetNode.getChildCount(); i++)
+			{
+				if (f.getName().equals(((DefaultMutableTreeNode) targetNode.getChildAt(i)).getUserObject()))
+				{
+					exists = true;
+					break;
+				}
+			}
+			
+			if (!exists) targetChildren.add(new DefaultMutableTreeNode(f.getName()));
+		}
+		
+		targetNode.removeAllChildren();
+		Collections.sort(targetChildren, new Comparator<DefaultMutableTreeNode>()
+		{
+			@Override
+			public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
+			{
+				return o1.getUserObject().toString().toLowerCase().compareTo(o2.getUserObject().toString().toLowerCase());
+			}
+		});
+		
+		for (DefaultMutableTreeNode dmtn : targetChildren)
+		{
+			targetNode.add(dmtn);
+		}
+		
+		dtm.reload(parent);
+		dtm.reload(targetNode);
+		
+		directoryLoader.fireUpdate();
 	}
 	
 	public File getSelectedTreeFile()
