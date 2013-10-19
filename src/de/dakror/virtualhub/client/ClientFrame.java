@@ -3,13 +3,11 @@ package de.dakror.virtualhub.client;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.dnd.DragSource;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,9 +40,9 @@ import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreePath;
 
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.BaseTreeUI;
@@ -73,7 +71,8 @@ public class ClientFrame extends JFrame
 	public JScrollPane catalogWrap;
 	
 	JTree catalog;
-	JPanel fileView, fileInfo;
+	FileViewPanel fileView;
+	JPanel fileInfo;
 	JScrollPane fileViewWrap;
 	
 	DirectoryLoader directoryLoader;
@@ -177,7 +176,7 @@ public class ClientFrame extends JFrame
 		catalog = new JTree(dtm);
 		catalog.setShowsRootHandles(true);
 		catalog.setRootVisible(false);
-		catalog.setCellRenderer(new CatalogTreeCellRenderer());
+		catalog.setCellRenderer(new CatalogTreeCellRenderer(this));
 		if (catalog.getUI() instanceof BaseTreeUI)
 		{
 			BaseTreeUI ui = (BaseTreeUI) catalog.getUI();
@@ -312,7 +311,51 @@ public class ClientFrame extends JFrame
 		settings.setPreferredSize(new Dimension(0, 26));
 		addGridBagLayoutComponent(viewSuper, gbl, settings, 0, 0, 1, 1, 1, 0);
 		
-		fileView = new JPanel(new WrapLayout(FlowLayout.LEFT, 5, 5));
+		int gap = 8;
+		
+		fileView = new FileViewPanel(new WrapLayout(FlowLayout.LEFT, gap, gap));
+		
+		final JPopupMenu popup = new JPopupMenu();
+		popup.add(new JMenuItem(new AbstractAction("Neuer Ordner", CFG.FOLDER)
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if (catalog.getSelectionPath() == null) return;
+				
+				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
+				
+				File parent = new File(Assistant.getNodePath((DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
+				int count = Assistant.getFileCountWithSamePrefix(parent, "Neuer Ordner");
+				
+				File folder = new File(parent, "Neuer Ordner" + (count > 0 ? " (" + (count + 1) + ")" : ""));
+				folder.mkdir();
+				
+				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+				
+				boolean expanded = catalog.isExpanded(catalog.getSelectionPath());
+				
+				dmtn.removeAllChildren();
+				dtm.reload(dmtn);
+				addFolderSourceTree(dmtn);
+				
+				if (expanded) catalog.expandPath(catalog.getSelectionPath());
+				
+				directoryLoader.fireUpdate();
+			}
+		}));
+		fileView.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseReleased(MouseEvent e)
+			{
+				if (e.getButton() == MouseEvent.BUTTON3 && catalog.getSelectionPath() != null) popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
+		
+		
 		fileViewWrap = new JScrollPane(fileView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		fileViewWrap.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, borderColor));
 		fileViewWrap.setPreferredSize(new Dimension(1, 1));
@@ -423,9 +466,10 @@ public class ClientFrame extends JFrame
 		for (int i = 0; i < targetNode.getChildCount(); i++)
 			targetChildren.add((DefaultMutableTreeNode) targetNode.getChildAt(i));
 		
-		
 		for (File f : selected)
 		{
+			if (!f.isDirectory()) continue;
+			
 			boolean exists = false;
 			for (int i = 0; i < targetNode.getChildCount(); i++)
 			{
@@ -457,74 +501,12 @@ public class ClientFrame extends JFrame
 		dtm.reload(parent);
 		dtm.reload(targetNode);
 		
-		directoryLoader.fireUpdate();
+		catalog.setSelectionPath(new TreePath(parent.getPath()));
 	}
 	
 	public File getSelectedTreeFile()
 	{
 		if (catalog.getSelectionPath() == null) return null;
 		return new File(Assistant.getNodePath((DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
-	}
-	
-	class CatalogTreeCellRenderer extends DefaultTreeCellRenderer
-	{
-		private static final long serialVersionUID = 1L;
-		
-		public CatalogTreeCellRenderer()
-		{
-			setLeafIcon(CFG.FOLDER);
-			setOpenIcon(CFG.FOLDER);
-			setClosedIcon(CFG.FOLDER);
-		}
-		
-		@Override
-		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
-		{
-			JLabel tce = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-			
-			if (row < 0 || row >= tree.getRowCount()) return tce;
-			
-			DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getPathForRow(row).getLastPathComponent();
-			
-			if (dragged != null)
-			{
-				int mouseRow = (mouse.y + catalogWrap.getVerticalScrollBar().getValue() - tce.getPreferredSize().height * 2) / tce.getPreferredSize().height;
-				if (mouseRow == row)
-				{
-					if (!setFrameCursor(dmtn))
-					{
-						targetNode = dmtn;
-					}
-					
-					selected = true;
-					tce.setForeground(Color.white);
-					
-					if (!leaf && mouse.x < 20 * dmtn.getLevel() && mouse.x > 20 * dmtn.getLevel() - 20) tree.expandRow(row);
-					
-					this.hasFocus = true;
-				}
-			}
-			return tce;
-		}
-	}
-	
-	private boolean setFrameCursor(DefaultMutableTreeNode node)
-	{
-		File nodeFile = new File(Assistant.getNodePath(node));
-		
-		File[] selected = getSelectedFiles();
-		boolean sameFile = false;
-		
-		for (File f : selected)
-		{
-			if (nodeFile.getPath().replace("\\", "/").startsWith(f.getPath().replace("\\", "/"))) sameFile = true;
-			if (nodeFile.equals(f.getParentFile())) sameFile = true;
-		}
-		
-		Cursor c = copy ? sameFile ? DragSource.DefaultCopyNoDrop : DragSource.DefaultCopyDrop : sameFile ? DragSource.DefaultMoveNoDrop : DragSource.DefaultMoveDrop;
-		
-		ClientFrame.this.setCursor(c);
-		
-		return sameFile;
 	}
 }

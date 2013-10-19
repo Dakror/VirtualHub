@@ -240,4 +240,30 @@ public class Assistant
 		result += "..." + lastline.substring(3, lastline.length() - 3) + ((ext.length() > 0) ? ("." + ext) : "");
 		return result;
 	}
+	
+	public static int getFileCountWithSamePrefix(File folder, String prefix)
+	{
+		int count = 0;
+		
+		for (File f : folder.listFiles())
+		{
+			if (f.isHidden()) continue;
+			
+			if (f.getName().startsWith(prefix)) count++;
+		}
+		
+		return count;
+	}
+	
+	public static boolean deleteDirectory(File dir)
+	{
+		for (File f : dir.listFiles())
+		{
+			if (f.isDirectory()) deleteDirectory(f);
+			boolean fd = f.delete();
+			
+			if (!fd) return false;
+		}
+		return dir.delete();
+	}
 }

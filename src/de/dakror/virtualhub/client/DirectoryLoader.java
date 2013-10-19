@@ -1,6 +1,7 @@
 package de.dakror.virtualhub.client;
 
 import java.awt.Desktop;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -9,7 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -33,6 +37,8 @@ public class DirectoryLoader extends Thread
 	{
 		frame = Client.currentClient.frame;
 		setName("DirectoryLoader");
+		
+		setPriority(MAX_PRIORITY);
 		
 		synced = true;
 		
@@ -59,7 +65,7 @@ public class DirectoryLoader extends Thread
 				{
 					continue;
 				}
-				
+				frame.fileView.dropTarget.setActive(false);
 				frame.fileView.removeAll();
 				frame.validate();
 				frame.repaint();
@@ -75,6 +81,7 @@ public class DirectoryLoader extends Thread
 			}
 			else continue;
 			
+			frame.fileView.dropTarget.setActive(true);
 			frame.fileViewWrap.getVerticalScrollBar().setValue(0);
 			frame.fileView.removeAll();
 			
@@ -90,6 +97,32 @@ public class DirectoryLoader extends Thread
 				if (frame.catalog.getSelectionPath() == null || !((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
 				
 				final FileButton fb = new FileButton(f);
+				
+				final JPopupMenu popup = new JPopupMenu();
+				popup.add(new JMenuItem(new AbstractAction("L\u00f6schen")
+				{
+					private static final long serialVersionUID = 1L;
+					
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						if (frame.getSelectedFiles().length < 2)
+						{
+							if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+							{
+								boolean success = true;
+								boolean directory = fb.file.isDirectory();
+								
+								if (directory) success = Assistant.deleteDirectory(fb.file);
+								else success = fb.file.delete();
+								
+								if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
+								else fireUpdate();
+							}
+						}
+					}
+				}));
+				
 				fb.addMouseListener(new MouseAdapter()
 				{
 					@Override
@@ -123,6 +156,7 @@ public class DirectoryLoader extends Thread
 								}
 							}
 						}
+						else if (e.getButton() == MouseEvent.BUTTON3) popup.show(e.getComponent(), e.getX(), e.getY());
 					}
 				});
 				frame.fileView.add(fb);
@@ -140,6 +174,10 @@ public class DirectoryLoader extends Thread
 	
 	public void fireUpdate()
 	{
+		frame.fileView.removeAll();
+		frame.validate();
+		frame.repaint();
+		
 		synced = false;
 		selectedNode = null;
 	}

@@ -14,7 +14,7 @@ public class Synchronizer extends Thread
 	{
 		frame = Client.currentClient.frame;;
 		
-		start();
+		// start();
 	}
 	
 	@Override
