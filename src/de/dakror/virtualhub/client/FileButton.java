@@ -1,18 +1,23 @@
 package de.dakror.virtualhub.client;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -27,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
 
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
@@ -36,13 +40,14 @@ import com.jtattoo.plaf.LazyImageIcon;
 
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.FileSelection;
 import de.dakror.virtualhub.util.MacOSXHandler;
 import de.dakror.virtualhub.util.ThumbnailAssistant;
 
 /**
  * @author Dakror
  */
-public class FileButton extends JToggleButton
+public class FileButton extends JToggleButton implements DragSourceListener, DragGestureListener
 {
 	private static final long serialVersionUID = 1L;
 	public static final String[] names = { "Kein Etikett", "Rot", "Orange", "Gelb", "Gr\u00fcn", "Blau", "Violett", "Grau", };
@@ -59,17 +64,18 @@ public class FileButton extends JToggleButton
 		eticetPolygon.addPoint(0, size);
 	}
 	
-	
 	File file;
 	JLabel preview;
 	
-	
 	Color eticet = new Color(0, 0, 0, 0);
 	
+	DragSource dragSource = DragSource.getDefaultDragSource();
 	
 	public FileButton(File file)
 	{
 		this.file = file;
+		
+		dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, this);
 		
 		setFocusPainted(false);
 		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -91,47 +97,6 @@ public class FileButton extends JToggleButton
 		
 		JLabel textLabel = new JLabel("<html><body style='text-align:center;'><br>" + Assistant.shortenFileName(file, 35, 2) + "</body></html>");
 		add(textLabel);
-		
-		addMouseMotionListener(new MouseMotionAdapter()
-		{
-			@Override
-			public void mouseDragged(MouseEvent e)
-			{
-				if (SwingUtilities.isLeftMouseButton(e))
-				{
-					setSelected(true);
-					
-					int x = FileButton.this.getLocationOnScreen().x - Client.currentClient.frame.getContentPane().getLocationOnScreen().x + e.getX();
-					int y = FileButton.this.getLocationOnScreen().y - Client.currentClient.frame.getContentPane().getLocationOnScreen().y + e.getY();
-					
-					if (Client.currentClient.frame.catalogWrap.contains(x, y))
-					{
-						Client.currentClient.frame.copy = e.isControlDown();
-						Client.currentClient.frame.dragged = FileButton.this;
-						Client.currentClient.frame.mouse = new Point(x, y);
-						Client.currentClient.frame.catalog.repaint();
-					}
-					else
-					{
-						Client.currentClient.frame.setCursor(Cursor.getDefaultCursor());
-					}
-				}
-			}
-		});
-		addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseReleased(MouseEvent e)
-			{
-				if (Client.currentClient.frame.dragged != null && Client.currentClient.frame.dragged.file.equals(FileButton.this.file) && e.getButton() == 1)
-				{
-					if (Client.currentClient.frame.targetNode != null) Client.currentClient.frame.moveOrCopySelectedFiles();
-					
-					Client.currentClient.frame.dragged = null;
-					Client.currentClient.frame.setCursor(Cursor.getDefaultCursor());
-				}
-			}
-		});
 		
 		final JPopupMenu eticet = new JPopupMenu();
 		for (int i = 0; i < names.length; i++)
@@ -232,5 +197,33 @@ public class FileButton extends JToggleButton
 		g2d.drawPolygon(eticetPolygon);
 		
 		g2d.setColor(oldColor);
+	}
+	
+	@Override
+	public void dragEnter(DragSourceDragEvent dsde)
+	{}
+	
+	@Override
+	public void dragOver(DragSourceDragEvent dsde)
+	{}
+	
+	@Override
+	public void dropActionChanged(DragSourceDragEvent dsde)
+	{}
+	
+	@Override
+	public void dragExit(DragSourceEvent dse)
+	{}
+	
+	@Override
+	public void dragDropEnd(DragSourceDropEvent dsde)
+	{}
+	
+	@Override
+	public void dragGestureRecognized(DragGestureEvent dge)
+	{
+		File[] selectedFiles = Client.currentClient.frame.getSelectedFiles();
+		FileSelection transferable = new FileSelection(selectedFiles.length > 0 ? selectedFiles : new File[] { file });
+		dge.startDrag(null, transferable, this);
 	}
 }

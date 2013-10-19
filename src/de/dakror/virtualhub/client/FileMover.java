@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
 import de.dakror.virtualhub.util.Assistant;
@@ -43,6 +44,19 @@ public class FileMover extends Thread
 		{
 			File target = new File(targetParent, files[i].getName());
 			monitor.setNote("Datei: " + files[i].getName());
+			
+			if (target.getPath().replace("\\", "/").startsWith(files[i].getPath().replace("\\", "/")))
+			{
+				JOptionPane.showMessageDialog(Client.currentClient.frame, "Hierhin kann nicht verschoben werden.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.ERROR_MESSAGE);
+				break;
+			}
+			
+			if (files[i].equals(target.getParentFile()))
+			{
+				if (JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Quell- und Zielverzeichnis" : "Die Quell- und Zieldatei") + " sind identisch.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.CANCEL_OPTION) break;
+				
+				continue;
+			}
 			
 			if (!copy) files[i].renameTo(target);
 			else

@@ -2,6 +2,9 @@ package de.dakror.virtualhub.util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -265,5 +268,16 @@ public class Assistant
 			if (!fd) return false;
 		}
 		return dir.delete();
+	}
+	
+	public static void setCorrectDragCursor(DragSourceDragEvent dsde)
+	{
+		int action = dsde.getDropAction();
+		if (action == DnDConstants.ACTION_COPY) dsde.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
+		else
+		{
+			if (action == DnDConstants.ACTION_MOVE) dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
+			else dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+		}
 	}
 }

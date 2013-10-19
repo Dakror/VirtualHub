@@ -67,8 +67,8 @@ public class DirectoryLoader extends Thread
 				}
 				frame.fileView.dropTarget.setActive(false);
 				frame.fileView.removeAll();
-				frame.validate();
-				frame.repaint();
+				frame.fileView.validate();
+				frame.fileView.repaint();
 				selectedNode = null;
 				continue;
 			}
@@ -161,12 +161,12 @@ public class DirectoryLoader extends Thread
 				});
 				frame.fileView.add(fb);
 				
-				frame.validate();
-				frame.repaint();
+				frame.fileView.validate();
+				frame.fileView.repaint();
 			}
 			
-			frame.validate();
-			frame.repaint();
+			frame.fileView.validate();
+			frame.fileView.repaint();
 			
 			synced = true;
 		}
@@ -175,8 +175,8 @@ public class DirectoryLoader extends Thread
 	public void fireUpdate()
 	{
 		frame.fileView.removeAll();
-		frame.validate();
-		frame.repaint();
+		frame.fileView.validate();
+		frame.fileView.repaint();
 		
 		synced = false;
 		selectedNode = null;
