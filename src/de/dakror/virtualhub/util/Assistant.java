@@ -20,7 +20,10 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.JFrame;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -279,5 +282,26 @@ public class Assistant
 			if (action == DnDConstants.ACTION_MOVE) dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
 			else dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
 		}
+	}
+	
+	public static void sortDefaultMutableTreeNodeChildren(DefaultMutableTreeNode dmtn)
+	{
+		ArrayList<DefaultMutableTreeNode> nodes = new ArrayList<DefaultMutableTreeNode>();
+		for (int i = 0; i < dmtn.getChildCount(); i++)
+			nodes.add((DefaultMutableTreeNode) dmtn.getChildAt(i));
+		
+		Collections.sort(nodes, new Comparator<DefaultMutableTreeNode>()
+		{
+			
+			@Override
+			public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
+			{
+				return o1.getUserObject().toString().toLowerCase().compareTo(o2.getUserObject().toString().toLowerCase());
+			}
+		});
+		
+		dmtn.removeAllChildren();
+		for (DefaultMutableTreeNode node : nodes)
+			dmtn.add(node);
 	}
 }

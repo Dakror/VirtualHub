@@ -21,6 +21,7 @@ import java.util.List;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import de.dakror.virtualhub.util.Assistant;
 
@@ -104,12 +105,38 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 			{
 				dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 				@SuppressWarnings("unchecked")
-				List<File> fileList = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+				List<File> selected = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				
-				DefaultMutableTreeNode hDmtn = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
-				File hFile = new File(Assistant.getNodePath(hDmtn));
+				DefaultTreeModel dtm = (DefaultTreeModel) Client.currentClient.frame.catalog.getModel();
 				
-				// new FileMover(Client.currentClient.frame,)
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent();
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
+				
+				Client.currentClient.frame.catalog.expandPath(new TreePath(targetNode.getPath()));
+				
+				File targetFile = new File(Assistant.getNodePath(targetNode));
+				
+				new FileMover(Client.currentClient.frame, dtde.getDropAction() == DnDConstants.ACTION_COPY, targetFile, selected.toArray(new File[] {}));
+				
+				for (int i = 0; i < parent.getChildCount(); i++)
+				{
+					for (File f : selected)
+					{
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(i);
+						if (node.getUserObject().toString().equals(f.getName()))
+						{
+							parent.remove(i);
+							targetNode.add(node);
+						}
+					}
+				}
+				
+				Assistant.sortDefaultMutableTreeNodeChildren(targetNode);
+				
+				dtm.reload(parent);
+				dtm.reload(targetNode);
+				
+				Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
 				
 				dtde.getDropTargetContext().dropComplete(true);
 				((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;

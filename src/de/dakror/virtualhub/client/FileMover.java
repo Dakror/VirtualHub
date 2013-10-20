@@ -34,7 +34,7 @@ public class FileMover extends Thread
 		monitor.setMillisToDecideToPopup(0);
 		monitor.setMillisToPopup(0);
 		
-		start();
+		run();
 	}
 	
 	@Override

@@ -437,62 +437,6 @@ public class ClientFrame extends JFrame
 		return files.toArray(new File[] {});
 	}
 	
-	// public void moveOrCopySelectedFiles()
-	// {
-	// DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
-	// File[] selected = getSelectedFiles();
-	// DefaultMutableTreeNode parent = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
-	//
-	// new FileMover(this, copy, new File(Assistant.getNodePath(targetNode)), selected);
-	//
-	// for (int i = 0; i < parent.getChildCount(); i++)
-	// {
-	// for (File f : selected)
-	// if (f.getName().equals(((DefaultMutableTreeNode) parent.getChildAt(i)).getUserObject())) parent.remove(i);
-	// }
-	//
-	// ArrayList<DefaultMutableTreeNode> targetChildren = new ArrayList<DefaultMutableTreeNode>();
-	// for (int i = 0; i < targetNode.getChildCount(); i++)
-	// targetChildren.add((DefaultMutableTreeNode) targetNode.getChildAt(i));
-	//
-	// for (File f : selected)
-	// {
-	// if (!f.isDirectory()) continue;
-	//
-	// boolean exists = false;
-	// for (int i = 0; i < targetNode.getChildCount(); i++)
-	// {
-	// if (f.getName().equals(((DefaultMutableTreeNode) targetNode.getChildAt(i)).getUserObject()))
-	// {
-	// exists = true;
-	// break;
-	// }
-	// }
-	//
-	// if (!exists) targetChildren.add(new DefaultMutableTreeNode(f.getName()));
-	// }
-	//
-	// targetNode.removeAllChildren();
-	// Collections.sort(targetChildren, new Comparator<DefaultMutableTreeNode>()
-	// {
-	// @Override
-	// public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
-	// {
-	// return o1.getUserObject().toString().toLowerCase().compareTo(o2.getUserObject().toString().toLowerCase());
-	// }
-	// });
-	//
-	// for (DefaultMutableTreeNode dmtn : targetChildren)
-	// {
-	// targetNode.add(dmtn);
-	// }
-	//
-	// dtm.reload(parent);
-	// dtm.reload(targetNode);
-	//
-	// catalog.setSelectionPath(new TreePath(parent.getPath()));
-	// }
-	
 	public File getSelectedTreeFile()
 	{
 		if (catalog.getSelectionPath() == null) return null;
