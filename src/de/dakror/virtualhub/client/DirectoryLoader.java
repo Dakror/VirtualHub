@@ -54,161 +54,162 @@ public class DirectoryLoader extends Thread
 			try
 			{
 				Thread.sleep(1);
-			}
-			catch (InterruptedException e2)
-			{
-				e2.printStackTrace();
-			}
-			
-			if (frame.catalog.getSelectionPath() == null)
-			{
-				if (selectedNode == null)
+				
+				
+				if (frame.catalog.getSelectionPath() == null)
 				{
+					if (selectedNode == null)
+					{
+						continue;
+					}
+					frame.fileView.dropTarget.setActive(false);
+					frame.fileView.removeAll();
+					frame.fileView.validate();
+					frame.fileView.repaint();
+					selectedNode = null;
 					continue;
 				}
-				frame.fileView.dropTarget.setActive(false);
+				
+				final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+				if (selectedNode == null || !dmtn.equals(selectedNode))
+				{
+					selectedNode = dmtn;
+					synced = false;
+				}
+				else continue;
+				
+				frame.fileView.dropTarget.setActive(true);
+				frame.fileViewWrap.getVerticalScrollBar().setValue(0);
 				frame.fileView.removeAll();
-				frame.fileView.validate();
-				frame.fileView.repaint();
-				selectedNode = null;
-				continue;
-			}
-			
-			final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
-			if (selectedNode == null || !dmtn.equals(selectedNode))
-			{
-				selectedNode = dmtn;
-				synced = false;
-			}
-			else continue;
-			
-			frame.fileView.dropTarget.setActive(true);
-			frame.fileViewWrap.getVerticalScrollBar().setValue(0);
-			frame.fileView.removeAll();
-			
-			File folder = new File(Assistant.getNodePath(dmtn));
-			
-			List<File> files = Arrays.asList(folder.listFiles());
-			Collections.sort(files, new FileComparator());
-			
-			for (File f : files)
-			{
-				if (f.isHidden()) continue;
 				
-				if (frame.catalog.getSelectionPath() == null || !((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
+				File folder = new File(Assistant.getNodePath(dmtn));
 				
-				final FileButton fb = new FileButton(f);
+				List<File> files = Arrays.asList(folder.listFiles());
+				Collections.sort(files, new FileComparator());
 				
-				final JPopupMenu popup = new JPopupMenu();
-				popup.add(new JMenuItem(new AbstractAction("L\u00f6schen")
+				for (File f : files)
 				{
-					private static final long serialVersionUID = 1L;
+					if (f.isHidden()) continue;
 					
-					@Override
-					public void actionPerformed(ActionEvent e)
+					if (frame.catalog.getSelectionPath() == null || !((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
+					
+					final FileButton fb = new FileButton(f);
+					
+					final JPopupMenu popup = new JPopupMenu();
+					popup.add(new JMenuItem(new AbstractAction("L\u00f6schen")
 					{
-						if (frame.getSelectedFiles().length < 2)
+						private static final long serialVersionUID = 1L;
+						
+						@Override
+						public void actionPerformed(ActionEvent e)
 						{
-							if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+							if (frame.getSelectedFiles().length < 2)
 							{
-								boolean success = true;
-								boolean directory = fb.file.isDirectory();
-								
-								if (directory)
+								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 								{
-									success = Assistant.deleteDirectory(fb.file);
+									boolean success = true;
+									boolean directory = fb.file.isDirectory();
 									
-									if (success)
+									if (directory)
 									{
-										DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
-										for (int i = 0; i < dmtn.getChildCount(); i++)
-											if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
+										success = Assistant.deleteDirectory(fb.file);
 										
-										((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
+										if (success)
+										{
+											DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+											for (int i = 0; i < dmtn.getChildCount(); i++)
+												if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
+											
+											((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
+										}
 									}
+									else success = fb.file.delete();
+									
+									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
+									else fireUpdate();
 								}
-								else success = fb.file.delete();
-								
-								if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
-								else fireUpdate();
+							}
+							else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", "Daten l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+							{
+								File[] files = frame.getSelectedFiles();
+								for (File file : files)
+								{
+									boolean success = true;
+									boolean directory = file.isDirectory();
+									
+									if (directory)
+									{
+										success = Assistant.deleteDirectory(file);
+										
+										if (success)
+										{
+											DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+											for (int i = 0; i < dmtn.getChildCount(); i++)
+												if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
+											
+											((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
+										}
+									}
+									else success = file.delete();
+									
+									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
+								}
+								fireUpdate();
 							}
 						}
-						else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", "Daten l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-						{
-							File[] files = frame.getSelectedFiles();
-							for (File file : files)
-							{
-								boolean success = true;
-								boolean directory = file.isDirectory();
-								
-								if (directory)
-								{
-									success = Assistant.deleteDirectory(file);
-									
-									if (success)
-									{
-										DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
-										for (int i = 0; i < dmtn.getChildCount(); i++)
-											if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
-										
-										((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
-									}
-								}
-								else success = file.delete();
-								
-								if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
-							}
-							fireUpdate();
-						}
-					}
-				}));
-				
-				fb.addMouseListener(new MouseAdapter()
-				{
-					@Override
-					public void mousePressed(MouseEvent e)
+					}));
+					
+					fb.addMouseListener(new MouseAdapter()
 					{
-						if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
+						@Override
+						public void mousePressed(MouseEvent e)
 						{
-							if (fb.file.isDirectory())
+							if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
 							{
-								frame.catalog.expandPath(new TreePath(dmtn.getPath()));
-								for (int i = 0; i < dmtn.getChildCount(); i++)
+								if (fb.file.isDirectory())
 								{
-									if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
+									frame.catalog.expandPath(new TreePath(dmtn.getPath()));
+									for (int i = 0; i < dmtn.getChildCount(); i++)
 									{
-										frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
+										if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
+										{
+											frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
+										}
+									}
+								}
+								else
+								{
+									if (Desktop.isDesktopSupported())
+									{
+										try
+										{
+											Desktop.getDesktop().browse(fb.file.toURI());
+										}
+										catch (IOException e1)
+										{
+											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
+										}
 									}
 								}
 							}
-							else
-							{
-								if (Desktop.isDesktopSupported())
-								{
-									try
-									{
-										Desktop.getDesktop().browse(fb.file.toURI());
-									}
-									catch (IOException e1)
-									{
-										JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
-									}
-								}
-							}
+							else if (e.getButton() == MouseEvent.BUTTON3) popup.show(e.getComponent(), e.getX(), e.getY());
 						}
-						else if (e.getButton() == MouseEvent.BUTTON3) popup.show(e.getComponent(), e.getX(), e.getY());
-					}
-				});
-				frame.fileView.add(fb);
+					});
+					frame.fileView.add(fb);
+					
+					frame.fileView.validate();
+					frame.fileView.repaint();
+				}
 				
 				frame.fileView.validate();
 				frame.fileView.repaint();
+				
+				synced = true;
 			}
-			
-			frame.fileView.validate();
-			frame.fileView.repaint();
-			
-			synced = true;
+			catch (InterruptedException e)
+			{}
+			catch (NullPointerException e)
+			{}
 		}
 	}
 	

@@ -163,6 +163,7 @@ public class ClientFrame extends JFrame
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
 		DefaultTreeModel dtm = new DefaultTreeModel(root);
 		catalog = new FileTree(dtm);
+		catalog.setExpandsSelectedPaths(true);
 		catalog.setShowsRootHandles(true);
 		catalog.setRootVisible(false);
 		catalog.setCellRenderer(new FileTreeCellRenderer(this));

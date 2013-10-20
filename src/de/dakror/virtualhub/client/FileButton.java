@@ -224,6 +224,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	{
 		File[] selectedFiles = Client.currentClient.frame.getSelectedFiles();
 		FileSelection transferable = new FileSelection(selectedFiles.length > 0 ? selectedFiles : new File[] { file });
+		
 		dge.startDrag(null, transferable, this);
 	}
 }

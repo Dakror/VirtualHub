@@ -118,36 +118,43 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 				
 				boolean copy = dtde.getDropAction() == DnDConstants.ACTION_COPY;
 				
-				FileMover mover = new FileMover(Client.currentClient.frame, copy, targetFile, selected.toArray(new File[] {}));
-				if (!mover.canceled)
+				for (int i = 0; i < parent.getChildCount(); i++)
 				{
-					for (int i = 0; i < parent.getChildCount(); i++)
+					for (File f : selected)
 					{
-						for (File f : selected)
+						if (!f.isDirectory()) continue;
+						
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(i);
+						if (node.getUserObject().toString().equals(f.getName()))
 						{
-							if (!f.isDirectory()) continue;
-							
-							DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(i);
-							if (node.getUserObject().toString().equals(f.getName()))
+							if (!copy) parent.remove(i);
+							if (!Assistant.containsNode(targetNode, node))
 							{
-								if (!copy) parent.remove(i);
-								if (!Assistant.containsNode(targetNode, node))
-								{
-									DefaultMutableTreeNode clone = (DefaultMutableTreeNode) node.clone();
-									if (Assistant.hasSubDirectories(f)) clone.add(new DefaultMutableTreeNode("CONTENT"));
-									targetNode.add(clone);
-								}
+								DefaultMutableTreeNode clone = (DefaultMutableTreeNode) node.clone();
+								if (Assistant.hasSubDirectories(f)) clone.add(new DefaultMutableTreeNode("CONTENT"));
+								targetNode.add(clone);
 							}
 						}
 					}
+				}
+				
+				FileMover mover = new FileMover(Client.currentClient.frame, copy, targetFile, selected.toArray(new File[] {}));
+				if (mover.canceled)
+				{
+					DefaultMutableTreeNode targetParent = ((DefaultMutableTreeNode) targetNode.getParent());
+					targetParent.removeAllChildren();
+					Client.currentClient.frame.addFolderSourceTree(targetParent);
 					
+					dtm.reload(targetParent);
+				}
+				else
+				{
 					Assistant.sortNodeChildren(targetNode);
 					
 					dtm.reload(parent);
 					dtm.reload(targetNode);
-					
-					Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
 				}
+				Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
 				
 				dtde.getDropTargetContext().dropComplete(true);
 				((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
