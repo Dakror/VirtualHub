@@ -23,12 +23,16 @@ public class FileMover extends Thread
 	
 	ClientFrame frame;
 	
+	boolean canceled;
+	
 	public FileMover(final ClientFrame frame, final boolean copy, File targetParent, File... files)
 	{
 		this.targetParent = targetParent;
 		this.files = files;
 		this.copy = copy;
 		this.frame = frame;
+		
+		canceled = false;
 		
 		monitor = new ProgressMonitor(frame, (copy ? "Kopiere" : "Verschiebe") + " Dateien...", "", 0, 50);
 		monitor.setMillisToDecideToPopup(0);
@@ -48,14 +52,25 @@ public class FileMover extends Thread
 			if (target.getPath().replace("\\", "/").startsWith(files[i].getPath().replace("\\", "/")))
 			{
 				JOptionPane.showMessageDialog(Client.currentClient.frame, "Hierhin kann nicht verschoben werden.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.ERROR_MESSAGE);
+				canceled = true;
 				break;
 			}
 			
 			if (files[i].equals(target.getParentFile()))
 			{
 				if (JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Quell- und Zielverzeichnis" : "Die Quell- und Zieldatei") + " sind identisch.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.CANCEL_OPTION) break;
-				
 				continue;
+			}
+			
+			if (target.exists())
+			{
+				int response = JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Zielverzeichnis" : "Die Zieldatei") + " existiert bereits. \u00dcberschreiben?\r\nBei \"Nein\" wird " + (files[i].isDirectory() ? "das Verzeichnis" : "die Datei") + " \u00fcbersprungen.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (response == JOptionPane.NO_OPTION) continue;
+				if (response == JOptionPane.CANCEL_OPTION)
+				{
+					canceled = true;
+					break;
+				}
 			}
 			
 			if (!copy) files[i].renameTo(target);

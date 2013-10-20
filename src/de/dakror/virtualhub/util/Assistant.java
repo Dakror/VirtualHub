@@ -284,7 +284,7 @@ public class Assistant
 		}
 	}
 	
-	public static void sortDefaultMutableTreeNodeChildren(DefaultMutableTreeNode dmtn)
+	public static void sortNodeChildren(DefaultMutableTreeNode dmtn)
 	{
 		ArrayList<DefaultMutableTreeNode> nodes = new ArrayList<DefaultMutableTreeNode>();
 		for (int i = 0; i < dmtn.getChildCount(); i++)
@@ -303,5 +303,13 @@ public class Assistant
 		dmtn.removeAllChildren();
 		for (DefaultMutableTreeNode node : nodes)
 			dmtn.add(node);
+	}
+	
+	public static boolean containsNode(DefaultMutableTreeNode parent, DefaultMutableTreeNode child)
+	{
+		for (int i = 0; i < parent.getChildCount(); i++)
+			if (((DefaultMutableTreeNode) parent.getChildAt(i)).getUserObject().toString().equals(child.getUserObject().toString())) return true;
+		
+		return false;
 	}
 }

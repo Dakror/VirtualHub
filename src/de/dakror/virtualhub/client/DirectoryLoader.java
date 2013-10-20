@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import de.dakror.virtualhub.util.Assistant;
@@ -113,12 +114,51 @@ public class DirectoryLoader extends Thread
 								boolean success = true;
 								boolean directory = fb.file.isDirectory();
 								
-								if (directory) success = Assistant.deleteDirectory(fb.file);
+								if (directory)
+								{
+									success = Assistant.deleteDirectory(fb.file);
+									
+									if (success)
+									{
+										DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+										for (int i = 0; i < dmtn.getChildCount(); i++)
+											if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
+										
+										((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
+									}
+								}
 								else success = fb.file.delete();
 								
 								if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
 								else fireUpdate();
 							}
+						}
+						else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", "Daten l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							File[] files = frame.getSelectedFiles();
+							for (File file : files)
+							{
+								boolean success = true;
+								boolean directory = file.isDirectory();
+								
+								if (directory)
+								{
+									success = Assistant.deleteDirectory(file);
+									
+									if (success)
+									{
+										DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+										for (int i = 0; i < dmtn.getChildCount(); i++)
+											if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
+										
+										((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
+									}
+								}
+								else success = file.delete();
+								
+								if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
+							}
+							fireUpdate();
 						}
 					}
 				}));

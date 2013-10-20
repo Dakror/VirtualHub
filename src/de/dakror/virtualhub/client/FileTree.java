@@ -116,27 +116,38 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 				
 				File targetFile = new File(Assistant.getNodePath(targetNode));
 				
-				new FileMover(Client.currentClient.frame, dtde.getDropAction() == DnDConstants.ACTION_COPY, targetFile, selected.toArray(new File[] {}));
+				boolean copy = dtde.getDropAction() == DnDConstants.ACTION_COPY;
 				
-				for (int i = 0; i < parent.getChildCount(); i++)
+				FileMover mover = new FileMover(Client.currentClient.frame, copy, targetFile, selected.toArray(new File[] {}));
+				if (!mover.canceled)
 				{
-					for (File f : selected)
+					for (int i = 0; i < parent.getChildCount(); i++)
 					{
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(i);
-						if (node.getUserObject().toString().equals(f.getName()))
+						for (File f : selected)
 						{
-							parent.remove(i);
-							targetNode.add(node);
+							if (!f.isDirectory()) continue;
+							
+							DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(i);
+							if (node.getUserObject().toString().equals(f.getName()))
+							{
+								if (!copy) parent.remove(i);
+								if (!Assistant.containsNode(targetNode, node))
+								{
+									DefaultMutableTreeNode clone = (DefaultMutableTreeNode) node.clone();
+									if (Assistant.hasSubDirectories(f)) clone.add(new DefaultMutableTreeNode("CONTENT"));
+									targetNode.add(clone);
+								}
+							}
 						}
 					}
+					
+					Assistant.sortNodeChildren(targetNode);
+					
+					dtm.reload(parent);
+					dtm.reload(targetNode);
+					
+					Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
 				}
-				
-				Assistant.sortDefaultMutableTreeNodeChildren(targetNode);
-				
-				dtm.reload(parent);
-				dtm.reload(targetNode);
-				
-				Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
 				
 				dtde.getDropTargetContext().dropComplete(true);
 				((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
