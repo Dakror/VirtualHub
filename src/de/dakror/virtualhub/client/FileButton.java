@@ -33,8 +33,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 
-import net.coobird.thumbnailator.Thumbnails;
-
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
 import com.jtattoo.plaf.JTattooUtilities;
@@ -170,20 +168,8 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	
 	public void setPreview() throws Exception
 	{
-		String e = Assistant.getFileExtension(file);
-		
-		Image image = null;
-		
-		if (e.equals("jpg") || e.equals("jpeg") || e.equals("png") || e.equals("gif") || e.equals("bmp")) image = ImageIO.read(file);
-		else if (e.equals("tif") || e.equals("tiff")) image = ThumbnailAssistant.readTIF(file);
-		else if (e.equals("psd")) image = ThumbnailAssistant.readPSD(file);
-		else if (e.equals("pdf")) image = ThumbnailAssistant.readPDF(file);
-		
-		if (image != null)
-		{
-			BufferedImage thm = Thumbnails.of(Assistant.toBufferedImage(image)).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).asBufferedImage();
-			preview.setIcon(new ImageIcon(thm));
-		}
+		Image image = ThumbnailAssistant.getThumbnail(file);
+		if (image != null) preview.setIcon(new ImageIcon(image));
 	}
 	
 	@Override

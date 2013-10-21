@@ -2,6 +2,7 @@ package de.dakror.virtualhub.util;
 
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import javax.imageio.ImageIO;
 import javax.media.jai.PlanarImage;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -16,6 +18,7 @@ import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
+import net.coobird.thumbnailator.Thumbnails;
 import psd.model.Psd;
 import sun.awt.shell.ShellFolder;
 
@@ -156,5 +159,54 @@ public class ThumbnailAssistant
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private static BufferedImage getFileThmubnail(File f) throws IOException
+	{
+		String e = Assistant.getFileExtension(f);
+		Image image = null;
+		
+		if (e.equals("jpg") || e.equals("jpeg") || e.equals("png") || e.equals("gif") || e.equals("bmp")) image = ImageIO.read(f);
+		else if (e.equals("tif") || e.equals("tiff")) image = readTIF(f);
+		else if (e.equals("psd")) image = readPSD(f);
+		else if (e.equals("pdf")) image = readPDF(f);
+		
+		if (image == null) return null;
+		
+		return Thumbnails.of(Assistant.toBufferedImage(image)).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).asBufferedImage();
+	}
+	
+	public static Image getThumbnail(File f)
+	{
+		try
+		{
+			File tmpFile = new File(f.getParentFile().getPath() + "/" + (!JTattooUtilities.isWindows() ? "." : "") + f.getName() + ".tmp");
+			if (tmpFile.exists()) return ImageIO.read(tmpFile);
+			else
+			{
+				BufferedImage thumbnail = getFileThmubnail(f);
+				
+				if (thumbnail == null) return null;
+				
+				createCacheFile(f, thumbnail);
+				
+				return thumbnail;
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static void createCacheFile(File f, BufferedImage thumbnail) throws IOException
+	{
+		File file = new File(f.getParentFile().getPath() + "/" + (!JTattooUtilities.isWindows() ? "." : "") + f.getName() + ".tmp");
+		CFG.p(f, file);
+		file.createNewFile();
+		file.deleteOnExit();
+		ImageIO.write(thumbnail, "PNG", file);
+		if (JTattooUtilities.isWindows()) Runtime.getRuntime().exec("attrib +H \"" + file.getPath() + "\"");
 	}
 }
