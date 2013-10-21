@@ -35,6 +35,8 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 	DropTarget dropTarget = new DropTarget(this, this);
 	DragSource dragSource = DragSource.getDefaultDragSource();
 	
+	DropTargetDropEvent dtde;
+	
 	public FileTree(DefaultTreeModel dtm)
 	{
 		super(dtm);
@@ -89,14 +91,16 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 	{}
 	
 	@Override
-	public void drop(DropTargetDropEvent dtde)
+	public void drop(DropTargetDropEvent e)
 	{
 		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
 		if (highlightedRow == -1)
 		{
-			dtde.rejectDrop();
+			e.rejectDrop();
 			return;
 		}
+		
+		dtde = e;
 		
 		Transferable transferable = dtde.getTransferable();
 		if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
@@ -107,57 +111,33 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 				@SuppressWarnings("unchecked")
 				List<File> selected = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				
-				DefaultTreeModel dtm = (DefaultTreeModel) Client.currentClient.frame.catalog.getModel();
-				
-				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent();
 				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
-				
-				Client.currentClient.frame.catalog.expandPath(new TreePath(targetNode.getPath()));
-				
 				File targetFile = new File(Assistant.getNodePath(targetNode));
 				
 				boolean copy = dtde.getDropAction() == DnDConstants.ACTION_COPY;
 				
-				FileMover mover = new FileMover(Client.currentClient.frame, copy, targetFile, selected.toArray(new File[] {}));
-				if (!mover.canceled)
-				{
-					for (int i = 0; i < parent.getChildCount(); i++)
-					{
-						for (File f : selected)
-						{
-							if (!f.isDirectory()) continue;
-							
-							DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(i);
-							if (node.getUserObject().toString().equals(f.getName()))
-							{
-								if (!copy) parent.remove(i);
-								if (!Assistant.containsNode(targetNode, node))
-								{
-									DefaultMutableTreeNode clone = (DefaultMutableTreeNode) node.clone();
-									if (Assistant.hasSubDirectories(f)) clone.add(new DefaultMutableTreeNode("CONTENT"));
-									targetNode.add(clone);
-								}
-							}
-						}
-					}
-					
-					Assistant.sortNodeChildren(targetNode);
-					
-					dtm.reload(parent);
-					dtm.reload(targetNode);
-					
-					Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
-				}
-				
-				dtde.getDropTargetContext().dropComplete(true);
-				((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
-				repaint();
+				new FileMover(Client.currentClient.frame, copy, targetFile, selected.toArray(new File[] {}));
 			}
-			catch (Exception e)
+			catch (Exception e1)
 			{
-				e.printStackTrace();
+				e1.printStackTrace();
 				dtde.rejectDrop();
 			}
 		}
+	}
+	
+	public void handleDrop()
+	{
+		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent();
+		DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
+		
+		Client.currentClient.frame.loadSubTree(parent);
+		Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
+		Client.currentClient.frame.loadSubTree(targetNode);
+		
+		dtde.getDropTargetContext().dropComplete(true);
+		((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
+		repaint();
 	}
 }

@@ -163,6 +163,7 @@ public class ClientFrame extends JFrame
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
 		DefaultTreeModel dtm = new DefaultTreeModel(root);
 		catalog = new FileTree(dtm);
+		catalog.setExpandsSelectedPaths(true);
 		catalog.setShowsRootHandles(true);
 		catalog.setRootVisible(false);
 		catalog.setCellRenderer(new FileTreeCellRenderer(this));
@@ -204,7 +205,7 @@ public class ClientFrame extends JFrame
 						
 						DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(source.getPath().replace("\\", "/"));
 						dtm.insertNodeInto(dmtn, root, root.getChildCount());
-						addFolderSourceTree(dmtn);
+						loadSubTree(dmtn);
 						
 						try
 						{
@@ -277,11 +278,7 @@ public class ClientFrame extends JFrame
 			public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException
 			{
 				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-				if (((DefaultMutableTreeNode) dmtn.getChildAt(0)).getUserObject().equals("CONTENT"))
-				{
-					dmtn.removeAllChildren();
-					addFolderSourceTree(dmtn);
-				}
+				if (((DefaultMutableTreeNode) dmtn.getChildAt(0)).getUserObject().equals("CONTENT")) loadSubTree(dmtn);
 			}
 			
 			@Override
@@ -328,7 +325,7 @@ public class ClientFrame extends JFrame
 				
 				dmtn.removeAllChildren();
 				dtm.reload(dmtn);
-				addFolderSourceTree(dmtn);
+				loadSubTree(dmtn);
 				
 				if (expanded) catalog.expandPath(catalog.getSelectionPath());
 				
@@ -389,7 +386,7 @@ public class ClientFrame extends JFrame
 			}
 			DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(file.getPath().replace("\\", "/"));
 			dtm.insertNodeInto(dmtn, root, root.getChildCount());
-			addFolderSourceTree(dmtn);
+			loadSubTree(dmtn);
 		}
 		
 		if (notFound.length() > 0)
@@ -401,9 +398,13 @@ public class ClientFrame extends JFrame
 		dtm.reload();
 	}
 	
-	public void addFolderSourceTree(DefaultMutableTreeNode folder)
+	public void loadSubTree(DefaultMutableTreeNode folder)
 	{
 		File f = new File(Assistant.getNodePath(folder));
+		
+		if (!f.exists()) return;
+		
+		folder.removeAllChildren();
 		
 		for (File file : f.listFiles())
 		{
@@ -414,6 +415,8 @@ public class ClientFrame extends JFrame
 				folder.add(dmtn);
 			}
 		}
+		
+		((DefaultTreeModel) catalog.getModel()).reload(folder);
 	}
 	
 	@Override

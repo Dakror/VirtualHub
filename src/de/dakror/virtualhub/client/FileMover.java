@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
+import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
 /**
@@ -18,6 +19,8 @@ public class FileMover extends Thread
 	File[] files;
 	
 	boolean copy;
+	
+	int value;
 	
 	ProgressMonitor monitor;
 	
@@ -34,11 +37,17 @@ public class FileMover extends Thread
 		
 		canceled = false;
 		
-		monitor = new ProgressMonitor(frame, (copy ? "Kopiere" : "Verschiebe") + " Dateien...", "", 0, 50);
+		int count = 0;
+		for (File f : files)
+			count += Assistant.getFileCount(f);
+		
+		value = 0;
+		
+		monitor = new ProgressMonitor(frame, (copy ? "Kopiere" : "Verschiebe") + " Dateien...", "", 0, count);
 		monitor.setMillisToDecideToPopup(0);
 		monitor.setMillisToPopup(0);
 		
-		run();
+		start();
 	}
 	
 	@Override
@@ -73,7 +82,11 @@ public class FileMover extends Thread
 				}
 			}
 			
-			if (!copy) files[i].renameTo(target);
+			if (!copy)
+			{
+				if (files[i].isDirectory()) moveOrCopyFolder(files[i], target, copy);
+				else files[i].renameTo(target);
+			}
 			else
 			{
 				if (files[i].isDirectory()) moveOrCopyFolder(files[i], target, copy);
@@ -90,11 +103,17 @@ public class FileMover extends Thread
 					}
 				}
 			}
-			monitor.setProgress(i + 1);
 		}
 		
-		monitor.close();
+		frame.catalog.handleDrop();
 		frame.directoryLoader.fireUpdate();
+	}
+	
+	public void updateProgress(String note)
+	{
+		value++;
+		monitor.setNote(note);
+		monitor.setProgress(value);
 	}
 	
 	public void moveOrCopyFolder(File folder, File targetParent, boolean copy)
@@ -108,6 +127,7 @@ public class FileMover extends Thread
 				File newFolder = new File(targetParent, f.getName());
 				newFolder.mkdir();
 				moveOrCopyFolder(f, newFolder, copy);
+				if (!copy) f.delete();
 			}
 			else if (f.isFile())
 			{
@@ -115,8 +135,18 @@ public class FileMover extends Thread
 				try
 				{
 					newFile.getParentFile().mkdirs();
-					newFile.createNewFile();
-					Assistant.copyInputStream(new FileInputStream(f), new FileOutputStream(newFile));
+					if (copy)
+					{
+						newFile.createNewFile();
+						Assistant.copyInputStream(new FileInputStream(f), new FileOutputStream(newFile));
+					}
+					else
+					{
+						newFile.delete();
+						f.renameTo(newFile);
+					}
+					
+					updateProgress(f.getPath());
 				}
 				catch (Exception e)
 				{
@@ -124,5 +154,7 @@ public class FileMover extends Thread
 				}
 			}
 		}
+		
+		if (!copy) CFG.p(folder, folder.delete());
 	}
 }

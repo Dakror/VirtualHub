@@ -33,6 +33,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 
+import net.coobird.thumbnailator.Thumbnails;
+
 import com.jtattoo.plaf.AbstractLookAndFeel;
 import com.jtattoo.plaf.ColorHelper;
 import com.jtattoo.plaf.JTattooUtilities;
@@ -131,7 +133,15 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 			@Override
 			public void run()
 			{
-				setPreview();
+				setPriority(Thread.MAX_PRIORITY);
+				try
+				{
+					setPreview();
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			};
 		}.start();
 	}
@@ -158,23 +168,22 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		}
 	}
 	
-	public void setPreview()
+	public void setPreview() throws Exception
 	{
 		String e = Assistant.getFileExtension(file);
 		
-		if (e.equals("jpg") || e.equals("jpeg") || e.equals("png") || e.equals("gif") || e.equals("bmp"))
-		{
-			try
-			{
-				preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ImageIO.read(file))));
-			}
-			catch (Exception e1)
-			{}
-		}
-		else if (e.equals("tif") || e.equals("tiff")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readTIF(file))));
-		else if (e.equals("psd")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPSD(file))));
-		else if (e.equals("pdf")) preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(ThumbnailAssistant.readPDF(file))));
+		Image image = null;
 		
+		if (e.equals("jpg") || e.equals("jpeg") || e.equals("png") || e.equals("gif") || e.equals("bmp")) image = ImageIO.read(file);
+		else if (e.equals("tif") || e.equals("tiff")) image = ThumbnailAssistant.readTIF(file);
+		else if (e.equals("psd")) image = ThumbnailAssistant.readPSD(file);
+		else if (e.equals("pdf")) image = ThumbnailAssistant.readPDF(file);
+		
+		if (image != null)
+		{
+			BufferedImage thm = Thumbnails.of(Assistant.toBufferedImage(image)).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).asBufferedImage();
+			preview.setIcon(new ImageIcon(thm));
+		}
 	}
 	
 	@Override
@@ -224,6 +233,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	{
 		File[] selectedFiles = Client.currentClient.frame.getSelectedFiles();
 		FileSelection transferable = new FileSelection(selectedFiles.length > 0 ? selectedFiles : new File[] { file });
+		
 		dge.startDrag(null, transferable, this);
 	}
 }

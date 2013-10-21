@@ -2,9 +2,11 @@ package de.dakror.virtualhub.util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Image;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceDragEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -265,8 +267,10 @@ public class Assistant
 	{
 		for (File f : dir.listFiles())
 		{
-			if (f.isDirectory()) deleteDirectory(f);
-			boolean fd = f.delete();
+			boolean fd = false;
+			
+			if (f.isDirectory()) fd = deleteDirectory(f);
+			else fd = f.delete();
 			
 			if (!fd) return false;
 		}
@@ -303,6 +307,27 @@ public class Assistant
 		dmtn.removeAllChildren();
 		for (DefaultMutableTreeNode node : nodes)
 			dmtn.add(node);
+	}
+	
+	public static int getFileCount(File folder)
+	{
+		int i = 0;
+		for (File f : folder.listFiles())
+		{
+			if (f.isHidden()) continue;
+			if (f.isDirectory()) i += getFileCount(f);
+			else i++;
+		}
+		
+		return i;
+	}
+	
+	public static BufferedImage toBufferedImage(Image img)
+	{
+		BufferedImage image = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		image.getGraphics().drawImage(img, 0, 0, null);
+		
+		return image;
 	}
 	
 	public static boolean containsNode(DefaultMutableTreeNode parent, DefaultMutableTreeNode child)

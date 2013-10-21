@@ -59,7 +59,9 @@ public class ThumbnailAssistant
 				rh = th;
 				rw = rh * sr;
 			}
-			return i.getScaledInstance((int) Math.round(rw), (int) Math.round(rh), Image.SCALE_SMOOTH);
+			Image result = i.getScaledInstance((int) Math.round(rw), (int) Math.round(rh), Image.SCALE_SMOOTH);
+			i.flush();
+			return result;
 		}
 		catch (Exception e)
 		{
