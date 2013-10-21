@@ -203,7 +203,6 @@ public class ThumbnailAssistant
 	public static void createCacheFile(File f, BufferedImage thumbnail) throws IOException
 	{
 		File file = new File(f.getParentFile().getPath() + "/" + (!JTattooUtilities.isWindows() ? "." : "") + f.getName() + ".tmp");
-		CFG.p(f, file);
 		file.createNewFile();
 		file.deleteOnExit();
 		ImageIO.write(thumbnail, "PNG", file);

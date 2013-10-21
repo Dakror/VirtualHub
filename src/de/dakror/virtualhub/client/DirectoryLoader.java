@@ -2,6 +2,7 @@ package de.dakror.virtualhub.client;
 
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -54,7 +55,6 @@ public class DirectoryLoader extends Thread
 			try
 			{
 				Thread.sleep(1);
-				
 				
 				if (frame.catalog.getSelectionPath() == null)
 				{
@@ -155,6 +155,15 @@ public class DirectoryLoader extends Thread
 						}
 					}));
 					
+					fb.addActionListener(new ActionListener()
+					{
+						@Override
+						public void actionPerformed(ActionEvent e)
+						{
+							frame.setFileInfo(fb.file);
+						}
+					});
+					
 					fb.addMouseListener(new MouseAdapter()
 					{
 						@Override
@@ -183,7 +192,7 @@ public class DirectoryLoader extends Thread
 										}
 										catch (IOException e1)
 										{
-											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
+											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software.", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
 										}
 									}
 								}

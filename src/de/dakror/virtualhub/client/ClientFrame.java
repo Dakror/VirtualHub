@@ -1,5 +1,6 @@
 package de.dakror.virtualhub.client;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -63,6 +64,9 @@ public class ClientFrame extends JFrame
 	FileViewPanel fileView;
 	JPanel fileInfo;
 	JScrollPane fileViewWrap;
+	
+	// -- file Info components -- //
+	JLabel fileInfoName;
 	
 	DirectoryLoader directoryLoader;
 	Synchronizer synchronizer;
@@ -341,7 +345,6 @@ public class ClientFrame extends JFrame
 			}
 		});
 		
-		
 		fileViewWrap = new JScrollPane(fileView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		fileViewWrap.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, borderColor));
 		fileViewWrap.setPreferredSize(new Dimension(1, 1));
@@ -349,8 +352,16 @@ public class ClientFrame extends JFrame
 		fileView.setSize(new Dimension(fileViewWrap.getSize().width, 0));
 		addGridBagLayoutComponent(viewSuper, gbl, fileViewWrap, 0, 1, 1, 1, 1, 1);
 		
-		fileInfo = new JPanel();
+		fileInfo = new JPanel(new BorderLayout());
+		fileInfo.setBorder(BorderFactory.createCompoundBorder(fileInfo.getBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 		fileInfo.setPreferredSize(new Dimension(0, 80));
+		
+		fileInfoName = new JLabel();
+		fileInfoName.setFont(fileInfoName.getFont().deriveFont(18f));
+		fileInfoName.setOpaque(false);
+		fileInfoName.setBorder(BorderFactory.createEmptyBorder());
+		fileInfo.add(fileInfoName, BorderLayout.PAGE_START);
+		
 		addGridBagLayoutComponent(viewSuper, gbl, fileInfo, 0, 2, 1, 1, 1, 0);
 		
 		return viewSuper;
@@ -417,6 +428,14 @@ public class ClientFrame extends JFrame
 		}
 		
 		((DefaultTreeModel) catalog.getModel()).reload(folder);
+	}
+	
+	public void setFileInfo(File f)
+	{
+		fileInfoName.setFocusable(f != null);
+		
+		if (f == null) fileInfoName.setText("");
+		else fileInfoName.setText(f.getName());
 	}
 	
 	@Override
