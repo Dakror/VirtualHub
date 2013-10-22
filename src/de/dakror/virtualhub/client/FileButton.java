@@ -92,7 +92,13 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		
 		if (JTattooUtilities.isMac()) sysIcon = MacOSXHandler.getIcon(sysIcon);
 		
-		preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(((ImageIcon) sysIcon).getImage(), CFG.PREVIEWSIZE.width / 2f, CFG.PREVIEWSIZE.height / 2f)));
+		try
+		{
+			preview.setIcon(new ImageIcon(ThumbnailAssistant.scaleImage(((ImageIcon) sysIcon).getImage(), CFG.PREVIEWSIZE.width / 2f, CFG.PREVIEWSIZE.height / 2f)));
+		}
+		catch (NullPointerException e)
+		{}
+		
 		add(preview);
 		
 		JLabel textLabel = new JLabel("<html><body style='text-align:center;'><br>" + Assistant.shortenFileName(file, 35, 2) + "</body></html>");

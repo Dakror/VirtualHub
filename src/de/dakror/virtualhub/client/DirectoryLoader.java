@@ -1,5 +1,6 @@
 package de.dakror.virtualhub.client;
 
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +66,7 @@ public class DirectoryLoader extends Thread
 					frame.fileView.dropTarget.setActive(false);
 					frame.fileView.removeAll();
 					frame.fileView.validate();
-					frame.fileView.repaint();
+					frame.repaint();
 					selectedNode = null;
 					continue;
 				}
@@ -160,6 +161,18 @@ public class DirectoryLoader extends Thread
 						@Override
 						public void actionPerformed(ActionEvent e)
 						{
+							if (e.getModifiers() == 16)
+							{
+								for (Component c : frame.fileView.getComponents())
+								{
+									if (c instanceof FileButton)
+									{
+										if (!c.equals(fb)) ((FileButton) c).setSelected(false);
+									}
+								}
+								fb.setSelected(fb.isSelected());
+							}
+							else if (e.getModifiers() == 18) fb.setSelected(fb.isSelected());
 							frame.setFileInfo(fb.file);
 						}
 					});
@@ -203,16 +216,18 @@ public class DirectoryLoader extends Thread
 					frame.fileView.add(fb);
 					
 					frame.fileView.revalidate();
-					frame.fileView.repaint();
+					frame.repaint();
 				}
 				
 				frame.fileView.revalidate();
-				frame.fileView.repaint();
+				frame.repaint();
 				
 				System.gc();
 				
 				synced = true;
 			}
+			catch (InterruptedException e)
+			{}
 			catch (Exception e)
 			{
 				e.printStackTrace();

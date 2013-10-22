@@ -337,4 +337,19 @@ public class Assistant
 		
 		return false;
 	}
+	
+	public static int getIndexOfComponent(Container container, Component c)
+	{
+		int index = -1;
+		for (int i = 0; i < container.getComponentCount(); i++)
+		{
+			if (container.getComponent(i).equals(c))
+			{
+				index = i;
+				break;
+			}
+		}
+		
+		return index;
+	}
 }

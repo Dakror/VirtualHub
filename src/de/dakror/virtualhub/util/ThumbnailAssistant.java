@@ -161,7 +161,7 @@ public class ThumbnailAssistant
 		}
 	}
 	
-	private static BufferedImage getFileThmubnail(File f) throws IOException
+	public static BufferedImage getFileThmubnail(File f) throws IOException
 	{
 		String e = Assistant.getFileExtension(f);
 		Image image = null;
@@ -173,7 +173,7 @@ public class ThumbnailAssistant
 		
 		if (image == null) return null;
 		
-		return Thumbnails.of(Assistant.toBufferedImage(image)).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).asBufferedImage();
+		return Assistant.toBufferedImage(image);
 	}
 	
 	public static Image getThumbnail(File f)
@@ -185,8 +185,9 @@ public class ThumbnailAssistant
 			else
 			{
 				BufferedImage thumbnail = getFileThmubnail(f);
-				
 				if (thumbnail == null) return null;
+				
+				thumbnail = Thumbnails.of(thumbnail).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).asBufferedImage();
 				
 				createCacheFile(f, thumbnail);
 				

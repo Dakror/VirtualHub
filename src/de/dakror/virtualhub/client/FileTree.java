@@ -130,15 +130,29 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 	{
 		
 		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
-		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent();
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
+		
+		TreePath path = new TreePath(parent.getPath());
+		
 		DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
 		
 		Client.currentClient.frame.loadSubTree(parent);
-		Client.currentClient.frame.catalog.setSelectionPath(new TreePath(parent.getPath()));
+		setSelectionPath(new TreePath(parent.getPath()));
 		Client.currentClient.frame.loadSubTree(targetNode);
 		
-		dtde.getDropTargetContext().dropComplete(true);
 		((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
-		repaint();
+		
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getParentPath().getLastPathComponent();
+		for (int i = 0; i < node.getChildCount(); i++)
+		{
+			if (((DefaultMutableTreeNode) node.getChildAt(i)).getUserObject().equals(((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject()))
+			{
+				setSelectionPath(new TreePath(((DefaultMutableTreeNode) node.getChildAt(i)).getPath()));
+				break;
+			}
+		}
+		
+		Client.currentClient.frame.directoryLoader.fireUpdate();
+		dtde.getDropTargetContext().dropComplete(true);
 	}
 }

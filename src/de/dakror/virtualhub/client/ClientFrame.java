@@ -1,6 +1,5 @@
 package de.dakror.virtualhub.client;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -11,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -36,6 +36,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
@@ -49,6 +50,7 @@ import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.ThumbnailAssistant;
 import de.dakror.virtualhub.util.WrapLayout;
 
 /**
@@ -66,7 +68,7 @@ public class ClientFrame extends JFrame
 	JScrollPane fileViewWrap;
 	
 	// -- file Info components -- //
-	JLabel fileInfoName;
+	JLabel fileInfoName, fileInfoType, fileInfoDetails, fileInfoSize;
 	
 	DirectoryLoader directoryLoader;
 	Synchronizer synchronizer;
@@ -352,19 +354,39 @@ public class ClientFrame extends JFrame
 		fileView.setSize(new Dimension(fileViewWrap.getSize().width, 0));
 		addGridBagLayoutComponent(viewSuper, gbl, fileViewWrap, 0, 1, 1, 1, 1, 1);
 		
-		fileInfo = new JPanel(new BorderLayout());
+		initInfo();
+		addGridBagLayoutComponent(viewSuper, gbl, fileInfo, 0, 2, 1, 1, 1, 0);
+		
+		return viewSuper;
+	}
+	
+	public void initInfo()
+	{
+		GridBagLayout gbl = new GridBagLayout();
+		fileInfo = new JPanel(gbl);
+		
 		fileInfo.setBorder(BorderFactory.createCompoundBorder(fileInfo.getBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 		fileInfo.setPreferredSize(new Dimension(0, 80));
 		
 		fileInfoName = new JLabel();
+		fileInfoName.setForeground(Color.darkGray);
 		fileInfoName.setFont(fileInfoName.getFont().deriveFont(18f));
-		fileInfoName.setOpaque(false);
-		fileInfoName.setBorder(BorderFactory.createEmptyBorder());
-		fileInfo.add(fileInfoName, BorderLayout.PAGE_START);
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoName, 0, 0, 3, 2, 0, 1);
 		
-		addGridBagLayoutComponent(viewSuper, gbl, fileInfo, 0, 2, 1, 1, 1, 0);
+		fileInfoType = new JLabel();
+		fileInfoType.setForeground(Color.decode("#1E395B"));
+		fileInfoType.setFont(fileInfoType.getFont().deriveFont(14f));
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoType, 0, 2, 1, 1, 1, 1);
 		
-		return viewSuper;
+		fileInfoDetails = new JLabel();
+		fileInfoDetails.setForeground(Color.decode("#1E395B"));
+		fileInfoDetails.setFont(fileInfoDetails.getFont().deriveFont(14f));
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoDetails, 1, 2, 1, 1, 1, 1);
+		
+		fileInfoSize = new JLabel();
+		fileInfoSize.setForeground(Color.decode("#1E395B"));
+		fileInfoSize.setFont(fileInfoSize.getFont().deriveFont(14f));
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoSize, 2, 2, 1, 1, 1, 1);
 	}
 	
 	public void addGridBagLayoutComponent(Container parent, GridBagLayout gbl, Component c, int x, int y, int width, int height, double wx, double wy)
@@ -430,12 +452,65 @@ public class ClientFrame extends JFrame
 		((DefaultTreeModel) catalog.getModel()).reload(folder);
 	}
 	
-	public void setFileInfo(File f)
+	public void setFileInfo(final File f)
 	{
-		fileInfoName.setFocusable(f != null);
-		
-		if (f == null) fileInfoName.setText("");
-		else fileInfoName.setText(f.getName());
+		if (f == null)
+		{
+			fileInfoName.setText("");
+			fileInfoType.setText("");
+			fileInfoSize.setText("");
+			fileInfoDetails.setText("");
+		}
+		else
+		{
+			File[] sel = getSelectedFiles();
+			if (sel.length == 1)
+			{
+				fileInfoName.setText(f.getName());
+				fileInfoType.setText(FileSystemView.getFileSystemView().getSystemTypeDescription(f));
+				if (!f.isDirectory()) fileInfoSize.setText("Gr\u00f6\u00dfe: " + Assistant.formatBinarySize(f.length(), 2));
+				else fileInfoSize.setText("");
+				
+				new Thread()
+				{
+					@Override
+					public void run()
+					{
+						try
+						{
+							BufferedImage image = ThumbnailAssistant.getFileThmubnail(f);
+							if (image != null) fileInfoDetails.setText("Abmessungen: " + image.getWidth() + " x " + image.getHeight());
+							else
+							{
+								fileInfoDetails.setText("");
+								
+								if (f.isDirectory())
+								{
+									int fl = 0, dir = 0;
+									
+									for (File file : f.listFiles())
+									{
+										if (f.isHidden()) continue;
+										
+										if (file.isDirectory()) dir++;
+										else fl++;
+									}
+									
+									fileInfoDetails.setText((fl > 0 ? fl + " Datei" + (fl > 1 ? "en" : "") : "") + (fl > 0 && dir > 0 ? " und " : "") + (dir > 0 ? dir + " Unterordner" : ""));
+								}
+							}
+						}
+						catch (IOException e)
+						{}
+					}
+				}.start();
+			}
+			else
+			{
+				setFileInfo(null);
+				if (sel.length > 0) fileInfoName.setText(sel.length + " Elemente ausgew\u00e4hlt");
+			}
+		}
 	}
 	
 	@Override

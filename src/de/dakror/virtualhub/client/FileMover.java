@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
-import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
 /**
@@ -39,7 +38,10 @@ public class FileMover extends Thread
 		
 		int count = 0;
 		for (File f : files)
-			count += Assistant.getFileCount(f);
+		{
+			if (f.isDirectory()) count += Assistant.getFileCount(f);
+			else count++;
+		}
 		
 		value = 0;
 		
@@ -80,6 +82,7 @@ public class FileMover extends Thread
 					canceled = true;
 					break;
 				}
+				if (!target.isDirectory()) target.delete();
 			}
 			
 			if (!copy)
@@ -106,7 +109,6 @@ public class FileMover extends Thread
 		}
 		
 		frame.catalog.handleDrop();
-		frame.directoryLoader.fireUpdate();
 	}
 	
 	public void updateProgress(String note)
@@ -155,6 +157,6 @@ public class FileMover extends Thread
 			}
 		}
 		
-		if (!copy) CFG.p(folder, folder.delete());
+		if (!copy) folder.delete();
 	}
 }
