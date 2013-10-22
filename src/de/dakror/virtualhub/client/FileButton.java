@@ -128,7 +128,12 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{
-				if (new Area(eticetPolygon).contains(e.getPoint())) eticet.show(e.getComponent(), e.getX(), e.getY());
+				if (new Area(eticetPolygon).contains(e.getPoint()))
+				{
+					eticet.show(e.getComponent(), e.getX(), e.getY());
+					setSelected(false);
+					Client.currentClient.frame.setFileInfo(null);
+				}
 			}
 		});
 		

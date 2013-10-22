@@ -116,7 +116,7 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 				
 				boolean copy = dtde.getDropAction() == DnDConstants.ACTION_COPY;
 				
-				new FileMover(Client.currentClient.frame, copy, targetFile, selected.toArray(new File[] {}));
+				new FileMover(Client.currentClient.frame, true, copy, targetFile, selected.toArray(new File[] {}));
 			}
 			catch (Exception e1)
 			{
@@ -128,7 +128,6 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 	
 	public void handleDrop()
 	{
-		
 		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
 		

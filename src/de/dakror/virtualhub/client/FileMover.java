@@ -18,6 +18,8 @@ public class FileMover extends Thread
 	File[] files;
 	
 	boolean copy;
+	boolean canceled;
+	boolean fromTree;
 	
 	int value;
 	
@@ -25,12 +27,12 @@ public class FileMover extends Thread
 	
 	ClientFrame frame;
 	
-	boolean canceled;
 	
-	public FileMover(final ClientFrame frame, final boolean copy, File targetParent, File... files)
+	public FileMover(final ClientFrame frame, boolean fromTree, final boolean copy, File targetParent, File... files)
 	{
 		this.targetParent = targetParent;
 		this.files = files;
+		this.fromTree = fromTree;
 		this.copy = copy;
 		this.frame = frame;
 		
@@ -108,7 +110,7 @@ public class FileMover extends Thread
 			}
 		}
 		
-		frame.catalog.handleDrop();
+		if (fromTree) frame.catalog.handleDrop();
 	}
 	
 	public void updateProgress(String note)

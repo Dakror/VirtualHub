@@ -1,6 +1,9 @@
 package de.dakror.virtualhub.client;
 
 import java.awt.LayoutManager;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -14,8 +17,15 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import de.dakror.virtualhub.settings.CFG;
+import de.dakror.virtualhub.util.Assistant;
 
 /**
  * @author Dakror
@@ -85,36 +95,36 @@ public class FileViewPanel extends JPanel implements DropTargetListener, DragSou
 			return;
 		}
 		
-		// try
-		// {
-		// Transferable tr = dtde.getTransferable();
-		// if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-		// {
-		// dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-		// java.util.List fileList = (java.util.List) tr.getTransferData(DataFlavor.javaFileListFlavor);
-		// Iterator iterator = fileList.iterator();
-		// while (iterator.hasNext())
-		// {
-		// File file = (File) iterator.next();
-		// CFG.p("Received: " + file);
-		// }
-		// dtde.getDropTargetContext().dropComplete(true);
-		// }
-		// else
-		// {
-		// CFG.p("Rejected");
-		// dtde.rejectDrop();
-		// }
-		// }
-		// catch (IOException io)
-		// {
-		// io.printStackTrace();
-		// dtde.rejectDrop();
-		// }
-		// catch (UnsupportedFlavorException ufe)
-		// {
-		// ufe.printStackTrace();
-		// dtde.rejectDrop();
-		// }
+		try
+		{
+			Transferable tr = dtde.getTransferable();
+			if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+			{
+				dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+				List<?> fileList = (List<?>) tr.getTransferData(DataFlavor.javaFileListFlavor);
+				
+				File parent = new File(Assistant.getNodePath((DefaultMutableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent()));
+				
+				new FileMover(Client.currentClient.frame, false, dtde.getDropAction() == DnDConstants.ACTION_COPY, parent, fileList.toArray(new File[] {}));
+				Client.currentClient.frame.directoryLoader.fireUpdate();
+				
+				dtde.getDropTargetContext().dropComplete(true);
+			}
+			else
+			{
+				CFG.p("Rejected");
+				dtde.rejectDrop();
+			}
+		}
+		catch (IOException io)
+		{
+			io.printStackTrace();
+			dtde.rejectDrop();
+		}
+		catch (UnsupportedFlavorException ufe)
+		{
+			ufe.printStackTrace();
+			dtde.rejectDrop();
+		}
 	}
 }
