@@ -46,6 +46,7 @@ import com.jtattoo.plaf.ColorHelper;
 
 import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.data.Catalog;
+import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.settings.CFG;
@@ -445,6 +446,14 @@ public class ClientFrame extends JFrame
 			{
 				EticetableTreeNode dmtn = new EticetableTreeNode(file.getName());
 				if (Assistant.hasSubDirectories(file)) dmtn.add(new EticetableTreeNode("CONTENT"));
+				try
+				{
+					Client.currentClient.sendPacket(new Packet2Eticet(file, Eticet.NULL));
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 				folder.add(dmtn);
 			}
 		}
@@ -553,7 +562,24 @@ public class ClientFrame extends JFrame
 					{
 						fb.setEticet(packet.getEticet());
 						fb.repaint();
+						
+						break;
 					}
+				}
+			}
+		}
+		
+		if (catalog.getSelectionPath() != null)
+		{
+			EticetableTreeNode parent = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+			for (int i = 0; i < parent.getChildCount(); i++)
+			{
+				EticetableTreeNode etn = (EticetableTreeNode) parent.getChildAt(i);
+				if (etn.getUserObject().equals(packet.getFile().getName()))
+				{
+					etn.setEticet(packet.getEticet());
+					catalog.repaint();
+					break;
 				}
 			}
 		}

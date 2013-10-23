@@ -1,8 +1,5 @@
 package de.dakror.virtualhub.client;
 
-
-
-
 /**
  * @author Dakror
  */

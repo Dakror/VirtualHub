@@ -34,12 +34,17 @@ public class FileTreeCellRenderer extends DefaultTreeCellRenderer
 		JLabel tce = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		if (row < 0 || row >= tree.getRowCount()) return tce;
 		
+		EticetableTreeNode etn = (EticetableTreeNode) value;
+		
 		if (highlightedRow == row)
 		{
 			selected = true;
 			tce.setForeground(Color.white);
 			this.hasFocus = true;
 		}
+		
+		tce.setOpaque(true);
+		tce.setBackground(etn.getEticet().getColor());
 		
 		return tce;
 	}

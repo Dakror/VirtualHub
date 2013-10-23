@@ -11,7 +11,7 @@ public class EticetableTreeNode extends DefaultMutableTreeNode
 {
 	private static final long serialVersionUID = 1L;
 	
-	private Eticet eticet;
+	private Eticet eticet = Eticet.NONE;
 	
 	public EticetableTreeNode()
 	{}
