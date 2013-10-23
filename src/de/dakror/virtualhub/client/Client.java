@@ -18,6 +18,7 @@ import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.net.PacketHandler;
 import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet0Catalogs;
+import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -89,12 +90,22 @@ public class Client extends Thread implements PacketHandler
 		switch (Packet.lookupPacket(data[0]))
 		{
 			case INVALID:
+			{
 				CFG.p("Received invalid packet");
 				break;
+			}
 			case CATALOGS:
+			{
 				Packet0Catalogs p = new Packet0Catalogs(data);
 				ChooseCatalogDialog.show(frame, p.getCatalogs());
 				break;
+			}
+			case ETICET:
+			{
+				Packet2Eticet p = new Packet2Eticet(data);
+				frame.setFileEticet(p);
+				break;
+			}
 			default:
 				break;
 		}

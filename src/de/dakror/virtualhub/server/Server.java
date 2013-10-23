@@ -41,6 +41,8 @@ public class Server extends Thread
 		dir = new File(CFG.DIR, "Server");
 		dir.mkdir();
 		
+		DBManager.init();
+		
 		frame = new ServerFrame();
 		frame.addWindowListener(new WindowAdapter()
 		{

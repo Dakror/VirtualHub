@@ -22,7 +22,7 @@ import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -38,6 +38,8 @@ import com.jtattoo.plaf.ColorHelper;
 import com.jtattoo.plaf.JTattooUtilities;
 import com.jtattoo.plaf.LazyImageIcon;
 
+import de.dakror.virtualhub.data.Eticet;
+import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.FileSelection;
@@ -50,8 +52,6 @@ import de.dakror.virtualhub.util.ThumbnailAssistant;
 public class FileButton extends JToggleButton implements DragSourceListener, DragGestureListener
 {
 	private static final long serialVersionUID = 1L;
-	public static final String[] names = { "Kein Etikett", "Rot", "Orange", "Gelb", "Gr\u00fcn", "Blau", "Violett", "Grau", };
-	public static final Color[] colors = { new Color(0, 0, 0, 0), Color.red, Color.orange, Color.yellow, Color.green, Color.blue, Color.magenta, Color.gray };
 	
 	public static Polygon eticetPolygon;
 	static
@@ -67,7 +67,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	File file;
 	JLabel preview;
 	
-	Color eticet = new Color(0, 0, 0, 0);
+	Eticet eticet = Eticet.NONE;
 	
 	DragSource dragSource = DragSource.getDefaultDragSource();
 	
@@ -105,18 +105,28 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		add(textLabel);
 		
 		final JPopupMenu eticet = new JPopupMenu();
-		for (int i = 0; i < names.length; i++)
+		for (final Eticet e : Eticet.values())
 		{
-			JMenuItem jmi = new JMenuItem(new AbstractAction(names[i], generateEticetIcon(colors[i]))
+			if (e == Eticet.NULL) continue;
+			
+			JMenuItem jmi = new JMenuItem(new AbstractAction(e.getName(), generateEticetIcon(e.getColor()))
 			{
 				
 				private static final long serialVersionUID = 1L;
 				
 				@Override
-				public void actionPerformed(ActionEvent e)
+				public void actionPerformed(ActionEvent evt)
 				{
-					JMenuItem jmi = (JMenuItem) e.getSource();
-					FileButton.this.eticet = colors[Arrays.asList(names).indexOf(jmi.getText())];
+					JMenuItem jmi = (JMenuItem) evt.getSource();
+					FileButton.this.eticet = Eticet.getByName(jmi.getText());
+					try
+					{
+						Client.currentClient.sendPacket(new Packet2Eticet(FileButton.this.file, FileButton.this.eticet));
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			});
 			eticet.add(jmi);
@@ -153,6 +163,20 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 				}
 			};
 		}.start();
+		
+		requestEticet();
+	}
+	
+	public void requestEticet()
+	{
+		try
+		{
+			Client.currentClient.sendPacket(new Packet2Eticet(file, Eticet.NULL));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public Icon generateEticetIcon(Color c)
@@ -193,7 +217,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		Graphics2D g2d = (Graphics2D) g;
 		Color oldColor = g2d.getColor();
 		
-		g2d.setColor(eticet);
+		g2d.setColor(eticet.getColor());
 		
 		g2d.fillPolygon(eticetPolygon);
 		

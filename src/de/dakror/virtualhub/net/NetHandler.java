@@ -9,10 +9,13 @@ import java.net.SocketException;
 
 import org.json.JSONException;
 
+import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet.PacketTypes;
 import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
+import de.dakror.virtualhub.net.packet.Packet2Eticet;
+import de.dakror.virtualhub.server.DBManager;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -98,7 +101,7 @@ public class NetHandler extends Thread implements PacketHandler
 	}
 	
 	/**
-	 * Only called Server sided
+	 * Only called on Server side
 	 */
 	@Override
 	public void parsePacket(byte[] data)
@@ -134,6 +137,23 @@ public class NetHandler extends Thread implements PacketHandler
 						}
 					}
 					catch (JSONException e)
+					{
+						e.printStackTrace();
+					}
+				}
+				break;
+			}
+			case ETICET:
+			{
+				Packet2Eticet p = new Packet2Eticet(data);
+				Eticet result = DBManager.eticet(p.getFile(), p.getEticet());
+				if (result != null)
+				{
+					try
+					{
+						sendPacket(new Packet2Eticet(p.getFile(), result));
+					}
+					catch (IOException e)
 					{
 						e.printStackTrace();
 					}

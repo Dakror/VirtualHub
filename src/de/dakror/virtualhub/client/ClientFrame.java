@@ -48,6 +48,7 @@ import com.jtattoo.plaf.ColorHelper;
 import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
+import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.ThumbnailAssistant;
@@ -538,5 +539,24 @@ public class ClientFrame extends JFrame
 	{
 		if (catalog.getSelectionPath() == null) return null;
 		return new File(Assistant.getNodePath((DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
+	}
+	
+	public void setFileEticet(Packet2Eticet packet)
+	{
+		if (fileView.getComponentCount() > 0)
+		{
+			for (Component c : fileView.getComponents())
+			{
+				if (c instanceof FileButton)
+				{
+					FileButton fb = (FileButton) c;
+					if (fb.file.equals(packet.getFile()))
+					{
+						fb.eticet = packet.getEticet();
+						fb.repaint();
+					}
+				}
+			}
+		}
 	}
 }

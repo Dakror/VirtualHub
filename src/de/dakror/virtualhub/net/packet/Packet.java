@@ -13,6 +13,7 @@ public abstract class Packet
 		INVALID,
 		CATALOGS,
 		CATALOG,
+		ETICET,
 		
 		;
 		public int getID()
