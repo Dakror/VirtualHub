@@ -16,7 +16,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -32,7 +31,7 @@ public class DirectoryLoader extends Thread
 	
 	private ClientFrame frame;
 	
-	DefaultMutableTreeNode selectedNode;
+	EticetableTreeNode selectedNode;
 	
 	boolean synced;
 	
@@ -71,7 +70,7 @@ public class DirectoryLoader extends Thread
 					continue;
 				}
 				
-				final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+				final EticetableTreeNode dmtn = (EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
 				if (selectedNode == null || !dmtn.equals(selectedNode))
 				{
 					selectedNode = dmtn;
@@ -93,7 +92,7 @@ public class DirectoryLoader extends Thread
 				{
 					if (f.isHidden()) continue;
 					
-					if (frame.catalog.getSelectionPath() == null || !((DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
+					if (frame.catalog.getSelectionPath() == null || !((EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
 					
 					final FileButton fb = new FileButton(f);
 					
@@ -116,7 +115,7 @@ public class DirectoryLoader extends Thread
 									{
 										success = Assistant.deleteDirectory(fb.file);
 										
-										DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+										EticetableTreeNode dmtn = (EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
 										frame.loadSubTree(dmtn);
 										
 									}
@@ -140,9 +139,9 @@ public class DirectoryLoader extends Thread
 										
 										if (success)
 										{
-											DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
+											EticetableTreeNode dmtn = (EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
 											for (int i = 0; i < dmtn.getChildCount(); i++)
-												if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
+												if (((EticetableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
 											
 											((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
 										}
@@ -189,9 +188,9 @@ public class DirectoryLoader extends Thread
 									frame.catalog.expandPath(new TreePath(dmtn.getPath()));
 									for (int i = 0; i < dmtn.getChildCount(); i++)
 									{
-										if (((DefaultMutableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
+										if (((EticetableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
 										{
-											frame.catalog.setSelectionPath(new TreePath(((DefaultMutableTreeNode) dmtn.getChildAt(i)).getPath()));
+											frame.catalog.setSelectionPath(new TreePath(((EticetableTreeNode) dmtn.getChildAt(i)).getPath()));
 										}
 									}
 								}

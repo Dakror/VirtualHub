@@ -44,27 +44,14 @@ public class DBManager
 			if (e == Eticet.NULL)
 			{
 				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM VIRTUALHUB WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
-				if (!rs.next())
-				{
-					Server.currentServer.frame.log("doesn't exist: " + f);
-					return Eticet.NONE;
-				}
+				if (!rs.next()) return Eticet.NONE;
 				
-				Server.currentServer.frame.log("return entry: " + f);
 				return Eticet.values()[rs.getInt(1)];
 			}
 			else
 			{
-				if (e == Eticet.NONE)
-				{
-					Server.currentServer.frame.log("clearing entry: " + f);
-					connection.createStatement().executeUpdate("DELETE FROM VIRTUALHUB WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
-				}
-				else
-				{
-					Server.currentServer.frame.log("inserting/updating entry: " + f);
-					connection.createStatement().executeUpdate("INSERT OR REPLACE INTO VIRTUALHUB VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ")");
-				}
+				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM VIRTUALHUB WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO VIRTUALHUB VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ")");
 			}
 		}
 		catch (SQLException e1)

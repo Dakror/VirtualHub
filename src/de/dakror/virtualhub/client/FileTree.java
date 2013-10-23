@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -111,7 +110,7 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 				@SuppressWarnings("unchecked")
 				List<File> selected = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
 				
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
+				EticetableTreeNode targetNode = (EticetableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
 				File targetFile = new File(Assistant.getNodePath(targetNode));
 				
 				boolean copy = dtde.getDropAction() == DnDConstants.ACTION_COPY;
@@ -129,11 +128,11 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 	public void handleDrop()
 	{
 		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
-		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) getSelectionPath().getLastPathComponent();
+		EticetableTreeNode parent = (EticetableTreeNode) getSelectionPath().getLastPathComponent();
 		
 		TreePath path = new TreePath(parent.getPath());
 		
-		DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
+		EticetableTreeNode targetNode = (EticetableTreeNode) getPathForRow(highlightedRow).getLastPathComponent();
 		
 		Client.currentClient.frame.loadSubTree(parent);
 		setSelectionPath(new TreePath(parent.getPath()));
@@ -141,12 +140,12 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 		
 		((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
 		
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getParentPath().getLastPathComponent();
+		EticetableTreeNode node = (EticetableTreeNode) path.getParentPath().getLastPathComponent();
 		for (int i = 0; i < node.getChildCount(); i++)
 		{
-			if (((DefaultMutableTreeNode) node.getChildAt(i)).getUserObject().equals(((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject()))
+			if (((EticetableTreeNode) node.getChildAt(i)).getUserObject().equals(((EticetableTreeNode) path.getLastPathComponent()).getUserObject()))
 			{
-				setSelectionPath(new TreePath(((DefaultMutableTreeNode) node.getChildAt(i)).getPath()));
+				setSelectionPath(new TreePath(((EticetableTreeNode) node.getChildAt(i)).getPath()));
 				break;
 			}
 		}

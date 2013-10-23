@@ -37,7 +37,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 
@@ -167,7 +166,7 @@ public class ClientFrame extends JFrame
 	
 	public void initTree()
 	{
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
+		EticetableTreeNode root = new EticetableTreeNode("ROOT");
 		DefaultTreeModel dtm = new DefaultTreeModel(root);
 		catalog = new FileTree(dtm);
 		catalog.setExpandsSelectedPaths(true);
@@ -208,9 +207,9 @@ public class ClientFrame extends JFrame
 					{
 						Client.currentClient.catalog.sources.add(source);
 						DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) dtm.getRoot();
+						EticetableTreeNode root = (EticetableTreeNode) dtm.getRoot();
 						
-						DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(source.getPath().replace("\\", "/"));
+						EticetableTreeNode dmtn = new EticetableTreeNode(source.getPath().replace("\\", "/"));
 						dtm.insertNodeInto(dmtn, root, root.getChildCount());
 						loadSubTree(dmtn);
 						
@@ -236,7 +235,7 @@ public class ClientFrame extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+				EticetableTreeNode dmtn = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
 				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 				
 				Client.currentClient.catalog.sources.remove(new File(dmtn.getUserObject().toString()));
@@ -269,8 +268,8 @@ public class ClientFrame extends JFrame
 					if (row != -1)
 					{
 						catalog.setSelectionRow(row);
-						DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
-						if (((DefaultMutableTreeNode) dmtn.getParent()).getUserObject().equals("ROOT"))
+						EticetableTreeNode dmtn = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+						if (((EticetableTreeNode) dmtn.getParent()).getUserObject().equals("ROOT"))
 						{
 							sourcePopupMenu.show(e.getComponent(), e.getX(), e.getY());
 						}
@@ -284,8 +283,8 @@ public class ClientFrame extends JFrame
 			@Override
 			public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException
 			{
-				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-				if (((DefaultMutableTreeNode) dmtn.getChildAt(0)).getUserObject().equals("CONTENT")) loadSubTree(dmtn);
+				EticetableTreeNode dmtn = (EticetableTreeNode) e.getPath().getLastPathComponent();
+				if (((EticetableTreeNode) dmtn.getChildAt(0)).getUserObject().equals("CONTENT")) loadSubTree(dmtn);
 			}
 			
 			@Override
@@ -320,13 +319,13 @@ public class ClientFrame extends JFrame
 				
 				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 				
-				File parent = new File(Assistant.getNodePath((DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
+				File parent = new File(Assistant.getNodePath((EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
 				int count = Assistant.getFileCountWithSamePrefix(parent, "Neuer Ordner");
 				
 				File folder = new File(parent, "Neuer Ordner" + (count > 0 ? " (" + (count + 1) + ")" : ""));
 				folder.mkdir();
 				
-				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent();
+				EticetableTreeNode dmtn = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
 				
 				boolean expanded = catalog.isExpanded(catalog.getSelectionPath());
 				
@@ -407,7 +406,7 @@ public class ClientFrame extends JFrame
 	public void loadCatalog(Catalog catalog)
 	{
 		DefaultTreeModel dtm = (DefaultTreeModel) this.catalog.getModel();
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) dtm.getRoot();
+		EticetableTreeNode root = (EticetableTreeNode) dtm.getRoot();
 		
 		String notFound = "";
 		String sep = ",\r\n ";
@@ -418,7 +417,7 @@ public class ClientFrame extends JFrame
 				notFound += file.getPath().replace("\\", "/") + sep;
 				continue;
 			}
-			DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(file.getPath().replace("\\", "/"));
+			EticetableTreeNode dmtn = new EticetableTreeNode(file.getPath().replace("\\", "/"));
 			dtm.insertNodeInto(dmtn, root, root.getChildCount());
 			loadSubTree(dmtn);
 		}
@@ -432,7 +431,7 @@ public class ClientFrame extends JFrame
 		dtm.reload();
 	}
 	
-	public void loadSubTree(DefaultMutableTreeNode folder)
+	public void loadSubTree(EticetableTreeNode folder)
 	{
 		File f = new File(Assistant.getNodePath(folder));
 		
@@ -444,8 +443,8 @@ public class ClientFrame extends JFrame
 		{
 			if (file.isDirectory() && !file.isHidden())
 			{
-				DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(file.getName());
-				if (Assistant.hasSubDirectories(file)) dmtn.add(new DefaultMutableTreeNode("CONTENT"));
+				EticetableTreeNode dmtn = new EticetableTreeNode(file.getName());
+				if (Assistant.hasSubDirectories(file)) dmtn.add(new EticetableTreeNode("CONTENT"));
 				folder.add(dmtn);
 			}
 		}
@@ -538,7 +537,7 @@ public class ClientFrame extends JFrame
 	public File getSelectedTreeFile()
 	{
 		if (catalog.getSelectionPath() == null) return null;
-		return new File(Assistant.getNodePath((DefaultMutableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
+		return new File(Assistant.getNodePath((EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
 	}
 	
 	public void setFileEticet(Packet2Eticet packet)
@@ -552,7 +551,7 @@ public class ClientFrame extends JFrame
 					FileButton fb = (FileButton) c;
 					if (fb.file.equals(packet.getFile()))
 					{
-						fb.eticet = packet.getEticet();
+						fb.setEticet(packet.getEticet());
 						fb.repaint();
 					}
 				}

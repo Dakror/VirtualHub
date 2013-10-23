@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
@@ -103,7 +102,7 @@ public class FileViewPanel extends JPanel implements DropTargetListener, DragSou
 				dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 				List<?> fileList = (List<?>) tr.getTransferData(DataFlavor.javaFileListFlavor);
 				
-				File parent = new File(Assistant.getNodePath((DefaultMutableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent()));
+				File parent = new File(Assistant.getNodePath((EticetableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent()));
 				
 				new FileMover(Client.currentClient.frame, false, dtde.getDropAction() == DnDConstants.ACTION_COPY, parent, fileList.toArray(new File[] {}));
 				Client.currentClient.frame.directoryLoader.fireUpdate();

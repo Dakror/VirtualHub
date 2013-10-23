@@ -67,7 +67,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	File file;
 	JLabel preview;
 	
-	Eticet eticet = Eticet.NONE;
+	private Eticet eticet = Eticet.NONE;
 	
 	DragSource dragSource = DragSource.getDefaultDragSource();
 	
@@ -205,6 +205,15 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	{
 		Image image = ThumbnailAssistant.getThumbnail(file);
 		if (image != null) preview.setIcon(new ImageIcon(image));
+	}
+	
+	public void setEticet(Eticet e)
+	{
+		eticet = e;
+		if (file.isDirectory())
+		{	
+			
+		}
 	}
 	
 	@Override
