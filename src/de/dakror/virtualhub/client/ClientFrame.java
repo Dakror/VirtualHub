@@ -76,6 +76,8 @@ public class ClientFrame extends JFrame
 	
 	Color borderColor = ColorHelper.brighter(AbstractLookAndFeel.getTheme().getFrameColor(), 50);
 	
+	ArrayList<EticetableTreeNode> lastAddedTreeNodes = new ArrayList<EticetableTreeNode>();
+	
 	public ClientFrame()
 	{
 		super("VirtualHub Client (" + UniVersion.prettyVersion() + ")");
@@ -446,6 +448,9 @@ public class ClientFrame extends JFrame
 			{
 				EticetableTreeNode dmtn = new EticetableTreeNode(file.getName());
 				if (Assistant.hasSubDirectories(file)) dmtn.add(new EticetableTreeNode("CONTENT"));
+				
+				folder.add(dmtn);
+				lastAddedTreeNodes.add(dmtn);
 				try
 				{
 					Client.currentClient.sendPacket(new Packet2Eticet(file, Eticet.NULL));
@@ -454,7 +459,6 @@ public class ClientFrame extends JFrame
 				{
 					e.printStackTrace();
 				}
-				folder.add(dmtn);
 			}
 		}
 		
@@ -567,6 +571,23 @@ public class ClientFrame extends JFrame
 					}
 				}
 			}
+		}
+		
+		EticetableTreeNode found = null;
+		
+		for (EticetableTreeNode etn : lastAddedTreeNodes)
+		{
+			if (new File(Assistant.getNodePath(etn)).equals(packet.getFile()))
+			{
+				found = etn;
+			}
+		}
+		
+		if (found != null)
+		{
+			found.setEticet(packet.getEticet());
+			catalog.repaint();
+			lastAddedTreeNodes.remove(found);
 		}
 		
 		if (catalog.getSelectionPath() != null)

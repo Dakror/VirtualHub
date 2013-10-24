@@ -13,7 +13,7 @@ public enum Eticet
 	ORANGE("Orange", Color.orange),
 	YELLOW("Gelb", Color.yellow),
 	GREEN("Gr\u00fcn", Color.green),
-	BLUE("Blau", Color.blue),
+	BLUE("Blau", Color.decode("#5555ff")),
 	MAGENTA("Violett", Color.magenta),
 	GRAY("Grau", Color.gray);
 	

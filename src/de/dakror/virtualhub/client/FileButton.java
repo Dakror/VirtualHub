@@ -127,6 +127,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 					{
 						e.printStackTrace();
 					}
+					Client.currentClient.frame.loadSubTree((EticetableTreeNode) Client.currentClient.frame.catalog.getSelectionPath().getLastPathComponent());
 				}
 			});
 			eticet.add(jmi);
@@ -163,8 +164,6 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 				}
 			};
 		}.start();
-		
-		requestEticet();
 	}
 	
 	public void requestEticet()
@@ -210,10 +209,6 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	public void setEticet(Eticet e)
 	{
 		eticet = e;
-		if (file.isDirectory())
-		{	
-			
-		}
 	}
 	
 	@Override

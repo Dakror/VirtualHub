@@ -216,6 +216,8 @@ public class DirectoryLoader extends Thread
 					
 					frame.fileView.revalidate();
 					frame.repaint();
+					
+					fb.requestEticet();
 				}
 				
 				frame.fileView.revalidate();
