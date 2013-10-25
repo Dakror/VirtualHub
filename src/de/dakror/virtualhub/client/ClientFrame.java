@@ -1,5 +1,6 @@
 package de.dakror.virtualhub.client;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -8,6 +9,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -309,13 +312,21 @@ public class ClientFrame extends JFrame
 		GridBagLayout gbl = new GridBagLayout();
 		JPanel viewSuper = new JPanel(gbl);
 		
-		JPanel settings = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		JPanel settings = new JPanel(/* new FlowLayout(FlowLayout.LEFT, 0, 0) */new BorderLayout());
 		settings.add(new JLabel());
 		settings.setPreferredSize(new Dimension(0, 26));
-		JHintTextField search = new JHintTextField("    Suche im aktuellen Verzeichnis");
+		final JHintTextField search = new JHintTextField("Suche im aktuellen Verzeichnis");
 		search.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
-		search.setPreferredSize(new Dimension(200, 26));
-		settings.add(search);
+		// search.setPreferredSize(new Dimension(200, 26));
+		search.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				showSearchFiles(search.getText());
+			}
+		});
+		settings.add(search, BorderLayout.CENTER);
 		
 		addGridBagLayoutComponent(viewSuper, gbl, settings, 0, 0, 1, 1, 1, 0);
 		
@@ -374,6 +385,21 @@ public class ClientFrame extends JFrame
 		addGridBagLayoutComponent(viewSuper, gbl, fileInfo, 0, 2, 1, 1, 1, 0);
 		
 		return viewSuper;
+	}
+	
+	public void showSearchFiles(String search)
+	{
+		for (Component c : fileView.getComponents())
+			c.setVisible(true);
+		
+		if (search != null && search.length() > 0)
+		{
+			for (Component c : fileView.getComponents())
+			{
+				FileButton fb = (FileButton) c;
+				c.setVisible(fb.file.getName().toLowerCase().contains(search.toLowerCase()));
+			}
+		}
 	}
 	
 	public void initInfo()
