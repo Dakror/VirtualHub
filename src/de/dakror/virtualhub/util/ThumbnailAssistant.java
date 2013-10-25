@@ -187,7 +187,7 @@ public class ThumbnailAssistant
 				BufferedImage thumbnail = getFileThmubnail(f);
 				if (thumbnail == null) return null;
 				
-				thumbnail = Thumbnails.of(thumbnail).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).asBufferedImage();
+				if (thumbnail.getWidth() > CFG.PREVIEWSIZE.width || thumbnail.getHeight() > CFG.PREVIEWSIZE.height) thumbnail = Thumbnails.of(thumbnail).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).keepAspectRatio(true).asBufferedImage();
 				
 				createCacheFile(f, thumbnail);
 				

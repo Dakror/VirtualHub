@@ -34,6 +34,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.filechooser.FileSystemView;
@@ -51,6 +52,7 @@ import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.JHintTextField;
 import de.dakror.virtualhub.util.ThumbnailAssistant;
 import de.dakror.virtualhub.util.WrapLayout;
 
@@ -64,6 +66,7 @@ public class ClientFrame extends JFrame
 	public JScrollPane catalogWrap;
 	
 	FileTree catalog;
+	JTree tags;
 	FileViewPanel fileView;
 	JPanel fileInfo;
 	JScrollPane fileViewWrap;
@@ -296,14 +299,24 @@ public class ClientFrame extends JFrame
 		});
 	}
 	
+	public void initTags()
+	{
+		// DefaultMutableTreeNode dtm = new DefaultMutableTreeNode();
+	}
+	
 	public JPanel initView()
 	{
 		GridBagLayout gbl = new GridBagLayout();
 		JPanel viewSuper = new JPanel(gbl);
 		
-		JPanel settings = new JPanel();
-		settings.add(new JLabel("Not implemented yet"));
+		JPanel settings = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		settings.add(new JLabel());
 		settings.setPreferredSize(new Dimension(0, 26));
+		JHintTextField search = new JHintTextField("    Suche im aktuellen Verzeichnis");
+		search.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
+		search.setPreferredSize(new Dimension(200, 26));
+		settings.add(search);
+		
 		addGridBagLayoutComponent(viewSuper, gbl, settings, 0, 0, 1, 1, 1, 0);
 		
 		int gap = 8;

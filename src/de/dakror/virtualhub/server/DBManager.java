@@ -29,7 +29,8 @@ public class DBManager
 			connection = DriverManager.getConnection("jdbc:sqlite:" + database.getPath().replace("\\", "/"));
 			
 			Statement s = connection.createStatement();
-			s.executeUpdate("CREATE TABLE IF NOT EXISTS VIRTUALHUB(PATH varchar(500) NOT NULL PRIMARY KEY, ETICET INT)"); /* missing tags column */
+			s.executeUpdate("CREATE TABLE IF NOT EXISTS ETICETS(PATH varchar(500) NOT NULL PRIMARY KEY, ETICET INT)");
+			s.executeUpdate("CREATE TABLE IF NOT EXISTS TAGS(PATH varchar(500) NOT NULL PRIMARY KEY, TAGS TEXT)");
 		}
 		catch (Exception e)
 		{
@@ -43,15 +44,15 @@ public class DBManager
 		{
 			if (e == Eticet.NULL)
 			{
-				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM VIRTUALHUB WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
+				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
 				if (!rs.next()) return Eticet.NONE;
 				
 				return Eticet.values()[rs.getInt(1)];
 			}
 			else
 			{
-				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM VIRTUALHUB WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
-				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO VIRTUALHUB VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ")");
+				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO ETICETS VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ")");
 			}
 		}
 		catch (SQLException e1)
