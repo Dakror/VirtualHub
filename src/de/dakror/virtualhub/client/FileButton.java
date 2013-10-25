@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -15,6 +16,11 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -49,7 +55,7 @@ import de.dakror.virtualhub.util.ThumbnailAssistant;
 /**
  * @author Dakror
  */
-public class FileButton extends JToggleButton implements DragSourceListener, DragGestureListener
+public class FileButton extends JToggleButton implements DragSourceListener, DragGestureListener, DropTargetListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -69,6 +75,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	
 	private Eticet eticet = Eticet.NONE;
 	
+	DropTarget dropTarget = new DropTarget(this, this);
 	DragSource dragSource = DragSource.getDefaultDragSource();
 	
 	public FileButton(File file)
@@ -260,5 +267,34 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		FileSelection transferable = new FileSelection(selectedFiles.length > 0 ? selectedFiles : new File[] { file });
 		
 		dge.startDrag(null, transferable, this);
+	}
+	
+	@Override
+	public void dragEnter(DropTargetDragEvent dtde)
+	{
+		getModel().setRollover(true);
+	}
+	
+	@Override
+	public void dragOver(DropTargetDragEvent dtde)
+	{}
+	
+	@Override
+	public void dropActionChanged(DropTargetDragEvent dtde)
+	{}
+	
+	@Override
+	public void dragExit(DropTargetEvent dte)
+	{
+		getModel().setRollover(false);
+	}
+	
+	@Override
+	public void drop(DropTargetDropEvent dtde)
+	{
+		if (!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+		{
+			CFG.p("could be tag");
+		}
 	}
 }

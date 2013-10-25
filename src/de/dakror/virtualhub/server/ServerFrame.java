@@ -80,7 +80,7 @@ public class ServerFrame extends JFrame
 				log("Log geleert.");
 			}
 		}));
-		menu.add(logEnabled = new JCheckBoxMenuItem("Log aktiviert", true));
+		menu.add(logEnabled = new JCheckBoxMenuItem("Log aktiviert", false));
 		menuBar.add(menu);
 		setJMenuBar(menuBar);
 	}

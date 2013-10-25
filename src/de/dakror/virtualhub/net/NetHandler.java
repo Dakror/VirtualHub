@@ -176,5 +176,4 @@ public class NetHandler extends Thread implements PacketHandler
 	{
 		return Server.currentServer != null;
 	}
-	
 }

@@ -38,7 +38,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.filechooser.FileSystemView;
@@ -69,7 +68,7 @@ public class ClientFrame extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	FileTree catalog;
-	JTree tags;
+	TagsTree tags;
 	FileViewPanel fileView;
 	JPanel fileInfo;
 	JScrollPane fileViewWrap;
@@ -311,7 +310,7 @@ public class ClientFrame extends JFrame
 	
 	public void initTags()
 	{
-		tags = new JTree();
+		tags = new TagsTree(null);
 		tags.setExpandsSelectedPaths(true);
 		tags.setShowsRootHandles(false);
 		tags.setCellRenderer(new TagsTreeCellRender());
