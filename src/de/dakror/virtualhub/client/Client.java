@@ -19,7 +19,6 @@ import de.dakror.virtualhub.net.PacketHandler;
 import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
-import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -105,12 +104,6 @@ public class Client extends Thread implements PacketHandler
 			{
 				Packet2Eticet p = new Packet2Eticet(data);
 				frame.setFileEticet(p);
-				break;
-			}
-			case TAGS:
-			{
-				Packet3Tags p = new Packet3Tags(data);
-				CFG.p("hellu");
 				break;
 			}
 			default:

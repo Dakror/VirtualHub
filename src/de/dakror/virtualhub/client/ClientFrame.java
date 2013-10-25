@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -41,6 +42,7 @@ import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 
@@ -65,8 +67,6 @@ import de.dakror.virtualhub.util.WrapLayout;
 public class ClientFrame extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	
-	public JScrollPane catalogWrap;
 	
 	FileTree catalog;
 	JTree tags;
@@ -148,13 +148,20 @@ public class ClientFrame extends JFrame
 	{
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
+		
 		initTree();
 		
-		catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane catalogWrap = new JScrollPane(catalog, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		catalogWrap.setBorder(null);
 		
 		tabs.addTab("Katalog", catalogWrap);
-		tabs.addTab("Kategorien", new JLabel("Not implemented yet", JLabel.CENTER));
+		
+		initTags();
+		
+		JScrollPane tagsWrap = new JScrollPane(tags, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		tagsWrap.setBorder(null);
+		
+		tabs.addTab("Schl\u00fcsselw\u00f6rter", tagsWrap);
 		
 		tabs.setMinimumSize(new Dimension(1, 670));
 		tabs.setPreferredSize(new Dimension(270, 670));
@@ -304,7 +311,91 @@ public class ClientFrame extends JFrame
 	
 	public void initTags()
 	{
-		// DefaultMutableTreeNode dtm = new DefaultMutableTreeNode();
+		tags = new JTree();
+		tags.setExpandsSelectedPaths(true);
+		tags.setShowsRootHandles(false);
+		tags.setCellRenderer(new TagsTreeCellRender());
+		if (tags.getUI() instanceof BaseTreeUI)
+		{
+			BaseTreeUI ui = (BaseTreeUI) tags.getUI();
+			ui.paintHorizontalLine = false;
+			ui.paintVerticalLine = false;
+		}
+		final JPopupMenu generalPopupMenu = new JPopupMenu();
+		generalPopupMenu.add(new JMenuItem(new AbstractAction("Schl\u00fcsselwort hinzuf\u00fcgen")
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				String name = JOptionPane.showInputDialog(ClientFrame.this, "Bitte geben Sie den Namen des neuen Schl\u00fcsselwortes ein.", "Schl\u00fcsselwort hinzuf\u00fcgen", JOptionPane.PLAIN_MESSAGE);
+				if (name == null || name.length() == 0) return;
+				
+				if (Client.currentClient.catalog.tags.contains(name))
+				{
+					JOptionPane.showMessageDialog(ClientFrame.this, "Es existiert bereits ein Schl\u00fcsselwort mit diesem Namen!", "Schl\u00fcsselwort bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
+					actionPerformed(e);
+					return;
+				}
+				
+				Client.currentClient.catalog.tags.add(name);
+				updateTags();
+				try
+				{
+					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+			}
+		}));
+		final JPopupMenu tagsPopupMenu = new JPopupMenu();
+		tagsPopupMenu.add(new JMenuItem(new AbstractAction("Schl\u00fcsselwort entfernen")
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) tags.getSelectionPath().getLastPathComponent();
+				
+				Client.currentClient.catalog.tags.remove(dmtn.getUserObject());
+				
+				try
+				{
+					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				
+				dmtn.removeFromParent();
+				
+				((DefaultTreeModel) tags.getModel()).reload();
+			}
+		}));
+		
+		tags.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseReleased(MouseEvent e)
+			{
+				if (e.getButton() == MouseEvent.BUTTON3)
+				{
+					int row = tags.getRowForLocation(e.getX(), e.getY());
+					if (row > 0)
+					{
+						tags.setSelectionRow(row);
+						
+						tagsPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+					}
+					else generalPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 	}
 	
 	public JPanel initView()
@@ -316,7 +407,7 @@ public class ClientFrame extends JFrame
 		settings.add(new JLabel());
 		settings.setPreferredSize(new Dimension(0, 26));
 		final JHintTextField search = new JHintTextField("Suche im aktuellen Verzeichnis");
-		search.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
+		search.setBorder(BorderFactory.createEmptyBorder());
 		// search.setPreferredSize(new Dimension(200, 26));
 		search.addKeyListener(new KeyAdapter()
 		{
@@ -471,6 +562,12 @@ public class ClientFrame extends JFrame
 		}
 		
 		dtm.reload();
+		
+		DefaultMutableTreeNode root1 = new DefaultMutableTreeNode(Client.currentClient.catalog.getName());
+		DefaultTreeModel dtm1 = new DefaultTreeModel(root1);
+		tags.setModel(dtm1);
+		
+		updateTags();
 	}
 	
 	public void loadSubTree(EticetableTreeNode folder)
@@ -502,6 +599,21 @@ public class ClientFrame extends JFrame
 		}
 		
 		((DefaultTreeModel) catalog.getModel()).reload(folder);
+	}
+	
+	public void updateTags()
+	{
+		DefaultTreeModel dtm = (DefaultTreeModel) tags.getModel();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) tags.getModel().getRoot();
+		root.removeAllChildren();
+		
+		Collections.sort(Client.currentClient.catalog.tags);
+		for (String t : Client.currentClient.catalog.tags)
+		{
+			root.add(new DefaultMutableTreeNode(t));
+		}
+		
+		dtm.reload();
 	}
 	
 	public void setFileInfo(final File f)

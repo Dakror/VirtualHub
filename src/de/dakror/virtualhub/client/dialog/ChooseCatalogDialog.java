@@ -83,7 +83,7 @@ public class ChooseCatalogDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein", "Katalog hinzuf\u00fcgen", JOptionPane.PLAIN_MESSAGE);
+				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein.", "Katalog hinzuf\u00fcgen", JOptionPane.PLAIN_MESSAGE);
 				if (name != null && name.length() > 0)
 				{
 					DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
@@ -103,7 +103,10 @@ public class ChooseCatalogDialog
 						JSONObject o = new JSONObject();
 						o.put("name", name);
 						o.put("sources", new JSONArray());
-						o.put("tags", new JSONArray());
+						
+						JSONArray arr = new JSONArray();
+						arr.put("Standard");
+						o.put("tags", arr);
 						data.put(o);
 						Client.currentClient.sendPacket(new Packet0Catalogs(data));
 					}
