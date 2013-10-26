@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -21,6 +23,7 @@ import javax.swing.tree.TreePath;
 
 import de.dakror.virtualhub.client.file.EticetableTreeNode;
 import de.dakror.virtualhub.client.file.FileButton;
+import de.dakror.virtualhub.client.tags.TagsTreeCellRender;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.FileComparator;
 
@@ -177,7 +180,23 @@ public class DirectoryLoader extends Thread
 							frame.setFileInfo(fb);
 						}
 					});
-					
+					fb.addFocusListener(new FocusListener()
+					{
+						
+						@Override
+						public void focusLost(FocusEvent e)
+						{
+							((TagsTreeCellRender) frame.tags.getCellRenderer()).selectedFile = null;
+							frame.tags.repaint();
+						}
+						
+						@Override
+						public void focusGained(FocusEvent e)
+						{
+							((TagsTreeCellRender) frame.tags.getCellRenderer()).selectedFile = fb;
+							frame.tags.repaint();
+						}
+					});
 					fb.addMouseListener(new MouseAdapter()
 					{
 						@Override

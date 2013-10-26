@@ -7,12 +7,16 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import de.dakror.virtualhub.client.file.FileButton;
+
 /**
  * @author Dakror
  */
 public class TagsTreeCellRender extends DefaultTreeCellRenderer
 {
 	private static final long serialVersionUID = 1L;
+	
+	public FileButton selectedFile;
 	
 	public TagsTreeCellRender()
 	{
@@ -25,6 +29,11 @@ public class TagsTreeCellRender extends DefaultTreeCellRenderer
 		JLabel tce = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		
 		if (row == 0) tce.setIcon(null);
+		
+		if (selectedFile != null && selectedFile.tags.contains(value.toString()))
+		{
+			selected = true;
+		}
 		
 		return tce;
 	}

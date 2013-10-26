@@ -146,7 +146,6 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 			eticet.add(jmi);
 		}
 		
-		
 		addMouseListener(new MouseAdapter()
 		{
 			@Override

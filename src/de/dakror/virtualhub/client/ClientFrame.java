@@ -9,6 +9,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -323,6 +325,18 @@ public class ClientFrame extends JFrame
 		tags.setShowsRootHandles(false);
 		tags.setCellRenderer(new TagsTreeCellRender());
 		tags.setToggleClickCount(0);
+		tags.addFocusListener(new FocusListener()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				tags.setSelectionRow(-1);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e)
+			{}
+		});
 		if (tags.getUI() instanceof BaseTreeUI)
 		{
 			BaseTreeUI ui = (BaseTreeUI) tags.getUI();
