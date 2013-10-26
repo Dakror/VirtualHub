@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -91,7 +93,7 @@ public class ClientFrame extends JFrame
 	
 	Color borderColor = ColorHelper.brighter(AbstractLookAndFeel.getTheme().getFrameColor(), 50);
 	
-	ArrayList<EticetableTreeNode> lastAddedTreeNodes = new ArrayList<EticetableTreeNode>();
+	List<EticetableTreeNode> lastAddedTreeNodes = new ArrayList<EticetableTreeNode>();
 	
 	public ClientFrame()
 	{
@@ -325,18 +327,6 @@ public class ClientFrame extends JFrame
 		tags.setShowsRootHandles(false);
 		tags.setCellRenderer(new TagsTreeCellRender());
 		tags.setToggleClickCount(0);
-		tags.addFocusListener(new FocusListener()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				tags.setSelectionRow(-1);
-			}
-			
-			@Override
-			public void focusGained(FocusEvent e)
-			{}
-		});
 		if (tags.getUI() instanceof BaseTreeUI)
 		{
 			BaseTreeUI ui = (BaseTreeUI) tags.getUI();
@@ -407,6 +397,19 @@ public class ClientFrame extends JFrame
 				((DefaultTreeModel) tags.getModel()).reload();
 			}
 		}));
+		
+		tags.addFocusListener(new FocusListener()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				if (!generalPopupMenu.isShowing() && !tagsPopupMenu.isShowing()) tags.setSelectionRow(-1);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e)
+			{}
+		});
 		
 		tags.addMouseListener(new MouseAdapter()
 		{
@@ -784,13 +787,27 @@ public class ClientFrame extends JFrame
 		}
 		
 		EticetableTreeNode found = null;
-		
-		for (EticetableTreeNode etn : lastAddedTreeNodes)
+		try
 		{
-			if (new File(Assistant.getNodePath(etn)).equals(packet.getFile()))
+			for (EticetableTreeNode etn : lastAddedTreeNodes)
 			{
-				found = etn;
+				if (new File(Assistant.getNodePath(etn)).equals(packet.getFile()))
+				{
+					found = etn;
+				}
 			}
+		}
+		catch (ConcurrentModificationException e)
+		{
+			try
+			{
+				Thread.sleep(10);
+			}
+			catch (InterruptedException e1)
+			{
+				e1.printStackTrace();
+			}
+			setFileEticet(packet);
 		}
 		
 		if (found != null)
