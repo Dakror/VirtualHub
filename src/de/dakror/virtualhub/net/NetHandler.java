@@ -10,6 +10,7 @@ import java.net.SocketException;
 import org.json.JSONException;
 
 import de.dakror.virtualhub.data.Eticet;
+import de.dakror.virtualhub.data.Tags;
 import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet.PacketTypes;
 import de.dakror.virtualhub.net.packet.Packet0Catalogs;
@@ -164,13 +165,17 @@ public class NetHandler extends Thread implements PacketHandler
 			case TAGS:
 			{
 				Packet3Tags p = new Packet3Tags(data);
-				try
+				Tags tags = DBManager.tags(p.getFile(), p.getTags());
+				if (tags != null)
 				{
-					sendPacket(new Packet3Tags(p.getFile(), DBManager.tags(p.getFile(), p.getTags())));
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
+					try
+					{
+						sendPacket(new Packet3Tags(p.getFile(), tags));
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
 				}
 				break;
 			}

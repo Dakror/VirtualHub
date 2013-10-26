@@ -17,6 +17,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +33,8 @@ public class ServerFrame extends JFrame
 	private static final long serialVersionUID = 1L;
 	
 	private JTextArea logArea;
+	
+	JScrollPane wrap;
 	
 	JCheckBoxMenuItem packetLogEnabled;
 	JCheckBoxMenuItem logEnabled;
@@ -65,9 +68,12 @@ public class ServerFrame extends JFrame
 		logArea.setWrapStyleWord(true);
 		logArea.setEditable(false);
 		logArea.setLineWrap(true);
+		DefaultCaret caret = (DefaultCaret) logArea.getCaret();
+		caret.setSelectionVisible(false);
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		
-		JScrollPane jsp = new JScrollPane(logArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		setContentPane(jsp);
+		wrap = new JScrollPane(logArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		setContentPane(wrap);
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Aktionen");
@@ -124,5 +130,6 @@ public class ServerFrame extends JFrame
 		if (!logEnabled.isSelected()) return;
 		
 		logArea.append("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "]: " + line + "\r\n");
+		logArea.setCaretPosition(logArea.getText().length() - 1);
 	}
 }

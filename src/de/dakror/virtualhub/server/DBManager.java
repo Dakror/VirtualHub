@@ -9,7 +9,6 @@ import java.sql.Statement;
 
 import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.data.Tags;
-import de.dakror.virtualhub.settings.CFG;
 
 /**
  * @author Dakror
@@ -73,8 +72,12 @@ public class DBManager
 				ResultSet rs = connection.createStatement().executeQuery("SELECT TAGS FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
 				if (!rs.next()) return new Tags();
 				
-				CFG.p("data: " + rs.getString(1));
-				// return new Tags();
+				return new Tags(rs.getString(1).split(", "));
+			}
+			else
+			{
+				if (t.getTags().length == 0) connection.createStatement().executeUpdate("DELETE FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO TAGS VALUES(\"" + f.getPath().replace("\\", "/") + "\", \"" + t.serialize() + "\")");
 			}
 		}
 		catch (SQLException e1)

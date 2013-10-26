@@ -61,6 +61,7 @@ import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
+import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.JHintTextField;
@@ -321,6 +322,7 @@ public class ClientFrame extends JFrame
 		tags.setExpandsSelectedPaths(true);
 		tags.setShowsRootHandles(false);
 		tags.setCellRenderer(new TagsTreeCellRender());
+		tags.setToggleClickCount(0);
 		if (tags.getUI() instanceof BaseTreeUI)
 		{
 			BaseTreeUI ui = (BaseTreeUI) tags.getUI();
@@ -397,7 +399,17 @@ public class ClientFrame extends JFrame
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{
-				if (e.getButton() == MouseEvent.BUTTON3)
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					int row = tags.getRowForLocation(e.getX(), e.getY());
+					if (row > 0) showTagFiles(((DefaultMutableTreeNode) tags.getPathForRow(row).getLastPathComponent()).getUserObject().toString());
+					else
+					{
+						showTagFiles(null);
+						tags.setSelectionRow(-1);
+					}
+				}
+				else if (e.getButton() == MouseEvent.BUTTON3)
 				{
 					int row = tags.getRowForLocation(e.getX(), e.getY());
 					if (row > 0)
@@ -494,6 +506,8 @@ public class ClientFrame extends JFrame
 	
 	public void showSearchFiles(String search)
 	{
+		if (!directoryLoader.synced) return;
+		
 		for (Component c : fileView.getComponents())
 			c.setVisible(true);
 		
@@ -503,6 +517,23 @@ public class ClientFrame extends JFrame
 			{
 				FileButton fb = (FileButton) c;
 				c.setVisible(fb.file.getName().toLowerCase().contains(search.toLowerCase()));
+			}
+		}
+	}
+	
+	public void showTagFiles(String tag)
+	{
+		if (!directoryLoader.synced) return;
+		
+		for (Component c : fileView.getComponents())
+			c.setVisible(true);
+		
+		if (tag != null && tag.length() > 0)
+		{
+			for (Component c : fileView.getComponents())
+			{
+				FileButton fb = (FileButton) c;
+				c.setVisible(fb.tags.contains(tag));
 			}
 		}
 	}
@@ -630,7 +661,7 @@ public class ClientFrame extends JFrame
 		dtm.reload();
 	}
 	
-	public void setFileInfo(final File f)
+	public void setFileInfo(final FileButton f)
 	{
 		if (f == null)
 		{
@@ -644,9 +675,9 @@ public class ClientFrame extends JFrame
 			File[] sel = getSelectedFiles();
 			if (sel.length == 1)
 			{
-				fileInfoName.setText(f.getName());
-				fileInfoType.setText(FileSystemView.getFileSystemView().getSystemTypeDescription(f));
-				if (!f.isDirectory()) fileInfoSize.setText("Größe: " + Assistant.formatBinarySize(f.length(), 2));
+				fileInfoName.setText(f.file.getName());
+				fileInfoType.setText(FileSystemView.getFileSystemView().getSystemTypeDescription(f.file));
+				if (!f.file.isDirectory()) fileInfoSize.setText("Größe: " + Assistant.formatBinarySize(f.file.length(), 2));
 				else fileInfoSize.setText("");
 				
 				new Thread()
@@ -656,19 +687,19 @@ public class ClientFrame extends JFrame
 					{
 						try
 						{
-							BufferedImage image = ThumbnailAssistant.getFileThmubnail(f);
+							BufferedImage image = ThumbnailAssistant.getFileThmubnail(f.file);
 							if (image != null) fileInfoDetails.setText("Abmessungen: " + image.getWidth() + " x " + image.getHeight());
 							else
 							{
 								fileInfoDetails.setText("");
 								
-								if (f.isDirectory())
+								if (f.file.isDirectory())
 								{
 									int fl = 0, dir = 0;
 									
-									for (File file : f.listFiles())
+									for (File file : f.file.listFiles())
 									{
-										if (f.isHidden()) continue;
+										if (f.file.isHidden()) continue;
 										
 										if (file.isDirectory()) dir++;
 										else fl++;
@@ -766,6 +797,25 @@ public class ClientFrame extends JFrame
 					etn.setEticet(packet.getEticet());
 					catalog.repaint();
 					break;
+				}
+			}
+		}
+	}
+	
+	public void setFileTags(Packet3Tags packet)
+	{
+		if (fileView.getComponentCount() > 0)
+		{
+			for (Component c : fileView.getComponents())
+			{
+				if (c instanceof FileButton)
+				{
+					FileButton fb = (FileButton) c;
+					if (fb.file.equals(packet.getFile()))
+					{
+						fb.tags = packet.getTags();
+						break;
+					}
 				}
 			}
 		}

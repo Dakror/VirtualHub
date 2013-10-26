@@ -30,13 +30,41 @@ public class Tags
 		return tags.contains(tag);
 	}
 	
-	public void add(String tag)
+	public boolean add(String tag)
 	{
-		if (!contains(tag)) tags.add(tag);
+		if (!contains(tag))
+		{
+			tags.add(tag);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean remove(String tag)
+	{
+		if (contains(tag))
+		{
+			tags.remove(tag);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public String[] getTags()
 	{
 		return tags.toArray(new String[] {});
+	}
+	
+	public String serialize()
+	{
+		return tags.toString().replace("[", "").replace("]", "");
+	}
+	
+	@Override
+	public String toString()
+	{
+		return tags.toString();
 	}
 }

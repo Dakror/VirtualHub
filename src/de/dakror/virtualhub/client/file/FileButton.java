@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -36,6 +37,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 
@@ -46,6 +48,7 @@ import com.jtattoo.plaf.LazyImageIcon;
 
 import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.data.Eticet;
+import de.dakror.virtualhub.data.Tags;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.settings.CFG;
@@ -73,6 +76,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	}
 	
 	public File file;
+	public Tags tags;
 	JLabel preview;
 	
 	private Eticet eticet = Eticet.NONE;
@@ -297,7 +301,23 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 	{
 		if (!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
 		{
-			CFG.p("could be tag");
+			Transferable tr = dtde.getTransferable();
+			try
+			{
+				String tag = tr.getTransferData(DataFlavor.stringFlavor).toString();
+				if (tags.add(tag)) Client.currentClient.sendPacket(new Packet3Tags(file, tags));
+				else
+				{
+					if (JOptionPane.showConfirmDialog(Client.currentClient.frame, "Diese" + (file.isDirectory() ? "s Verzeichnis" : " Datei") + " ist mit diesem Schlüsselwort bereits verknüpft.\nMöchten Sie es von diese" + (file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schlüsselwort bereits verknüpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+					{
+						if (tags.remove(tag)) Client.currentClient.sendPacket(new Packet3Tags(file, tags));
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -174,7 +174,7 @@ public class DirectoryLoader extends Thread
 								fb.setSelected(fb.isSelected());
 							}
 							else if (e.getModifiers() == 18) fb.setSelected(fb.isSelected());
-							frame.setFileInfo(fb.file);
+							frame.setFileInfo(fb);
 						}
 					});
 					

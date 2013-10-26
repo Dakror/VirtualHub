@@ -20,13 +20,13 @@ public class TagsTree extends JTree implements DragSourceListener, DragGestureLi
 {
 	private static final long serialVersionUID = 1L;
 	
-	DragSource dragSource = DragSource.getDefaultDragSource();
+	public DragSource dragSource = DragSource.getDefaultDragSource();
 	
 	public TagsTree(DefaultTreeModel dtm)
 	{
 		super(dtm);
 		
-		dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, this);
+		dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_LINK, this);
 	}
 	
 	@Override
