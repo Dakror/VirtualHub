@@ -13,7 +13,7 @@ import javax.swing.filechooser.FileSystemView;
 public class CFG
 {
 	// -- UniVersion -- //
-	public static final int VERSION = 2013101120;
+	public static final int VERSION = 2013102617;
 	public static final int PHASE = 2;
 	
 	public static boolean INTERNET;
