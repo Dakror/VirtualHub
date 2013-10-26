@@ -41,8 +41,6 @@ public class Server extends Thread
 		dir = new File(CFG.DIR, "Server");
 		dir.mkdir();
 		
-		DBManager.init();
-		
 		frame = new ServerFrame();
 		frame.addWindowListener(new WindowAdapter()
 		{
@@ -79,6 +77,9 @@ public class Server extends Thread
 		{
 			e.printStackTrace();
 		}
+		
+		DBManager.init();
+		frame.log("Datenbank initialisiert");
 		
 		start();
 	}

@@ -9,6 +9,7 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -32,6 +33,7 @@ public class ServerFrame extends JFrame
 	
 	private JTextArea logArea;
 	
+	JCheckBoxMenuItem packetLogEnabled;
 	JCheckBoxMenuItem logEnabled;
 	
 	public ServerFrame()
@@ -69,7 +71,7 @@ public class ServerFrame extends JFrame
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Aktionen");
-		menu.add(new JMenuItem(new AbstractAction("Log leeren")
+		menu.add(new JMenuItem(new AbstractAction("Protokoll leeren", new ImageIcon(getClass().getResource("/img/trash.png")))
 		{
 			private static final long serialVersionUID = 1L;
 			
@@ -77,10 +79,11 @@ public class ServerFrame extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				logArea.setText("");
-				log("Log geleert.");
+				log("Protokoll geleert.");
 			}
 		}));
-		menu.add(logEnabled = new JCheckBoxMenuItem("Log aktiviert", false));
+		menu.add(logEnabled = new JCheckBoxMenuItem("Protokoll aktiviert", new ImageIcon(getClass().getResource("/img/log.png")), true));
+		menu.add(packetLogEnabled = new JCheckBoxMenuItem("Paketverkehr protokollieren", new ImageIcon(getClass().getResource("/img/traffic.png")), false));
 		menuBar.add(menu);
 		setJMenuBar(menuBar);
 	}
@@ -111,15 +114,15 @@ public class ServerFrame extends JFrame
 		Assistant.setFileContent(catalogs, Server.currentServer.catalogs.toString());
 	}
 	
+	public void plog(String line)
+	{
+		if (packetLogEnabled.isSelected()) log(line);
+	}
+	
 	public void log(String line)
 	{
 		if (!logEnabled.isSelected()) return;
 		
 		logArea.append("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "]: " + line + "\r\n");
-	}
-	
-	public void showSettingsDialog()
-	{	
-		
 	}
 }

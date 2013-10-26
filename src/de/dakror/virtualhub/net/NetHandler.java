@@ -107,19 +107,19 @@ public class NetHandler extends Thread implements PacketHandler
 	public void parsePacket(byte[] data)
 	{
 		PacketTypes t = Packet.lookupPacket(data[0]);
-		Server.currentServer.frame.log("< " + Assistant.getSocketAddress(socket) + " : " + t.name());
+		Server.currentServer.frame.plog("< " + Assistant.getSocketAddress(socket) + " : " + t.name());
 		switch (t)
 		{
 			case INVALID:
 			{
-				Server.currentServer.frame.log("Empfing ung\u00fcltiges Paket");
+				Server.currentServer.frame.plog("Empfing ung\u00fcltiges Paket");
 				break;
 			}
 			case CATALOGS:
 			{
 				Packet0Catalogs p = new Packet0Catalogs(data);
 				Server.currentServer.catalogs = p.getCatalogs();
-				Server.currentServer.frame.log("Kataloge ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
+				Server.currentServer.frame.plog("Kataloge ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
 				break;
 			}
 			case CATALOG:
@@ -132,7 +132,7 @@ public class NetHandler extends Thread implements PacketHandler
 						if (Server.currentServer.catalogs.getJSONObject(i).getString("name").equals(p.getCatalog().getName()))
 						{
 							Server.currentServer.catalogs.put(i, p.getCatalog().getJSONObject());
-							Server.currentServer.frame.log("Katalog " + p.getCatalog().getName() + " ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
+							Server.currentServer.frame.plog("Katalog " + p.getCatalog().getName() + " ge\u00e4ndert von: " + Assistant.getSocketAddress(socket));
 							break;
 						}
 					}
@@ -168,7 +168,7 @@ public class NetHandler extends Thread implements PacketHandler
 	@Override
 	public void sendPacket(Packet p) throws IOException
 	{
-		if (isServerSided()) Server.currentServer.frame.log("> " + Assistant.getSocketAddress(socket) + " : " + p.getType().name());
+		if (isServerSided()) Server.currentServer.frame.plog("> " + Assistant.getSocketAddress(socket) + " : " + p.getType().name());
 		dos.write(p.getData());
 	}
 	
