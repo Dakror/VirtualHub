@@ -120,7 +120,7 @@ public class ClientFrame extends JFrame
 				Properties properties = new Properties();
 				properties.put("server", InetAddress.getLocalHost().getHostAddress());
 				Client.currentClient.properties = properties;
-				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software l\u00e4uft\r\n");
+				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software läuft\r\n");
 			}
 			else
 			{
@@ -160,7 +160,7 @@ public class ClientFrame extends JFrame
 		JScrollPane tagsWrap = new JScrollPane(tags, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		tagsWrap.setBorder(null);
 		
-		tabs.addTab("Schl\u00fcsselw\u00f6rter", tagsWrap);
+		tabs.addTab("Schlüsselwörter", tagsWrap);
 		
 		tabs.setMinimumSize(new Dimension(1, 670));
 		tabs.setPreferredSize(new Dimension(270, 670));
@@ -196,7 +196,7 @@ public class ClientFrame extends JFrame
 		}
 		
 		final JPopupMenu generalPopupMenu = new JPopupMenu();
-		generalPopupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzuf\u00fcgen")
+		generalPopupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzufügen")
 		{
 			private static final long serialVersionUID = 1L;
 			
@@ -321,19 +321,27 @@ public class ClientFrame extends JFrame
 			ui.paintVerticalLine = false;
 		}
 		final JPopupMenu generalPopupMenu = new JPopupMenu();
-		generalPopupMenu.add(new JMenuItem(new AbstractAction("Schl\u00fcsselwort hinzuf\u00fcgen")
+		generalPopupMenu.add(new JMenuItem(new AbstractAction("Schlüsselwort hinzufügen")
 		{
 			private static final long serialVersionUID = 1L;
 			
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String name = JOptionPane.showInputDialog(ClientFrame.this, "Bitte geben Sie den Namen des neuen Schl\u00fcsselwortes ein.", "Schl\u00fcsselwort hinzuf\u00fcgen", JOptionPane.PLAIN_MESSAGE);
+				String name = JOptionPane.showInputDialog(ClientFrame.this, "Bitte geben Sie den Namen des neuen Schlüsselwortes ein.", "Schlüsselwort hinzufügen", JOptionPane.PLAIN_MESSAGE);
+				
 				if (name == null || name.length() == 0) return;
+				
+				if (!name.matches("^[a-zA-Z0-9 ]*$"))
+				{
+					JOptionPane.showMessageDialog(ClientFrame.this, "Schlüsselwörter dürfen nur Buchstaben,\nZahlen und Leerzeichen enthalten!", "Ungültiges Schlüsselwort", JOptionPane.ERROR_MESSAGE);
+					actionPerformed(e);
+					return;
+				}
 				
 				if (Client.currentClient.catalog.tags.contains(name))
 				{
-					JOptionPane.showMessageDialog(ClientFrame.this, "Es existiert bereits ein Schl\u00fcsselwort mit diesem Namen!", "Schl\u00fcsselwort bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(ClientFrame.this, "Es existiert bereits ein Schlüsselwort mit diesem Namen!", "Schlüsselwort bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 					actionPerformed(e);
 					return;
 				}
@@ -351,7 +359,7 @@ public class ClientFrame extends JFrame
 			}
 		}));
 		final JPopupMenu tagsPopupMenu = new JPopupMenu();
-		tagsPopupMenu.add(new JMenuItem(new AbstractAction("Schl\u00fcsselwort entfernen")
+		tagsPopupMenu.add(new JMenuItem(new AbstractAction("Schlüsselwort entfernen")
 		{
 			private static final long serialVersionUID = 1L;
 			
@@ -631,7 +639,7 @@ public class ClientFrame extends JFrame
 			{
 				fileInfoName.setText(f.getName());
 				fileInfoType.setText(FileSystemView.getFileSystemView().getSystemTypeDescription(f));
-				if (!f.isDirectory()) fileInfoSize.setText("Gr\u00f6\u00dfe: " + Assistant.formatBinarySize(f.length(), 2));
+				if (!f.isDirectory()) fileInfoSize.setText("Größe: " + Assistant.formatBinarySize(f.length(), 2));
 				else fileInfoSize.setText("");
 				
 				new Thread()
@@ -671,7 +679,7 @@ public class ClientFrame extends JFrame
 			else
 			{
 				setFileInfo(null);
-				if (sel.length > 0) fileInfoName.setText(sel.length + " Elemente ausgew\u00e4hlt");
+				if (sel.length > 0) fileInfoName.setText(sel.length + " Elemente ausgewählt");
 			}
 		}
 	}

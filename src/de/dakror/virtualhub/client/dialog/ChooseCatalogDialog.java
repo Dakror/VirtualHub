@@ -38,7 +38,7 @@ public class ChooseCatalogDialog
 	public static void show(ClientFrame frame, final JSONArray data)
 	{
 		final JDialog dialog = new JDialog(frame, true);
-		dialog.setTitle("Katalog w\u00e4hlen");
+		dialog.setTitle("Katalog wählen");
 		dialog.setSize(400, 300);
 		dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		dialog.addWindowListener(new WindowAdapter()
@@ -83,7 +83,7 @@ public class ChooseCatalogDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein.", "Katalog hinzuf\u00fcgen", JOptionPane.PLAIN_MESSAGE);
+				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein.", "Katalog hinzufügen", JOptionPane.PLAIN_MESSAGE);
 				if (name != null && name.length() > 0)
 				{
 					DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
@@ -126,7 +126,7 @@ public class ChooseCatalogDialog
 			{
 				if (catalogs.getSelectedIndex() != -1)
 				{
-					if (JOptionPane.showConfirmDialog(dialog, "Sind Sie sicher, dass Sie diesen\r\nKatalog unwiderruflich l\u00f6schen wollen?", "Katalog l\u00f6schen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+					if (JOptionPane.showConfirmDialog(dialog, "Sind Sie sicher, dass Sie diesen\r\nKatalog unwiderruflich löschen wollen?", "Katalog löschen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 					{
 						DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
 						data.remove(catalogs.getSelectedIndex());
@@ -167,7 +167,7 @@ public class ChooseCatalogDialog
 				System.exit(0);
 			}
 		}));
-		buttons.add(new JButton(new AbstractAction("Katalog w\u00e4hlen")
+		buttons.add(new JButton(new AbstractAction("Katalog wählen")
 		{
 			private static final long serialVersionUID = 1L;
 			

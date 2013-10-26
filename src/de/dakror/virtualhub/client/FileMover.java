@@ -77,7 +77,7 @@ public class FileMover extends Thread
 			
 			if (target.exists())
 			{
-				int response = JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Zielverzeichnis" : "Die Zieldatei") + " existiert bereits. \u00dcberschreiben?\r\nBei \"Nein\" wird " + (files[i].isDirectory() ? "das Verzeichnis" : "die Datei") + " \u00fcbersprungen.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				int response = JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Zielverzeichnis" : "Die Zieldatei") + " existiert bereits. Überschreiben?\r\nBei \"Nein\" wird " + (files[i].isDirectory() ? "das Verzeichnis" : "die Datei") + " übersprungen.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (response == JOptionPane.NO_OPTION) continue;
 				if (response == JOptionPane.CANCEL_OPTION)
 				{

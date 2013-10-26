@@ -97,7 +97,7 @@ public class DirectoryLoader extends Thread
 					final FileButton fb = new FileButton(f);
 					
 					final JPopupMenu popup = new JPopupMenu();
-					popup.add(new JMenuItem(new AbstractAction("L\u00f6schen")
+					popup.add(new JMenuItem(new AbstractAction("Löschen")
 					{
 						private static final long serialVersionUID = 1L;
 						
@@ -106,7 +106,7 @@ public class DirectoryLoader extends Thread
 						{
 							if (frame.getSelectedFiles().length < 2)
 							{
-								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 								{
 									boolean success = true;
 									boolean directory = fb.file.isDirectory();
@@ -121,11 +121,11 @@ public class DirectoryLoader extends Thread
 									}
 									else success = fb.file.delete();
 									
-									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
+									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
 									else fireUpdate();
 								}
 							}
-							else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich l\u00f6schen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie l\u00f6schen.", "Daten l\u00f6schen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+							else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", "Daten löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 							{
 								File[] files = frame.getSelectedFiles();
 								for (File file : files)
@@ -148,7 +148,7 @@ public class DirectoryLoader extends Thread
 									}
 									else success = file.delete();
 									
-									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gel\u00f6scht werden, da sie in einem anderen Programm ge\u00f6ffnet ist.", "L\u00f6schen nicht m\u00f6glich", JOptionPane.ERROR_MESSAGE);
+									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
 								}
 								fireUpdate();
 							}
@@ -204,7 +204,7 @@ public class DirectoryLoader extends Thread
 										}
 										catch (IOException e1)
 										{
-											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht ge\u00f6ffnet werden!\nM\u00f6glicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software.", "Datei konnte nicht ge\u00f6ffnet werden!", JOptionPane.ERROR_MESSAGE);
+											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht geöffnet werden!\nMöglicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software.", "Datei konnte nicht geöffnet werden!", JOptionPane.ERROR_MESSAGE);
 										}
 									}
 								}

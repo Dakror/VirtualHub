@@ -69,7 +69,7 @@ public class Server extends Thread
 		}
 		catch (BindException e)
 		{
-			frame.log("Es l\u00e4uft bereits ein Server auf diesem Port!");
+			frame.log("Es läuft bereits ein Server auf diesem Port!");
 			shutdown();
 			return;
 		}
