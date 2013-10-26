@@ -9,6 +9,7 @@ import java.sql.Statement;
 
 import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.data.Tags;
+import de.dakror.virtualhub.net.packet.Packet4Rename;
 
 /**
  * @author Dakror
@@ -85,5 +86,18 @@ public class DBManager
 			e1.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static void rename(Packet4Rename packet)
+	{
+		try
+		{
+			connection.createStatement().executeUpdate("UPDATE ETICETS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \"" + packet.getOldFile().getPath().replace("\\", "/") + "\"");
+			connection.createStatement().executeUpdate("UPDATE TAGS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \"" + packet.getOldFile().getPath().replace("\\", "/") + "\"");
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

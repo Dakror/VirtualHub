@@ -17,6 +17,7 @@ import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.net.packet.Packet3Tags;
+import de.dakror.virtualhub.net.packet.Packet4Rename;
 import de.dakror.virtualhub.server.DBManager;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.util.Assistant;
@@ -177,6 +178,12 @@ public class NetHandler extends Thread implements PacketHandler
 						e.printStackTrace();
 					}
 				}
+				break;
+			}
+			case RENAME:
+			{
+				Packet4Rename p = new Packet4Rename(data);
+				DBManager.rename(p);
 				break;
 			}
 			default:

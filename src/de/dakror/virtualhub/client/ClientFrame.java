@@ -42,6 +42,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.filechooser.FileSystemView;
@@ -66,6 +68,7 @@ import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.net.packet.Packet3Tags;
+import de.dakror.virtualhub.net.packet.Packet4Rename;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.JHintTextField;
@@ -86,7 +89,8 @@ public class ClientFrame extends JFrame
 	JScrollPane fileViewWrap;
 	
 	// -- file Info components -- //
-	JLabel fileInfoName, fileInfoType, fileInfoDetails, fileInfoSize;
+	JTextField fileInfoName;
+	JLabel fileInfoType, fileInfoDetails, fileInfoSize;
 	
 	public DirectoryLoader directoryLoader;
 	Synchronizer synchronizer;
@@ -521,6 +525,102 @@ public class ClientFrame extends JFrame
 		return viewSuper;
 	}
 	
+	public void initInfo()
+	{
+		GridBagLayout gbl = new GridBagLayout();
+		fileInfo = new JPanel(gbl);
+		
+		fileInfo.setBorder(BorderFactory.createCompoundBorder(fileInfo.getBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+		fileInfo.setPreferredSize(new Dimension(0, 80));
+		
+		fileInfoName = new JTextField("");
+		fileInfoName.setOpaque(false);
+		final Border oldBorder = fileInfoName.getBorder();
+		fileInfoName.setBorder(null);
+		fileInfoName.setForeground(Color.darkGray);
+		fileInfoName.setFont(fileInfoName.getFont().deriveFont(18f));
+		fileInfoName.setEditable(false);
+		fileInfoName.addFocusListener(new FocusListener()
+		{
+			
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				fileInfoName.setEditable(false);
+				fileInfoName.setBorder(null);
+				fileInfoName.setForeground(Color.darkGray);
+				fileInfoName.getCaret().setVisible(false);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e)
+			{
+				if (getSelectedFiles().length != 1) return;
+				
+				fileInfoName.setEditable(true);
+				fileInfoName.setBorder(oldBorder);
+				fileInfoName.getCaret().setVisible(true);
+				fileInfoName.setForeground(Color.black);
+			}
+		});
+		fileInfoName.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				if (!fileInfoName.isEditable() || getSelectedFiles().length == 0) return;
+				
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
+					String newName = fileInfoName.getText();
+					
+					File f = getSelectedFiles()[0];
+					File newFile = new File(f.getParentFile(), newName);
+					boolean dir = f.isDirectory();
+					if (f.renameTo(newFile))
+					{
+						if (dir) loadSubTree((EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent());
+						
+						directoryLoader.fireUpdate();
+						
+						try
+						{
+							Client.currentClient.sendPacket(new Packet4Rename(f, newFile));
+						}
+						catch (IOException e1)
+						{
+							e1.printStackTrace();
+						}
+						
+						// -- unfocus -- //
+						fileInfoName.setEditable(false);
+						fileInfoName.setBorder(null);
+						fileInfoName.setForeground(Color.darkGray);
+						fileInfoName.getCaret().setVisible(false);
+					}
+					else JOptionPane.showMessageDialog(ClientFrame.this, (dir ? "Das Verzeichnis" : "Die Datei") + " konnte nicht umbenannt werden!", "Fehler!", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoName, 0, 0, 3, 2, 0, 1);
+		
+		fileInfoType = new JLabel();
+		fileInfoType.setForeground(Color.decode("#1E395B"));
+		fileInfoType.setFont(fileInfoType.getFont().deriveFont(14f));
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoType, 0, 2, 1, 1, 1, 1);
+		
+		fileInfoDetails = new JLabel();
+		fileInfoDetails.setForeground(Color.decode("#1E395B"));
+		fileInfoDetails.setFont(fileInfoDetails.getFont().deriveFont(14f));
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoDetails, 1, 2, 1, 1, 1, 1);
+		
+		fileInfoSize = new JLabel();
+		fileInfoSize.setForeground(Color.decode("#1E395B"));
+		fileInfoSize.setFont(fileInfoSize.getFont().deriveFont(14f));
+		addGridBagLayoutComponent(fileInfo, gbl, fileInfoSize, 2, 2, 1, 1, 1, 1);
+	}
+	
 	public void showSearchFiles(String search)
 	{
 		if (!directoryLoader.synced) return;
@@ -553,35 +653,6 @@ public class ClientFrame extends JFrame
 				c.setVisible(fb.tags.contains(tag));
 			}
 		}
-	}
-	
-	public void initInfo()
-	{
-		GridBagLayout gbl = new GridBagLayout();
-		fileInfo = new JPanel(gbl);
-		
-		fileInfo.setBorder(BorderFactory.createCompoundBorder(fileInfo.getBorder(), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-		fileInfo.setPreferredSize(new Dimension(0, 80));
-		
-		fileInfoName = new JLabel();
-		fileInfoName.setForeground(Color.darkGray);
-		fileInfoName.setFont(fileInfoName.getFont().deriveFont(18f));
-		addGridBagLayoutComponent(fileInfo, gbl, fileInfoName, 0, 0, 3, 2, 0, 1);
-		
-		fileInfoType = new JLabel();
-		fileInfoType.setForeground(Color.decode("#1E395B"));
-		fileInfoType.setFont(fileInfoType.getFont().deriveFont(14f));
-		addGridBagLayoutComponent(fileInfo, gbl, fileInfoType, 0, 2, 1, 1, 1, 1);
-		
-		fileInfoDetails = new JLabel();
-		fileInfoDetails.setForeground(Color.decode("#1E395B"));
-		fileInfoDetails.setFont(fileInfoDetails.getFont().deriveFont(14f));
-		addGridBagLayoutComponent(fileInfo, gbl, fileInfoDetails, 1, 2, 1, 1, 1, 1);
-		
-		fileInfoSize = new JLabel();
-		fileInfoSize.setForeground(Color.decode("#1E395B"));
-		fileInfoSize.setFont(fileInfoSize.getFont().deriveFont(14f));
-		addGridBagLayoutComponent(fileInfo, gbl, fileInfoSize, 2, 2, 1, 1, 1, 1);
 	}
 	
 	public void addGridBagLayoutComponent(Container parent, GridBagLayout gbl, Component c, int x, int y, int width, int height, double wx, double wy)
