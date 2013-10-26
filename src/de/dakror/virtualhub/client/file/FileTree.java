@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.file;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -22,6 +22,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.util.Assistant;
 
 /**

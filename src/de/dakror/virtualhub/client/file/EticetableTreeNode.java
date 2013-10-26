@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.file;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 

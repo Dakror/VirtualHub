@@ -19,6 +19,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.dakror.virtualhub.client.file.EticetableTreeNode;
+import de.dakror.virtualhub.client.file.FileButton;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.FileComparator;
 
@@ -217,7 +219,7 @@ public class DirectoryLoader extends Thread
 					frame.fileView.revalidate();
 					frame.repaint();
 					
-					fb.requestEticet();
+					fb.requestFileData();
 				}
 				
 				frame.fileView.revalidate();

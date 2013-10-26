@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.file;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -33,7 +34,7 @@ public class FileViewPanel extends JPanel implements DropTargetListener, DragSou
 {
 	private static final long serialVersionUID = 1L;
 	
-	DropTarget dropTarget = new DropTarget(this, this);
+	public DropTarget dropTarget = new DropTarget(this, this);
 	DragSource dragSource = DragSource.getDefaultDragSource();
 	
 	public FileViewPanel(LayoutManager layout)

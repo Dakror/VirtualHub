@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.tags;
 
 import java.awt.datatransfer.StringSelection;
 import java.awt.dnd.DnDConstants;

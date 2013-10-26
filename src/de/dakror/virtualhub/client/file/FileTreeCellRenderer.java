@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.file;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import de.dakror.virtualhub.client.ClientFrame;
 import de.dakror.virtualhub.settings.CFG;
 
 /**

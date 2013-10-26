@@ -50,6 +50,13 @@ import com.jtattoo.plaf.BaseTreeUI;
 import com.jtattoo.plaf.ColorHelper;
 
 import de.dakror.universion.UniVersion;
+import de.dakror.virtualhub.client.file.EticetableTreeNode;
+import de.dakror.virtualhub.client.file.FileButton;
+import de.dakror.virtualhub.client.file.FileTree;
+import de.dakror.virtualhub.client.file.FileTreeCellRenderer;
+import de.dakror.virtualhub.client.file.FileViewPanel;
+import de.dakror.virtualhub.client.tags.TagsTree;
+import de.dakror.virtualhub.client.tags.TagsTreeCellRender;
 import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
@@ -67,7 +74,7 @@ public class ClientFrame extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 	
-	FileTree catalog;
+	public FileTree catalog;
 	TagsTree tags;
 	FileViewPanel fileView;
 	JPanel fileInfo;
@@ -76,7 +83,7 @@ public class ClientFrame extends JFrame
 	// -- file Info components -- //
 	JLabel fileInfoName, fileInfoType, fileInfoDetails, fileInfoSize;
 	
-	DirectoryLoader directoryLoader;
+	public DirectoryLoader directoryLoader;
 	Synchronizer synchronizer;
 	
 	Color borderColor = ColorHelper.brighter(AbstractLookAndFeel.getTheme().getFrameColor(), 50);
@@ -332,7 +339,7 @@ public class ClientFrame extends JFrame
 				
 				if (name == null || name.length() == 0) return;
 				
-				if (!name.matches("^[a-zA-Z0-9 ]*$"))
+				if (!name.matches("^[a-zA-Z0-9öäüÖÄÜß ]*$"))
 				{
 					JOptionPane.showMessageDialog(ClientFrame.this, "Schlüsselwörter dürfen nur Buchstaben,\nZahlen und Leerzeichen enthalten!", "Ungültiges Schlüsselwort", JOptionPane.ERROR_MESSAGE);
 					actionPerformed(e);

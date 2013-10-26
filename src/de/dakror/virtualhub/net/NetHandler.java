@@ -15,6 +15,7 @@ import de.dakror.virtualhub.net.packet.Packet.PacketTypes;
 import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
+import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.server.DBManager;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.util.Assistant;
@@ -157,6 +158,19 @@ public class NetHandler extends Thread implements PacketHandler
 					{
 						e.printStackTrace();
 					}
+				}
+				break;
+			}
+			case TAGS:
+			{
+				Packet3Tags p = new Packet3Tags(data);
+				try
+				{
+					sendPacket(new Packet3Tags(p.getFile(), DBManager.tags(p.getFile(), p.getTags())));
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
 				}
 				break;
 			}

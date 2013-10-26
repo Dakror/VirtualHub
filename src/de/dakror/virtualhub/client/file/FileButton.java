@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.file;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,8 +44,10 @@ import com.jtattoo.plaf.ColorHelper;
 import com.jtattoo.plaf.JTattooUtilities;
 import com.jtattoo.plaf.LazyImageIcon;
 
+import de.dakror.virtualhub.client.Client;
 import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
+import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.FileSelection;
@@ -70,7 +72,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		eticetPolygon.addPoint(0, size);
 	}
 	
-	File file;
+	public File file;
 	JLabel preview;
 	
 	private Eticet eticet = Eticet.NONE;
@@ -173,11 +175,12 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		}.start();
 	}
 	
-	public void requestEticet()
+	public void requestFileData()
 	{
 		try
 		{
 			Client.currentClient.sendPacket(new Packet2Eticet(file, Eticet.NULL));
+			Client.currentClient.sendPacket(new Packet3Tags(file, null));
 		}
 		catch (IOException e)
 		{

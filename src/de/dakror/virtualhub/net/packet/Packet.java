@@ -14,7 +14,7 @@ public abstract class Packet
 		CATALOGS,
 		CATALOG,
 		ETICET,
-		TAG
+		TAGS
 		
 		;
 		public int getID()

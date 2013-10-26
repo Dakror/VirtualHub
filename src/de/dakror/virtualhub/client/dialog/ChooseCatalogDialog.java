@@ -103,10 +103,7 @@ public class ChooseCatalogDialog
 						JSONObject o = new JSONObject();
 						o.put("name", name);
 						o.put("sources", new JSONArray());
-						
-						JSONArray arr = new JSONArray();
-						arr.put("Standard");
-						o.put("tags", arr);
+						o.put("tags", new JSONArray());
 						data.put(o);
 						Client.currentClient.sendPacket(new Packet0Catalogs(data));
 					}

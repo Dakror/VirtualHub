@@ -1,4 +1,4 @@
-package de.dakror.virtualhub.client;
+package de.dakror.virtualhub.client.file;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
+import de.dakror.virtualhub.client.Client;
+import de.dakror.virtualhub.client.ClientFrame;
 import de.dakror.virtualhub.util.Assistant;
 
 /**
