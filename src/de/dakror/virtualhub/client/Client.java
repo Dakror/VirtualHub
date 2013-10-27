@@ -20,6 +20,7 @@ import de.dakror.virtualhub.net.packet.Packet;
 import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.net.packet.Packet3Tags;
+import de.dakror.virtualhub.net.packet.Packet5Attribute;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -111,6 +112,13 @@ public class Client extends Thread implements PacketHandler
 			{
 				Packet3Tags p = new Packet3Tags(data);
 				frame.setFileTags(p);
+				break;
+			}
+			case ATTRIBUTE:
+			{
+				Packet5Attribute p = new Packet5Attribute(data);
+				if (p.getKey().equals("backup.path")) frame.doBackup(p);
+				
 				break;
 			}
 			default:

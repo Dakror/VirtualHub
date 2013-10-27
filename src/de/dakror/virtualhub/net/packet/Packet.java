@@ -16,6 +16,7 @@ public abstract class Packet
 		ETICET,
 		TAGS,
 		RENAME,
+		ATTRIBUTE,
 		
 		;
 		public int getID()

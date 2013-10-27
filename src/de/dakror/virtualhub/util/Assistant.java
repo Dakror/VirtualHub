@@ -314,7 +314,7 @@ public class Assistant
 		int i = 0;
 		for (File f : folder.listFiles())
 		{
-			if (f.isHidden()) continue;
+			// if (f.isHidden()) continue;
 			if (f.isDirectory()) i += getFileCount(f);
 			else i++;
 		}
@@ -351,5 +351,18 @@ public class Assistant
 		}
 		
 		return index;
+	}
+	
+	public static boolean isDeepChild(File parent, File child)
+	{
+		File f = child;
+		while (true)
+		{
+			if (f.getParentFile() == null) return false;
+			
+			if (f.equals(parent)) return true;
+			
+			f = f.getParentFile();
+		}
 	}
 }

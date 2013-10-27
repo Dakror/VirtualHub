@@ -18,6 +18,7 @@ import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.net.packet.Packet4Rename;
+import de.dakror.virtualhub.net.packet.Packet5Attribute;
 import de.dakror.virtualhub.server.DBManager;
 import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.util.Assistant;
@@ -184,6 +185,22 @@ public class NetHandler extends Thread implements PacketHandler
 			{
 				Packet4Rename p = new Packet4Rename(data);
 				DBManager.rename(p);
+				break;
+			}
+			case ATTRIBUTE:
+			{
+				Packet5Attribute p = new Packet5Attribute(data);
+				if (p.getKey().equals("backup.path"))
+				{
+					try
+					{
+						sendPacket(new Packet5Attribute("backup.path", Server.currentServer.settings.has("backup.path") ? Server.currentServer.settings.getString("backup.path") : ""));
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
 				break;
 			}
 			default:

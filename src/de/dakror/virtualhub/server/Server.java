@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.util.HashMap;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.settings.CFG;
@@ -27,6 +28,7 @@ public class Server extends Thread
 	
 	public ServerFrame frame;
 	public JSONArray catalogs;
+	public JSONObject settings;
 	
 	public static File dir;
 	

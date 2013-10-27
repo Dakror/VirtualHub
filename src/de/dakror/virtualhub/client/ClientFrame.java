@@ -21,15 +21,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,6 +61,7 @@ import com.jtattoo.plaf.ColorHelper;
 import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.client.file.EticetableTreeNode;
 import de.dakror.virtualhub.client.file.FileButton;
+import de.dakror.virtualhub.client.file.FileMover;
 import de.dakror.virtualhub.client.file.FileTree;
 import de.dakror.virtualhub.client.file.FileTreeCellRenderer;
 import de.dakror.virtualhub.client.file.FileViewPanel;
@@ -69,6 +73,7 @@ import de.dakror.virtualhub.net.packet.Packet1Catalog;
 import de.dakror.virtualhub.net.packet.Packet2Eticet;
 import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.net.packet.Packet4Rename;
+import de.dakror.virtualhub.net.packet.Packet5Attribute;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 import de.dakror.virtualhub.util.JHintTextField;
@@ -152,11 +157,31 @@ public class ClientFrame extends JFrame
 	
 	public void initMenu()
 	{
-		JMenuBar menu = new JMenuBar();
-		JMenu main = new JMenu("Aktionen");
-		menu.add(main);
+		JMenuBar menubar = new JMenuBar();
+		JMenu menu = new JMenu("Aktionen");
+		menu.add(new JMenuItem(new AbstractAction("Katalog-Backup erstellen", new ImageIcon(getClass().getResource("/img/backup.png")))
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if (JOptionPane.showConfirmDialog(ClientFrame.this, "Sind Sie sicher, dass Sie ein Backupdes Katalogs erstellen wollen?\nDieser Vorgang kann einige Zeit in Anspruch nehmen.", "Backup starten?", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION)
+				{
+					try
+					{
+						Client.currentClient.sendPacket(new Packet5Attribute("backup.path", ""));
+					}
+					catch (IOException e1)
+					{
+						e1.printStackTrace();
+					}
+				}
+			}
+		}));
+		menubar.add(menu);
 		
-		setJMenuBar(menu);
+		setJMenuBar(menubar);
 	}
 	
 	public void initComponents()
@@ -921,5 +946,11 @@ public class ClientFrame extends JFrame
 				}
 			}
 		}
+	}
+	
+	public void doBackup(Packet5Attribute packet)
+	{
+		if (packet.getValue().length() == 0) JOptionPane.showMessageDialog(this, "Es wurde noch kein Backupverzeichnis konfiguiert!\nBitte stellen Sie ein solches in der VirtualHub Server Software ein,\n indem Sie unter Aktionen -> Backup-Einstellungen einen Pfad festlegen.\nVersuchen Sie daraufhin erneut, ein Backup zu erstellen.", "Backupverzeichnis nicht konfiguriert!", JOptionPane.ERROR_MESSAGE);
+		else new FileMover(this, false, true, new File(packet.getValue() + "/" + Client.currentClient.catalog.getName() + "-Backup " + new SimpleDateFormat("dd.MM.yy HH-mm").format(new Date())), Client.currentClient.catalog.sources.toArray(new File[] {}));
 	}
 }

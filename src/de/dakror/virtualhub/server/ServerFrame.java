@@ -21,8 +21,10 @@ import javax.swing.text.DefaultCaret;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import de.dakror.universion.UniVersion;
+import de.dakror.virtualhub.server.dialog.BackupEditDialog;
 import de.dakror.virtualhub.util.Assistant;
 
 /**
@@ -90,6 +92,25 @@ public class ServerFrame extends JFrame
 		}));
 		menu.add(logEnabled = new JCheckBoxMenuItem("Protokoll aktiviert", new ImageIcon(getClass().getResource("/img/log.png")), true));
 		menu.add(packetLogEnabled = new JCheckBoxMenuItem("Paketverkehr protokollieren", new ImageIcon(getClass().getResource("/img/traffic.png")), false));
+		menu.addSeparator();
+		menu.add(new JMenuItem(new AbstractAction("Backup-Einstellungen", new ImageIcon(getClass().getResource("/img/backup_edit.png")))
+		{
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					BackupEditDialog.show();
+				}
+				catch (JSONException e1)
+				{
+					e1.printStackTrace();
+				}
+			}
+		}));
+		
 		menuBar.add(menu);
 		setJMenuBar(menuBar);
 	}
@@ -98,7 +119,7 @@ public class ServerFrame extends JFrame
 	{
 		try
 		{
-			// katalogs file
+			// catalogs file
 			File catalogs = new File(Server.dir, "catalogs.json");
 			
 			if (!catalogs.exists())
@@ -107,6 +128,16 @@ public class ServerFrame extends JFrame
 				Server.currentServer.catalogs = new JSONArray();
 			}
 			else Server.currentServer.catalogs = new JSONArray(Assistant.getFileContent(catalogs));
+			
+			File settings = new File(Server.dir, "settings.json");
+			
+			// settings file
+			if (!settings.exists())
+			{
+				Assistant.setFileContent(settings, new JSONObject().toString());
+				Server.currentServer.settings = new JSONObject();
+			}
+			else Server.currentServer.settings = new JSONObject(Assistant.getFileContent(settings));
 		}
 		catch (JSONException e)
 		{
@@ -118,6 +149,9 @@ public class ServerFrame extends JFrame
 	{
 		File catalogs = new File(Server.dir, "catalogs.json");
 		Assistant.setFileContent(catalogs, Server.currentServer.catalogs.toString());
+		
+		File settings = new File(Server.dir, "settings.json");
+		Assistant.setFileContent(settings, Server.currentServer.settings.toString());
 	}
 	
 	public void plog(String line)

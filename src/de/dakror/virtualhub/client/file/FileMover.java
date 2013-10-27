@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 
@@ -40,12 +42,22 @@ public class FileMover extends Thread
 		
 		canceled = false;
 		
+		
+		JDialog dialog = new JDialog(frame, "");
+		dialog.setContentPane(new JLabel("<html><body>Ermittle Gesamtgröße<br>Bitte warten...</body></html>", JLabel.CENTER));
+		dialog.setSize(160, 80);
+		dialog.setLocationRelativeTo(frame);
+		dialog.setAlwaysOnTop(true);
+		dialog.setVisible(true);
+		
 		int count = 0;
 		for (File f : files)
 		{
 			if (f.isDirectory()) count += Assistant.getFileCount(f);
 			else count++;
 		}
+		
+		dialog.dispose();
 		
 		value = 0;
 		
@@ -64,7 +76,7 @@ public class FileMover extends Thread
 			File target = new File(targetParent, files[i].getName());
 			monitor.setNote("Datei: " + files[i].getName());
 			
-			if (target.getPath().replace("\\", "/").startsWith(files[i].getPath().replace("\\", "/")))
+			if (Assistant.isDeepChild(files[i], target))
 			{
 				JOptionPane.showMessageDialog(Client.currentClient.frame, "Hierhin kann nicht verschoben werden.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.ERROR_MESSAGE);
 				canceled = true;
@@ -126,7 +138,7 @@ public class FileMover extends Thread
 	{
 		for (File f : folder.listFiles())
 		{
-			if (f.isHidden()) continue;
+			// if (f.isHidden()) continue;
 			
 			if (f.isDirectory())
 			{
@@ -152,7 +164,11 @@ public class FileMover extends Thread
 						f.renameTo(newFile);
 					}
 					
-					updateProgress(f.getPath());
+					String path = f.getPath();
+					
+					int length = 70;
+					
+					updateProgress(f.getPath().length() > length ? path.substring(0, length - 3) + "..." : path);
 				}
 				catch (Exception e)
 				{

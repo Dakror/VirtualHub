@@ -37,8 +37,7 @@ public class ChooseCatalogDialog
 {
 	public static void show(ClientFrame frame, final JSONArray data)
 	{
-		final JDialog dialog = new JDialog(frame, true);
-		dialog.setTitle("Katalog wählen");
+		final JDialog dialog = new JDialog(frame, "Katalog wählen", true);
 		dialog.setSize(400, 300);
 		dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		dialog.addWindowListener(new WindowAdapter()
