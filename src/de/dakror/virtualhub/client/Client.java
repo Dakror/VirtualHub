@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
+import de.dakror.virtualhub.VirtualHub;
 import de.dakror.virtualhub.client.dialog.ChooseCatalogDialog;
 import de.dakror.virtualhub.data.Catalog;
 import de.dakror.virtualhub.net.NetHandler;
@@ -162,5 +163,11 @@ public class Client extends Thread implements PacketHandler
 	{
 		this.catalog = catalog;
 		frame.loadCatalog(catalog);
+	}
+	
+	public static void main(String[] args)
+	{
+		VirtualHub.init();
+		new Client();
 	}
 }

@@ -7,8 +7,6 @@ import javax.swing.UIManager;
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
 import de.dakror.universion.UniVersion;
-import de.dakror.virtualhub.client.Client;
-import de.dakror.virtualhub.server.Server;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -18,7 +16,7 @@ import de.dakror.virtualhub.util.Assistant;
  */
 public class VirtualHub
 {
-	public static void main(String[] args)
+	public static void init()
 	{
 		CFG.INTERNET = Assistant.isInternetReachable();
 		
@@ -39,8 +37,5 @@ public class VirtualHub
 		UniVersion.init(VirtualHub.class, CFG.VERSION, CFG.PHASE);
 		
 		// Reporter.init(new File(CFG.DIR, "Logs"));
-		
-		if (args.length == 0) new Client();
-		else if (args[0].equals("-s")) new Server();
 	}
 }

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import de.dakror.virtualhub.VirtualHub;
 import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
@@ -130,5 +131,11 @@ public class Server extends Thread
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args)
+	{
+		VirtualHub.init();
+		new Server();
 	}
 }
