@@ -31,6 +31,9 @@ import de.dakror.virtualhub.util.Assistant;
  */
 public class Client extends Thread implements PacketHandler
 {
+	public static final int VERSION = 2013102617;
+	public static final int PHASE = 2;
+	
 	public static Client currentClient;
 	
 	Socket socket;
@@ -171,7 +174,7 @@ public class Client extends Thread implements PacketHandler
 		VirtualHub.init();
 		
 		UniVersion.offline = !CFG.INTERNET;
-		UniVersion.init(Client.class, CFG.VERSION, CFG.PHASE);
+		UniVersion.init(Client.class, VERSION, PHASE);
 		
 		new Client();
 	}

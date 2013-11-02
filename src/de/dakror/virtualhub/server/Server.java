@@ -26,6 +26,9 @@ import de.dakror.virtualhub.util.Assistant;
  */
 public class Server extends Thread
 {
+	public static final int VERSION = 2013102617;
+	public static final int PHASE = 2;
+	
 	public static Server currentServer;
 	
 	public ServerFrame frame;
@@ -139,7 +142,7 @@ public class Server extends Thread
 		VirtualHub.init();
 		
 		UniVersion.offline = !CFG.INTERNET;
-		UniVersion.init(Server.class, CFG.VERSION, CFG.PHASE);
+		UniVersion.init(Server.class, VERSION, PHASE);
 		
 		new Server();
 	}
