@@ -542,6 +542,7 @@ public class ClientFrame extends JFrame
 		fileViewWrap.setPreferredSize(new Dimension(1, 1));
 		fileViewWrap.getVerticalScrollBar().setUnitIncrement(50);
 		fileView.setSize(new Dimension(fileViewWrap.getSize().width, 0));
+		
 		addGridBagLayoutComponent(viewSuper, gbl, fileViewWrap, 0, 1, 1, 1, 1, 1);
 		
 		initInfo();
@@ -854,6 +855,31 @@ public class ClientFrame extends JFrame
 		}
 		
 		return files.toArray(new File[] {});
+	}
+	
+	public FileButton[] getSelectedFileButtons()
+	{
+		ArrayList<FileButton> files = new ArrayList<FileButton>();
+		for (Component c : fileView.getComponents())
+		{
+			if (c instanceof FileButton)
+			{
+				FileButton fb = (FileButton) c;
+				if (fb.isSelected()) files.add(fb);
+			}
+		}
+		
+		return files.toArray(new FileButton[] {});
+	}
+	
+	public int getFileIndex(File f)
+	{
+		for (int i = 0; i < fileView.getComponentCount(); i++)
+		{
+			if (((FileButton) fileView.getComponent(i)).file.equals(f)) return i;
+		}
+		
+		return -1;
 	}
 	
 	public File getSelectedTreeFile()

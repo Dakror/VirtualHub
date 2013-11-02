@@ -301,21 +301,24 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		if (!dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
 		{
 			Transferable tr = dtde.getTransferable();
-			try
+			for (FileButton fb : Client.currentClient.frame.getSelectedFileButtons())
 			{
-				String tag = tr.getTransferData(DataFlavor.stringFlavor).toString();
-				if (tags.add(tag)) Client.currentClient.sendPacket(new Packet3Tags(file, tags));
-				else
+				try
 				{
-					if (JOptionPane.showConfirmDialog(Client.currentClient.frame, "Diese" + (file.isDirectory() ? "s Verzeichnis" : " Datei") + " ist mit diesem Schlüsselwort bereits verknüpft.\nMöchten Sie es von diese" + (file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schlüsselwort bereits verknüpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+					String tag = tr.getTransferData(DataFlavor.stringFlavor).toString();
+					if (fb.tags.add(tag)) Client.currentClient.sendPacket(new Packet3Tags(fb.file, fb.tags));
+					else
 					{
-						if (tags.remove(tag)) Client.currentClient.sendPacket(new Packet3Tags(file, tags));
+						if (JOptionPane.showConfirmDialog(Client.currentClient.frame, fb.file.getName() + " ist mit diesem Schlüsselwort bereits verknüpft.\nMöchten Sie es von diese" + (fb.file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schlüsselwort bereits verknüpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							if (fb.tags.remove(tag)) Client.currentClient.sendPacket(new Packet3Tags(fb.file, fb.tags));
+						}
 					}
 				}
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 	}

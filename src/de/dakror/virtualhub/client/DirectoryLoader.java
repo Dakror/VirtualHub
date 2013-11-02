@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -165,7 +167,7 @@ public class DirectoryLoader extends Thread
 						@Override
 						public void actionPerformed(ActionEvent e)
 						{
-							if (e.getModifiers() == 16)
+							if (e.getModifiers() == 16) // nothing except click
 							{
 								for (Component c : frame.fileView.getComponents())
 								{
@@ -176,7 +178,23 @@ public class DirectoryLoader extends Thread
 								}
 								fb.setSelected(fb.isSelected());
 							}
-							else if (e.getModifiers() == 18) fb.setSelected(fb.isSelected());
+							else if (e.getModifiers() == 18) // ctrl
+							{
+								fb.setSelected(fb.isSelected());
+							}
+							else if (e.getModifiers() == 17) // shift
+							{
+								if (frame.getSelectedFiles().length == 2 && fb.isSelected())
+								{
+									for (int i = frame.getFileIndex(frame.getSelectedFiles()[0]); i < frame.fileView.getComponentCount(); i++)
+									{
+										((FileButton) frame.fileView.getComponent(i)).setSelected(true);
+										if (((FileButton) frame.fileView.getComponent(i)).file.equals(fb.file)) break;
+									}
+								}
+							}
+							
+							
 							frame.setFileInfo(fb);
 						}
 					});
@@ -231,6 +249,20 @@ public class DirectoryLoader extends Thread
 								}
 							}
 							else if (e.getButton() == MouseEvent.BUTTON3) popup.show(e.getComponent(), e.getX(), e.getY());
+						}
+					});
+					fb.addKeyListener(new KeyAdapter()
+					{
+						@Override
+						public void keyPressed(KeyEvent e)
+						{
+							if (e.getKeyCode() == KeyEvent.VK_A && e.isControlDown())
+							{
+								for (Component c : frame.fileView.getComponents())
+								{
+									((FileButton) c).setSelected(!((FileButton) c).isSelected());
+								}
+							}
 						}
 					});
 					frame.fileView.add(fb);

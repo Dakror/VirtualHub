@@ -6,7 +6,6 @@ import javax.swing.UIManager;
 
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
 
-import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
 
@@ -32,9 +31,6 @@ public class VirtualHub
 		{
 			e.printStackTrace();
 		}
-		
-		UniVersion.offline = !CFG.INTERNET;
-		UniVersion.init(VirtualHub.class, CFG.VERSION, CFG.PHASE);
 		
 		// Reporter.init(new File(CFG.DIR, "Logs"));
 	}

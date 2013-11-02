@@ -15,6 +15,7 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.VirtualHub;
 import de.dakror.virtualhub.net.NetHandler;
 import de.dakror.virtualhub.settings.CFG;
@@ -136,6 +137,10 @@ public class Server extends Thread
 	public static void main(String[] args)
 	{
 		VirtualHub.init();
+		
+		UniVersion.offline = !CFG.INTERNET;
+		UniVersion.init(Server.class, CFG.VERSION, CFG.PHASE);
+		
 		new Server();
 	}
 }

@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
+import de.dakror.universion.UniVersion;
 import de.dakror.virtualhub.VirtualHub;
 import de.dakror.virtualhub.client.dialog.ChooseCatalogDialog;
 import de.dakror.virtualhub.data.Catalog;
@@ -168,6 +169,10 @@ public class Client extends Thread implements PacketHandler
 	public static void main(String[] args)
 	{
 		VirtualHub.init();
+		
+		UniVersion.offline = !CFG.INTERNET;
+		UniVersion.init(Client.class, CFG.VERSION, CFG.PHASE);
+		
 		new Client();
 	}
 }
