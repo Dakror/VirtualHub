@@ -253,7 +253,7 @@ public class ClientFrame extends JFrame
 				{
 					File source = jfc.getSelectedFile();
 					
-					if (Client.currentClient.catalog.sources.contains(source))
+					if (Client.currentClient.getCatalog().sources.contains(source))
 					{
 						JOptionPane.showMessageDialog(ClientFrame.this, "Dieser Ordner ist bereits eine Quelle in diesem Katalog!", "Bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 						actionPerformed(e);
@@ -261,7 +261,7 @@ public class ClientFrame extends JFrame
 					}
 					else
 					{
-						Client.currentClient.catalog.sources.add(source);
+						Client.currentClient.getCatalog().sources.add(source);
 						DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 						EticetableTreeNode root = (EticetableTreeNode) dtm.getRoot();
 						
@@ -271,7 +271,7 @@ public class ClientFrame extends JFrame
 						
 						try
 						{
-							Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+							Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
 						}
 						catch (IOException e1)
 						{
@@ -294,11 +294,11 @@ public class ClientFrame extends JFrame
 				EticetableTreeNode dmtn = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
 				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 				
-				Client.currentClient.catalog.sources.remove(new File(dmtn.getUserObject().toString()));
+				Client.currentClient.getCatalog().sources.remove(new File(dmtn.getUserObject().toString()));
 				
 				try
 				{
-					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
 				}
 				catch (IOException e1)
 				{
@@ -381,18 +381,18 @@ public class ClientFrame extends JFrame
 					return;
 				}
 				
-				if (Client.currentClient.catalog.tags.contains(name))
+				if (Client.currentClient.getCatalog().tags.contains(name))
 				{
 					JOptionPane.showMessageDialog(ClientFrame.this, "Es existiert bereits ein Schlüsselwort mit diesem Namen!", "Schlüsselwort bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 					actionPerformed(e);
 					return;
 				}
 				
-				Client.currentClient.catalog.tags.add(name);
+				Client.currentClient.getCatalog().tags.add(name);
 				updateTags();
 				try
 				{
-					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
 				}
 				catch (IOException e1)
 				{
@@ -410,11 +410,11 @@ public class ClientFrame extends JFrame
 			{
 				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) tags.getSelectionPath().getLastPathComponent();
 				
-				Client.currentClient.catalog.tags.remove(dmtn.getUserObject());
+				Client.currentClient.getCatalog().tags.remove(dmtn.getUserObject());
 				
 				try
 				{
-					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.catalog));
+					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
 				}
 				catch (IOException e1)
 				{
@@ -702,7 +702,7 @@ public class ClientFrame extends JFrame
 		
 		String notFound = "";
 		String sep = ",\r\n ";
-		for (File file : Client.currentClient.catalog.sources)
+		for (File file : Client.currentClient.getCatalog().sources)
 		{
 			if (!file.exists())
 			{
@@ -722,7 +722,7 @@ public class ClientFrame extends JFrame
 		
 		dtm.reload();
 		
-		DefaultMutableTreeNode root1 = new DefaultMutableTreeNode(Client.currentClient.catalog.getName());
+		DefaultMutableTreeNode root1 = new DefaultMutableTreeNode(Client.currentClient.getCatalog().getName());
 		DefaultTreeModel dtm1 = new DefaultTreeModel(root1);
 		tags.setModel(dtm1);
 		
@@ -748,7 +748,7 @@ public class ClientFrame extends JFrame
 				lastAddedTreeNodes.add(dmtn);
 				try
 				{
-					Client.currentClient.sendPacket(new Packet2Eticet(file, Eticet.NULL));
+					Client.currentClient.sendPacket(new Packet2Eticet(file, Client.currentClient.getCatalog().getName(), Eticet.NULL));
 				}
 				catch (IOException e)
 				{
@@ -766,8 +766,8 @@ public class ClientFrame extends JFrame
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) tags.getModel().getRoot();
 		root.removeAllChildren();
 		
-		Collections.sort(Client.currentClient.catalog.tags);
-		for (String t : Client.currentClient.catalog.tags)
+		Collections.sort(Client.currentClient.getCatalog().tags);
+		for (String t : Client.currentClient.getCatalog().tags)
 		{
 			root.add(new DefaultMutableTreeNode(t));
 		}
@@ -977,6 +977,6 @@ public class ClientFrame extends JFrame
 	public void doBackup(Packet5Attribute packet)
 	{
 		if (packet.getValue().length() == 0) JOptionPane.showMessageDialog(this, "Es wurde noch kein Backupverzeichnis konfiguiert!\nBitte stellen Sie ein solches in der VirtualHub Server Software ein,\n indem Sie unter Aktionen -> Backup-Einstellungen einen Pfad festlegen.\nVersuchen Sie daraufhin erneut, ein Backup zu erstellen.", "Backupverzeichnis nicht konfiguriert!", JOptionPane.ERROR_MESSAGE);
-		else new FileMover(this, false, true, new File(packet.getValue() + "/" + Client.currentClient.catalog.getName() + "-Backup " + new SimpleDateFormat("dd.MM.yy HH-mm").format(new Date())), Client.currentClient.catalog.sources.toArray(new File[] {}));
+		else new FileMover(this, false, true, new File(packet.getValue() + "/" + Client.currentClient.getCatalog().getName() + "-Backup " + new SimpleDateFormat("dd.MM.yy HH-mm").format(new Date())), Client.currentClient.getCatalog().sources.toArray(new File[] {}));
 	}
 }

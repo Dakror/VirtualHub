@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.json.JSONObject;
+
 import de.dakror.virtualhub.data.Eticet;
 import de.dakror.virtualhub.data.Tags;
 import de.dakror.virtualhub.net.packet.Packet4Rename;
@@ -31,8 +33,8 @@ public class DBManager
 			connection = DriverManager.getConnection("jdbc:sqlite:" + database.getPath().replace("\\", "/"));
 			
 			Statement s = connection.createStatement();
-			s.executeUpdate("CREATE TABLE IF NOT EXISTS ETICETS(PATH varchar(500) NOT NULL PRIMARY KEY, ETICET INT)");
-			s.executeUpdate("CREATE TABLE IF NOT EXISTS TAGS(PATH varchar(500) NOT NULL PRIMARY KEY, TAGS TEXT)");
+			s.executeUpdate("CREATE TABLE IF NOT EXISTS ETICETS(PATH varchar(500) NOT NULL PRIMARY KEY, CATALOG varchar(100), ETICET INT)");
+			s.executeUpdate("CREATE TABLE IF NOT EXISTS TAGS(PATH varchar(500) NOT NULL PRIMARY KEY, CATALOG varchar(100), TAGS TEXT)");
 		}
 		catch (Exception e)
 		{
@@ -40,21 +42,21 @@ public class DBManager
 		}
 	}
 	
-	public static Eticet eticet(File f, Eticet e)
+	public static Eticet eticet(File f, String catalog, Eticet e)
 	{
 		try
 		{
 			if (e == Eticet.NULL)
 			{
-				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
+				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
 				if (!rs.next()) return Eticet.NONE;
 				
 				return Eticet.values()[rs.getInt(1)];
 			}
 			else
 			{
-				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
-				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO ETICETS VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ")");
+				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO ETICETS VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ") AND CATALOG = \"" + catalog + "\"");
 			}
 		}
 		catch (SQLException e1)
@@ -64,21 +66,21 @@ public class DBManager
 		return null;
 	}
 	
-	public static Tags tags(File f, Tags t)
+	public static Tags tags(File f, String catalog, Tags t)
 	{
 		try
 		{
 			if (t == null)
 			{
-				ResultSet rs = connection.createStatement().executeQuery("SELECT TAGS FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
+				ResultSet rs = connection.createStatement().executeQuery("SELECT TAGS FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
 				if (!rs.next()) return new Tags();
 				
 				return new Tags(rs.getString(1).split(", "));
 			}
 			else
 			{
-				if (t.getTags().length == 0) connection.createStatement().executeUpdate("DELETE FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\"");
-				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO TAGS VALUES(\"" + f.getPath().replace("\\", "/") + "\", \"" + t.serialize() + "\")");
+				if (t.getTags().length == 0) connection.createStatement().executeUpdate("DELETE FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO TAGS VALUES(\"" + f.getPath().replace("\\", "/") + "\", \"" + catalog + "\", \"" + t.serialize() + "\")");
 			}
 		}
 		catch (SQLException e1)
@@ -86,6 +88,26 @@ public class DBManager
 			e1.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static JSONObject tagdata(String catalog)
+	{
+		JSONObject o = new JSONObject();
+		
+		try
+		{
+			ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM TAGS");
+			while (rs.next())
+			{
+				o.put(rs.getString(1), rs.getString(3).split(", "));
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return o;
 	}
 	
 	public static void rename(Packet4Rename packet)

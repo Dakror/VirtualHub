@@ -38,5 +38,4 @@ public class Packet5Attribute extends Packet
 	{
 		return (key + "[" + value).getBytes();
 	}
-	
 }

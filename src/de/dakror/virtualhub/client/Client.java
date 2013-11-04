@@ -39,7 +39,7 @@ public class Client extends Thread implements PacketHandler
 	Socket socket;
 	NetHandler netHandler;
 	public ClientFrame frame;
-	Catalog catalog;
+	private Catalog catalog;
 	
 	public Properties properties;
 	

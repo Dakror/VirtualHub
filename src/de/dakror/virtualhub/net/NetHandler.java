@@ -150,12 +150,12 @@ public class NetHandler extends Thread implements PacketHandler
 			case ETICET:
 			{
 				Packet2Eticet p = new Packet2Eticet(data);
-				Eticet result = DBManager.eticet(p.getFile(), p.getEticet());
+				Eticet result = DBManager.eticet(p.getFile(), p.getCatalog(), p.getEticet());
 				if (result != null)
 				{
 					try
 					{
-						sendPacket(new Packet2Eticet(p.getFile(), result));
+						sendPacket(new Packet2Eticet(p.getFile(), p.getCatalog(), result));
 					}
 					catch (IOException e)
 					{
@@ -167,12 +167,12 @@ public class NetHandler extends Thread implements PacketHandler
 			case TAGS:
 			{
 				Packet3Tags p = new Packet3Tags(data);
-				Tags tags = DBManager.tags(p.getFile(), p.getTags());
+				Tags tags = DBManager.tags(p.getFile(), p.getCatalog(), p.getTags());
 				if (tags != null)
 				{
 					try
 					{
-						sendPacket(new Packet3Tags(p.getFile(), tags));
+						sendPacket(new Packet3Tags(p.getFile(), p.getCatalog(), tags));
 					}
 					catch (IOException e)
 					{
@@ -197,6 +197,17 @@ public class NetHandler extends Thread implements PacketHandler
 						sendPacket(new Packet5Attribute("backup.path", Server.currentServer.settings.has("backup.path") ? Server.currentServer.settings.getString("backup.path") : ""));
 					}
 					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else if (p.getKey().equals("web.tagdata"))
+				{
+					try
+					{
+						sendPacket(new Packet5Attribute("web.tagdata", DBManager.tagdata(p.getValue()).toString()));
+					}
+					catch (IOException e)
 					{
 						e.printStackTrace();
 					}
