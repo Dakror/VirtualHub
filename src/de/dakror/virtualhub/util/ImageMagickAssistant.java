@@ -1,5 +1,6 @@
 package de.dakror.virtualhub.util;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +49,6 @@ public class ImageMagickAssistant
 				filePath = filePath.substring(0, filePath.indexOf(".") > -1 ? filePath.lastIndexOf(".") : filePath.length()) + "CACHECACHE.png";
 				Process process = new ProcessBuilder(dir.getPath().replace("\\", "/") + "/windows/convert.exe", "-layers", "merge", "-thumbnail", CFG.PREVIEWSIZE.width * 2 + "x" + CFG.PREVIEWSIZE.height * 2 + ">", f.getPath().replace("\\", "/"), filePath).start();
 				process.waitFor();
-				CFG.p(filePath);
 				
 				File dest = new File(filePath);
 				if (!dest.exists()) return null;
@@ -58,6 +58,37 @@ public class ImageMagickAssistant
 				dest.delete();
 				
 				return image;
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
+	}
+	
+	public static Dimension getSize(File f)
+	{
+		if (JTattooUtilities.isWindows())
+		{
+			try
+			{
+				if (Assistant.getFileExtension(f).equals("xcf")) return null; // xcf conversion pretty bad on IM
+				
+				String filePath = f.getPath().replace("\\", "/");
+				filePath = filePath.substring(0, filePath.indexOf(".") > -1 ? filePath.lastIndexOf(".") : filePath.length()) + "CACHECACHE.png";
+				Process process = new ProcessBuilder(dir.getPath().replace("\\", "/") + "/windows/convert.exe", "-layers", "merge", f.getPath().replace("\\", "/"), filePath).start();
+				process.waitFor();
+				
+				File dest = new File(filePath);
+				if (!dest.exists()) return null;
+				
+				BufferedImage image = ImageIO.read(dest);
+				
+				dest.delete();
+				
+				return new Dimension(image.getWidth(), image.getHeight());
 			}
 			catch (Exception e)
 			{

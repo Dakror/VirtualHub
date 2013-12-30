@@ -15,7 +15,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -799,8 +798,8 @@ public class ClientFrame extends JFrame
 					@Override
 					public void run()
 					{
-						BufferedImage image = ImageMagickAssistant.getThumbnail(f.file);
-						if (image != null) fileInfoDetails.setText("Abmessungen: " + image.getWidth() + " x " + image.getHeight());
+						Dimension size = ImageMagickAssistant.getSize(f.file);
+						if (size != null) fileInfoDetails.setText("Abmessungen: " + size.width + " x " + size.height);
 						else
 						{
 							fileInfoDetails.setText("");
