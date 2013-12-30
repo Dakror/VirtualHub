@@ -18,7 +18,7 @@ public class VirtualHub
 	public static void init()
 	{
 		CFG.INTERNET = Assistant.isInternetReachable();
-		// test
+		
 		try
 		{
 			Properties props = new Properties();
