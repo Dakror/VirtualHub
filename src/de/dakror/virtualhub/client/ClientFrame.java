@@ -76,8 +76,8 @@ import de.dakror.virtualhub.net.packet.Packet4Rename;
 import de.dakror.virtualhub.net.packet.Packet5Attribute;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.ImageMagickAssistant;
 import de.dakror.virtualhub.util.JHintTextField;
-import de.dakror.virtualhub.util.ThumbnailAssistant;
 import de.dakror.virtualhub.util.WrapLayout;
 
 /**
@@ -799,32 +799,27 @@ public class ClientFrame extends JFrame
 					@Override
 					public void run()
 					{
-						try
+						BufferedImage image = ImageMagickAssistant.getThumbnail(f.file);
+						if (image != null) fileInfoDetails.setText("Abmessungen: " + image.getWidth() + " x " + image.getHeight());
+						else
 						{
-							BufferedImage image = ThumbnailAssistant.getFileThmubnail(f.file);
-							if (image != null) fileInfoDetails.setText("Abmessungen: " + image.getWidth() + " x " + image.getHeight());
-							else
+							fileInfoDetails.setText("");
+							
+							if (f.file.isDirectory())
 							{
-								fileInfoDetails.setText("");
+								int fl = 0, dir = 0;
 								
-								if (f.file.isDirectory())
+								for (File file : f.file.listFiles())
 								{
-									int fl = 0, dir = 0;
+									if (f.file.isHidden()) continue;
 									
-									for (File file : f.file.listFiles())
-									{
-										if (f.file.isHidden()) continue;
-										
-										if (file.isDirectory()) dir++;
-										else fl++;
-									}
-									
-									fileInfoDetails.setText((fl > 0 ? fl + " Datei" + (fl > 1 ? "en" : "") : "") + (fl > 0 && dir > 0 ? " und " : "") + (dir > 0 ? dir + " Unterordner" : ""));
+									if (file.isDirectory()) dir++;
+									else fl++;
 								}
+								
+								fileInfoDetails.setText((fl > 0 ? fl + " Datei" + (fl > 1 ? "en" : "") : "") + (fl > 0 && dir > 0 ? " und " : "") + (dir > 0 ? dir + " Unterordner" : ""));
 							}
 						}
-						catch (IOException e)
-						{}
 					}
 				}.start();
 			}

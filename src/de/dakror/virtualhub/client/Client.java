@@ -25,6 +25,7 @@ import de.dakror.virtualhub.net.packet.Packet3Tags;
 import de.dakror.virtualhub.net.packet.Packet5Attribute;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.ImageMagickAssistant;
 
 /**
  * @author Dakror
@@ -51,6 +52,9 @@ public class Client extends Thread implements PacketHandler
 		
 		dir = new File(CFG.DIR, "Client");
 		dir.mkdir();
+		
+		ImageMagickAssistant.init();
+		
 		frame = new ClientFrame();
 		frame.addWindowListener(new WindowAdapter()
 		{

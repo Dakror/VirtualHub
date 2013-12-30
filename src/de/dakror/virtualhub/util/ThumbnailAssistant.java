@@ -18,7 +18,6 @@ import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
-import net.coobird.thumbnailator.Thumbnails;
 import psd.model.Psd;
 import sun.awt.shell.ShellFolder;
 
@@ -161,20 +160,6 @@ public class ThumbnailAssistant
 		}
 	}
 	
-	public static BufferedImage getFileThmubnail(File f) throws IOException
-	{
-		String e = Assistant.getFileExtension(f);
-		Image image = null;
-		
-		if (e.equals("jpg") || e.equals("jpeg") || e.equals("png") || e.equals("gif") || e.equals("bmp")) image = ImageIO.read(f);
-		else if (e.equals("tif") || e.equals("tiff")) image = readTIF(f);
-		else if (e.equals("psd")) image = readPSD(f);
-		else if (e.equals("pdf")) image = readPDF(f);
-		
-		if (image == null) return null;
-		
-		return Assistant.toBufferedImage(image);
-	}
 	
 	public static Image getThumbnail(File f)
 	{
@@ -184,10 +169,10 @@ public class ThumbnailAssistant
 			if (tmpFile.exists()) return ImageIO.read(tmpFile);
 			else
 			{
-				BufferedImage thumbnail = getFileThmubnail(f);
+				BufferedImage thumbnail = ImageMagickAssistant.getThumbnail(f);
 				if (thumbnail == null) return null;
 				
-				if (thumbnail.getWidth() > CFG.PREVIEWSIZE.width || thumbnail.getHeight() > CFG.PREVIEWSIZE.height) thumbnail = Thumbnails.of(thumbnail).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).keepAspectRatio(true).asBufferedImage();
+				// if (thumbnail.getWidth() > CFG.PREVIEWSIZE.width || thumbnail.getHeight() > CFG.PREVIEWSIZE.height) thumbnail = Thumbnails.of(thumbnail).size(CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height).keepAspectRatio(true).asBufferedImage();
 				
 				createCacheFile(f, thumbnail);
 				
