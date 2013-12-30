@@ -116,14 +116,14 @@ public class NetHandler extends Thread implements PacketHandler
 		{
 			case INVALID:
 			{
-				Server.currentServer.frame.plog("Empfing ung√ºltiges Paket");
+				Server.currentServer.frame.plog("Empfing ungültiges Paket");
 				break;
 			}
 			case CATALOGS:
 			{
 				Packet0Catalogs p = new Packet0Catalogs(data);
 				Server.currentServer.catalogs = p.getCatalogs();
-				Server.currentServer.frame.plog("Kataloge ge√§ndert von: " + Assistant.getSocketAddress(socket));
+				Server.currentServer.frame.plog("Kataloge geändert von: " + Assistant.getSocketAddress(socket));
 				break;
 			}
 			case CATALOG:
@@ -136,7 +136,7 @@ public class NetHandler extends Thread implements PacketHandler
 						if (Server.currentServer.catalogs.getJSONObject(i).getString("name").equals(p.getCatalog().getName()))
 						{
 							Server.currentServer.catalogs.put(i, p.getCatalog().getJSONObject());
-							Server.currentServer.frame.plog("Katalog " + p.getCatalog().getName() + " ge√§ndert von: " + Assistant.getSocketAddress(socket));
+							Server.currentServer.frame.plog("Katalog " + p.getCatalog().getName() + " geändert von: " + Assistant.getSocketAddress(socket));
 							break;
 						}
 					}

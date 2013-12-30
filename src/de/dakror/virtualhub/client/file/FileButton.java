@@ -312,7 +312,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 						if (fb.tags.add(tag)) Client.currentClient.sendPacket(new Packet3Tags(fb.file, Client.currentClient.getCatalog().getName(), fb.tags));
 						else
 						{
-							if (JOptionPane.showConfirmDialog(Client.currentClient.frame, fb.file.getName() + " ist mit diesem Schl√ºsselwort bereits verkn√ºpft.\nM√∂chten Sie es von diese" + (fb.file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schl√ºsselwort bereits verkn√ºpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+							if (JOptionPane.showConfirmDialog(Client.currentClient.frame, fb.file.getName() + " ist mit diesem Schlüsselwort bereits verknüpft.\nM√∂chten Sie es von diese" + (fb.file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schlüsselwort bereits verknüpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 							{
 								if (fb.tags.remove(tag)) Client.currentClient.sendPacket(new Packet3Tags(fb.file, Client.currentClient.getCatalog().getName(), fb.tags));
 							}
@@ -332,7 +332,7 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 					if (tags.add(tag)) Client.currentClient.sendPacket(new Packet3Tags(file, Client.currentClient.getCatalog().getName(), tags));
 					else
 					{
-						if (JOptionPane.showConfirmDialog(Client.currentClient.frame, file.getName() + " ist mit diesem Schl√ºsselwort bereits verkn√ºpft.\nM√∂chten Sie es von diese" + (file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schl√ºsselwort bereits verkn√ºpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						if (JOptionPane.showConfirmDialog(Client.currentClient.frame, file.getName() + " ist mit diesem Schlüsselwort bereits verknüpft.\nM√∂chten Sie es von diese" + (file.isDirectory() ? "m Verzeichnis" : "r Datei") + " entfernen?", "Schlüsselwort bereits verknüpft", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 						{
 							if (tags.remove(tag)) Client.currentClient.sendPacket(new Packet3Tags(file, Client.currentClient.getCatalog().getName(), tags));
 						}

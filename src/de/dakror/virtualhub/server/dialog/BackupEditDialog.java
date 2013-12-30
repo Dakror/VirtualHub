@@ -34,7 +34,7 @@ public class BackupEditDialog
 		JPanel panel = new JPanel();
 		final JTextField path = new JTextField((Server.currentServer.settings.has("backup.path") ? Server.currentServer.settings.getString("backup.path") : ""), 10);
 		panel.add(path);
-		panel.add(new JButton(new AbstractAction("W√§hlen...")
+		panel.add(new JButton(new AbstractAction("Wählen...")
 		{
 			private static final long serialVersionUID = 1L;
 			
@@ -44,7 +44,7 @@ public class BackupEditDialog
 				JFileChooser jfc = new JFileChooser((path.getText().length() > 0 ? new File(path.getText()) : new File(System.getProperty("user.home"))));
 				jfc.setFileHidingEnabled(false);
 				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				jfc.setDialogTitle("Backup-Zielverzeichnis w√§hlen");
+				jfc.setDialogTitle("Backup-Zielverzeichnis wählen");
 				
 				if (jfc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) path.setText(jfc.getSelectedFile().getPath().replace("\\", "/"));
 			}

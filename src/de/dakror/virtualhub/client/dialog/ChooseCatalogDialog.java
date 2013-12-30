@@ -37,7 +37,7 @@ public class ChooseCatalogDialog
 {
 	public static void show(ClientFrame frame, final JSONArray data)
 	{
-		final JDialog dialog = new JDialog(frame, "Katalog w√§hlen", true);
+		final JDialog dialog = new JDialog(frame, "Katalog wählen", true);
 		dialog.setSize(400, 300);
 		dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		dialog.addWindowListener(new WindowAdapter()
@@ -82,7 +82,7 @@ public class ChooseCatalogDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein.", "Katalog hinzuf√ºgen", JOptionPane.PLAIN_MESSAGE);
+				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein.", "Katalog hinzufügen", JOptionPane.PLAIN_MESSAGE);
 				if (name != null && name.length() > 0)
 				{
 					DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
@@ -90,7 +90,7 @@ public class ChooseCatalogDialog
 					{
 						if (dlm.get(i).toString().equals(name))
 						{
-							JOptionPane.showMessageDialog(dialog, "Es existert bereits ein Katalog mit diesem Namen!", "Katalog berets vorhanden!", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(dialog, "Es existert bereits ein Katalog mit diesem Namen!", "Katalog bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 							actionPerformed(e);
 							return;
 						}
@@ -163,7 +163,7 @@ public class ChooseCatalogDialog
 				System.exit(0);
 			}
 		}));
-		buttons.add(new JButton(new AbstractAction("Katalog w√§hlen")
+		buttons.add(new JButton(new AbstractAction("Katalog wählen")
 		{
 			private static final long serialVersionUID = 1L;
 			
