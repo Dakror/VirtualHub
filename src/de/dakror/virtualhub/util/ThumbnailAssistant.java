@@ -126,7 +126,7 @@ public class ThumbnailAssistant
 			else
 			{
 				BufferedImage thumbnail;
-				if (Assistant.getFileExtension(f).equals("pdf")) thumbnail = Assistant.toBufferedImage(readPDF(f));
+				if (Assistant.getFileExtension(f).equals("pdf")) thumbnail = Assistant.toBufferedImage(scaleImage(readPDF(f)));
 				else thumbnail = ImageMagickAssistant.getThumbnail(f);
 				if (thumbnail == null) return null;
 				

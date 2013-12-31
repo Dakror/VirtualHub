@@ -103,7 +103,11 @@ public class FileButton extends JToggleButton implements DragSourceListener, Dra
 		
 		if (sysIcon instanceof LazyImageIcon) sysIcon = ((LazyImageIcon) sysIcon).getIcon();
 		
-		if (JTattooUtilities.isMac()) sysIcon = MacOSXHandler.getIcon(sysIcon);
+		if (JTattooUtilities.isMac())
+		{
+			sysIcon = MacOSXHandler.getIcon(sysIcon);
+			if (file.isDirectory()) sysIcon = new ImageIcon(getClass().getResource("/img/folder.png"));
+		}
 		
 		try
 		{
