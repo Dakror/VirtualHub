@@ -58,6 +58,8 @@ public class ZipAssistant
 				if (os != null) os.close();
 				if (is != null) is.close();
 			}
+			file.setExecutable(true, false);
+			file.setWritable(true, false);
 		}
 	}
 }
