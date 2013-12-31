@@ -42,7 +42,6 @@ public class ImageMagickAssistant
 		try
 		{
 			if (f.isDirectory()) return null;
-			if (Assistant.getFileExtension(f).equals("xcf")) return null; // xcf conversion pretty bad on IM
 			
 			String filePath = f.getPath().replace("\\", "/");
 			filePath = filePath.substring(0, filePath.indexOf(".") > -1 ? filePath.lastIndexOf(".") : filePath.length()) + "CACHECACHE.png";
@@ -55,10 +54,17 @@ public class ImageMagickAssistant
 			if (JTattooUtilities.isWindows()) exec = "/windows/convert.exe";
 			if (JTattooUtilities.isMac()) exec = "/mac/convert.sh";
 			
-			String cmd = "\"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge -thumbnail " + CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + " \"" + filePath + "\"";
-			
-			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; " + cmd);
-			else cmds.add(cmd);
+			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge -thumbnail " + CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + " \"" + filePath + "\"");
+			else
+			{
+				cmds.add("\"" + dir.getPath().replace("\\", "/") + exec + "\"");
+				cmds.add("\"" + f.getPath().replace("\\", "/") + "\"");
+				cmds.add("-layers");
+				cmds.add("merge");
+				cmds.add("-thumbnail");
+				cmds.add(CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height);
+				cmds.add("\"" + filePath + "\"");
+			}
 			
 			Process process = new ProcessBuilder(cmds.toArray(new String[] {})).start();
 			process.waitFor();
@@ -66,7 +72,7 @@ public class ImageMagickAssistant
 			File dest = new File(filePath);
 			if (!dest.exists())
 			{
-				CFG.p("dest failed");
+				dest.delete();
 				return null;
 			}
 			
