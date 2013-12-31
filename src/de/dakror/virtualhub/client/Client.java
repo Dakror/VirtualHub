@@ -32,8 +32,8 @@ import de.dakror.virtualhub.util.ImageMagickAssistant;
  */
 public class Client extends Thread implements PacketHandler
 {
-	public static final int VERSION = 2013102617;
-	public static final int PHASE = 2;
+	public static final int VERSION = 2013123115;
+	public static final int PHASE = 3;
 	
 	public static Client currentClient;
 	

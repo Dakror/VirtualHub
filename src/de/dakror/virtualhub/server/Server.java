@@ -26,8 +26,8 @@ import de.dakror.virtualhub.util.Assistant;
  */
 public class Server extends Thread
 {
-	public static final int VERSION = 2013102617;
-	public static final int PHASE = 2;
+	public static final int VERSION = 2013123115;
+	public static final int PHASE = 3;
 	
 	public static Server currentServer;
 	
