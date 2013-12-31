@@ -1,9 +1,13 @@
 package de.dakror.virtualhub.util;
 
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -16,6 +20,8 @@ import sun.awt.shell.ShellFolder;
 
 import com.jtattoo.plaf.JTattooUtilities;
 import com.jtattoo.plaf.acryl.AcrylLookAndFeel;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
 
 import de.dakror.virtualhub.settings.CFG;
 
@@ -90,6 +96,27 @@ public class ThumbnailAssistant
 		}
 	}
 	
+	public static Image readPDF(File f)
+	{
+		try
+		{
+			RandomAccessFile raf = new RandomAccessFile(f, "r");
+			FileChannel channel = raf.getChannel();
+			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+			PDFFile pdf = new PDFFile(buf);
+			PDFPage page = pdf.getPage(0);
+			Rectangle rect = new Rectangle(0, 0, (int) page.getBBox().getWidth(), (int) page.getBBox().getHeight());
+			Image image = page.getImage(rect.width, rect.height, rect, null, true, true);
+			raf.close();
+			return image;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public static Image getThumbnail(File f)
 	{
 		try
@@ -98,7 +125,9 @@ public class ThumbnailAssistant
 			if (tmpFile.exists()) return ImageIO.read(tmpFile);
 			else
 			{
-				BufferedImage thumbnail = ImageMagickAssistant.getThumbnail(f);
+				BufferedImage thumbnail;
+				if (Assistant.getFileExtension(f).equals("pdf")) thumbnail = Assistant.toBufferedImage(readPDF(f));
+				else thumbnail = ImageMagickAssistant.getThumbnail(f);
 				if (thumbnail == null) return null;
 				
 				createCacheFile(f, thumbnail);
