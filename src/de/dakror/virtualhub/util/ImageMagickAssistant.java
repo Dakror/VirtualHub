@@ -1,6 +1,8 @@
 package de.dakror.virtualhub.util;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -81,6 +83,52 @@ public class ImageMagickAssistant
 			dest.delete();
 			
 			return image;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public static Dimension getSize(File f)
+	{
+		try
+		{
+			if (f.isDirectory()) return null;
+			
+			ArrayList<String> cmds = new ArrayList<String>();
+			for (String s : getAdditionalParameters())
+				cmds.add(s);
+			
+			String exec = "";
+			if (JTattooUtilities.isWindows()) exec = "/windows/identify.exe";
+			if (JTattooUtilities.isMac()) exec = "/mac/identify.sh";
+			
+			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" -format \"%wx%h\" \"" + f.getPath().replace("\\", "/") + "\"");
+			else
+			{
+				cmds.add("\"" + dir.getPath().replace("\\", "/") + exec + "\"");
+				cmds.add("-format");
+				cmds.add("\"%wx%h\"");
+				cmds.add("\"" + f.getPath().replace("\\", "/") + "\"");
+			}
+			
+			Process process = new ProcessBuilder(cmds.toArray(new String[] {})).start();
+			process.waitFor();
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Assistant.copyInputStream(process.getInputStream(), baos);
+			String s = new String(baos.toByteArray());
+			
+			if (s.length() == 0 || s.indexOf("x") == -1) return null;
+			
+			Dimension d = new Dimension();
+			d.width = Integer.parseInt(s.substring(0, s.indexOf("x")));
+			d.height = Integer.parseInt(s.substring(s.indexOf("x") + 1));
+			
+			return d;
 		}
 		catch (Exception e)
 		{

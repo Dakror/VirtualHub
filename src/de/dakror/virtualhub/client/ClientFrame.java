@@ -75,6 +75,7 @@ import de.dakror.virtualhub.net.packet.Packet4Rename;
 import de.dakror.virtualhub.net.packet.Packet5Attribute;
 import de.dakror.virtualhub.settings.CFG;
 import de.dakror.virtualhub.util.Assistant;
+import de.dakror.virtualhub.util.ImageMagickAssistant;
 import de.dakror.virtualhub.util.JHintTextField;
 import de.dakror.virtualhub.util.WrapLayout;
 
@@ -797,7 +798,7 @@ public class ClientFrame extends JFrame
 					@Override
 					public void run()
 					{
-						Dimension size = null;// TODO ImageMagickAssistant.getSize(f.file);
+						Dimension size = ImageMagickAssistant.getSize(f.file);
 						if (size != null) fileInfoDetails.setText("Abmessungen: " + size.width + " x " + size.height);
 						else
 						{
