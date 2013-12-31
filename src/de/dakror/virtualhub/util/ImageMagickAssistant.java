@@ -1,7 +1,7 @@
 package de.dakror.virtualhub.util;
 
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -42,6 +42,7 @@ public class ImageMagickAssistant
 	{
 		try
 		{
+			if (f.isDirectory()) return null;
 			if (Assistant.getFileExtension(f).equals("xcf")) return null; // xcf conversion pretty bad on IM
 			
 			String filePath = f.getPath().replace("\\", "/");
@@ -51,19 +52,32 @@ public class ImageMagickAssistant
 			for (String s : getAdditionalParameters())
 				cmds.add(s);
 			
-			cmds.add(dir.getPath().replace("\\", "/") + "/windows/convert.exe");
-			cmds.add("-layers");
-			cmds.add("merge");
-			cmds.add("-thumbnail");
-			cmds.add(CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + ">");
-			cmds.add(f.getPath().replace("\\", "/"));
-			cmds.add(filePath);
+			String exec = "";
+			if (JTattooUtilities.isWindows()) exec = "/windows/convert.exe";
+			if (JTattooUtilities.isMac()) exec = "/mac/convert.sh";
 			
-			Process process = new ProcessBuilder(cmds).start();
+			// cmds.add("-thumbnail");
+			// cmds.add(CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + ">");
+			
+			String cmd = "\"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge \"" + filePath + "\"";
+			
+			if (JTattooUtilities.isMac()) cmds.add("'export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; " + cmd + "'");
+			else cmds.add(cmd);
+			
+			CFG.p(cmds);
+			
+			Process process = new ProcessBuilder(cmds.toArray(new String[] {})).start();
 			process.waitFor();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Assistant.copyInputStream(process.getErrorStream(), baos);
+			CFG.p(new String(baos.toByteArray()));
 			
 			File dest = new File(filePath);
-			if (!dest.exists()) return null;
+			if (!dest.exists())
+			{
+				// CFG.p("dest failed");
+				return null;
+			}
 			
 			BufferedImage image = ImageIO.read(dest);
 			
@@ -81,38 +95,7 @@ public class ImageMagickAssistant
 	
 	public static String[] getAdditionalParameters()
 	{
-		if (JTattooUtilities.isMac()) return new String[] { "/bin/bash", "-c", "export", "MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "\";", "export", "PATH=\"$MAGICK_HOME/bin:$PATH\";", "export", "DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"" };
+		if (JTattooUtilities.isMac()) return new String[] { "/bin/sh", "-c" };
 		return new String[] {};
-	}
-	
-	public static Dimension getSize(File f)
-	{
-		if (JTattooUtilities.isWindows())
-		{
-			try
-			{
-				if (Assistant.getFileExtension(f).equals("xcf")) return null; // xcf conversion pretty bad on IM
-				
-				String filePath = f.getPath().replace("\\", "/");
-				filePath = filePath.substring(0, filePath.indexOf(".") > -1 ? filePath.lastIndexOf(".") : filePath.length()) + "CACHECACHE.png";
-				Process process = new ProcessBuilder(dir.getPath().replace("\\", "/") + "/windows/convert.exe", "-layers", "merge", f.getPath().replace("\\", "/"), filePath).start();
-				process.waitFor();
-				
-				File dest = new File(filePath);
-				if (!dest.exists()) return null;
-				
-				BufferedImage image = ImageIO.read(dest);
-				
-				dest.delete();
-				
-				return new Dimension(image.getWidth(), image.getHeight());
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		
-		return null;
 	}
 }
