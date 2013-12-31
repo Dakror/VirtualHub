@@ -1,7 +1,6 @@
 package de.dakror.virtualhub.util;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -56,26 +55,18 @@ public class ImageMagickAssistant
 			if (JTattooUtilities.isWindows()) exec = "/windows/convert.exe";
 			if (JTattooUtilities.isMac()) exec = "/mac/convert.sh";
 			
-			// cmds.add("-thumbnail");
-			// cmds.add(CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + ">");
+			String cmd = "\"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge -thumbnail " + CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + " \"" + filePath + "\"";
 			
-			String cmd = "\"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge \"" + filePath + "\"";
-			
-			if (JTattooUtilities.isMac()) cmds.add("'export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; " + cmd + "'");
+			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; " + cmd);
 			else cmds.add(cmd);
-			
-			CFG.p(cmds);
 			
 			Process process = new ProcessBuilder(cmds.toArray(new String[] {})).start();
 			process.waitFor();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			Assistant.copyInputStream(process.getErrorStream(), baos);
-			CFG.p(new String(baos.toByteArray()));
 			
 			File dest = new File(filePath);
 			if (!dest.exists())
 			{
-				// CFG.p("dest failed");
+				CFG.p("dest failed");
 				return null;
 			}
 			
