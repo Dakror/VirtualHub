@@ -120,7 +120,7 @@ public class ImageMagickAssistant
 			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			Assistant.copyInputStream(process.getInputStream(), baos);
-			String s = new String(baos.toByteArray());
+			String s = new String(baos.toByteArray()).trim();
 			
 			if (s.length() == 0 || s.indexOf("x") == -1) return null;
 			
