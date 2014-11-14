@@ -10,16 +10,13 @@ import org.json.JSONObject;
 /**
  * @author Dakror
  */
-public class Catalog
-{
+public class Catalog {
 	String name;
 	public ArrayList<File> sources = new ArrayList<File>();
 	public ArrayList<String> tags = new ArrayList<String>();
 	
-	public Catalog(JSONObject o)
-	{
-		try
-		{
+	public Catalog(JSONObject o) {
+		try {
 			name = o.getString("name");
 			
 			JSONArray sources = o.getJSONArray("sources");
@@ -29,17 +26,13 @@ public class Catalog
 			JSONArray tags = o.getJSONArray("tags");
 			for (int i = 0; i < tags.length(); i++)
 				this.tags.add(tags.getString(i));
-		}
-		catch (JSONException e)
-		{
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public JSONObject getJSONObject()
-	{
-		try
-		{
+	public JSONObject getJSONObject() {
+		try {
 			JSONObject o = new JSONObject();
 			o.put("name", name);
 			JSONArray sources = new JSONArray();
@@ -50,22 +43,18 @@ public class Catalog
 			o.put("tags", tags.toArray(new String[] {}));
 			
 			return o;
-		}
-		catch (JSONException e)
-		{
+		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
 		}
 		
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 	
-	public void setName(String name)
-	{
+	public void setName(String name) {
 		this.name = name;
 	}
 }

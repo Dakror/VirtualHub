@@ -16,16 +16,13 @@ import de.dakror.virtualhub.net.packet.Packet4Rename;
 /**
  * @author Dakror
  */
-public class DBManager
-{
+public class DBManager {
 	public static File database;
 	
 	static Connection connection;
 	
-	public static void init()
-	{
-		try
-		{
+	public static void init() {
+		try {
 			database = new File(Server.dir, "virtualhub.db");
 			database.createNewFile();
 			
@@ -35,90 +32,65 @@ public class DBManager
 			Statement s = connection.createStatement();
 			s.executeUpdate("CREATE TABLE IF NOT EXISTS ETICETS(PATH varchar(500) NOT NULL PRIMARY KEY, CATALOG varchar(100), ETICET INT)");
 			s.executeUpdate("CREATE TABLE IF NOT EXISTS TAGS(PATH varchar(500) NOT NULL PRIMARY KEY, CATALOG varchar(100), TAGS TEXT)");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static Eticet eticet(File f, String catalog, Eticet e)
-	{
-		try
-		{
-			if (e == Eticet.NULL)
-			{
+	public static Eticet eticet(File f, String catalog, Eticet e) {
+		try {
+			if (e == Eticet.NULL) {
 				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
 				if (!rs.next()) return Eticet.NONE;
 				
 				return Eticet.values()[rs.getInt(1)];
-			}
-			else
-			{
+			} else {
 				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
 				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO ETICETS VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ") AND CATALOG = \"" + catalog + "\"");
 			}
-		}
-		catch (SQLException e1)
-		{
+		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
 		return null;
 	}
 	
-	public static Tags tags(File f, String catalog, Tags t)
-	{
-		try
-		{
-			if (t == null)
-			{
+	public static Tags tags(File f, String catalog, Tags t) {
+		try {
+			if (t == null) {
 				ResultSet rs = connection.createStatement().executeQuery("SELECT TAGS FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
 				if (!rs.next()) return new Tags();
 				
 				return new Tags(rs.getString(1).split(", "));
-			}
-			else
-			{
+			} else {
 				if (t.getTags().length == 0) connection.createStatement().executeUpdate("DELETE FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
 				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO TAGS VALUES(\"" + f.getPath().replace("\\", "/") + "\", \"" + catalog + "\", \"" + t.serialize() + "\")");
 			}
-		}
-		catch (SQLException e1)
-		{
+		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
 		return null;
 	}
 	
-	public static JSONObject tagdata(String catalog)
-	{
+	public static JSONObject tagdata(String catalog) {
 		JSONObject o = new JSONObject();
 		
-		try
-		{
+		try {
 			ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM TAGS");
-			while (rs.next())
-			{
+			while (rs.next()) {
 				o.put(rs.getString(1), rs.getString(3).split(", "));
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		return o;
 	}
 	
-	public static void rename(Packet4Rename packet)
-	{
-		try
-		{
+	public static void rename(Packet4Rename packet) {
+		try {
 			connection.createStatement().executeUpdate("UPDATE ETICETS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \"" + packet.getOldFile().getPath().replace("\\", "/") + "\"");
 			connection.createStatement().executeUpdate("UPDATE TAGS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \"" + packet.getOldFile().getPath().replace("\\", "/") + "\"");
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}

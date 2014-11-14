@@ -7,8 +7,7 @@ import de.dakror.virtualhub.net.packet.Packet;
 /**
  * @author Dakror
  */
-public interface PacketHandler
-{
+public interface PacketHandler {
 	public void parsePacket(byte[] data);
 	
 	public void sendPacket(Packet p) throws IOException;

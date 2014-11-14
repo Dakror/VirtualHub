@@ -7,32 +7,26 @@ import de.dakror.virtualhub.data.Eticet;
 /**
  * @author Dakror
  */
-public class EticetableTreeNode extends DefaultMutableTreeNode
-{
+public class EticetableTreeNode extends DefaultMutableTreeNode {
 	private static final long serialVersionUID = 1L;
 	
 	private Eticet eticet = Eticet.NONE;
 	
-	public EticetableTreeNode()
-	{}
+	public EticetableTreeNode() {}
 	
-	public EticetableTreeNode(Object userObject)
-	{
+	public EticetableTreeNode(Object userObject) {
 		super(userObject);
 	}
 	
-	public EticetableTreeNode(Object userObject, boolean allowsChildren)
-	{
+	public EticetableTreeNode(Object userObject, boolean allowsChildren) {
 		super(userObject, allowsChildren);
 	}
 	
-	public Eticet getEticet()
-	{
+	public Eticet getEticet() {
 		return eticet;
 	}
 	
-	public void setEticet(Eticet eticet)
-	{
+	public void setEticet(Eticet eticet) {
 		this.eticet = eticet;
 	}
 }

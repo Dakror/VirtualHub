@@ -33,18 +33,14 @@ import de.dakror.virtualhub.net.packet.Packet0Catalogs;
 /**
  * @author Dakror
  */
-public class ChooseCatalogDialog
-{
-	public static void show(ClientFrame frame, final JSONArray data)
-	{
+public class ChooseCatalogDialog {
+	public static void show(ClientFrame frame, final JSONArray data) {
 		final JDialog dialog = new JDialog(frame, "Katalog wählen", true);
 		dialog.setSize(400, 300);
 		dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		dialog.addWindowListener(new WindowAdapter()
-		{
+		dialog.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e)
-			{
+			public void windowClosing(WindowEvent e) {
 				Client.currentClient.disconnect();
 				System.exit(0);
 			}
@@ -53,14 +49,10 @@ public class ChooseCatalogDialog
 		JPanel contentPane = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
 		dialog.setContentPane(contentPane);
 		DefaultListModel dlm = new DefaultListModel();
-		for (int i = 0; i < data.length(); i++)
-		{
-			try
-			{
+		for (int i = 0; i < data.length(); i++) {
+			try {
 				dlm.addElement(data.getJSONObject(i).getString("name"));
-			}
-			catch (JSONException e)
-			{
+			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
@@ -75,29 +67,23 @@ public class ChooseCatalogDialog
 		
 		JPanel mods = new JPanel(new GridLayout(1, 2));
 		mods.setPreferredSize(new Dimension(50, 22));
-		mods.add(new JButton(new AbstractAction("+")
-		{
+		mods.add(new JButton(new AbstractAction("+") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				String name = JOptionPane.showInputDialog(dialog, "Bitte geben Sie den Namen des neuen Katalogs ein.", "Katalog hinzufügen", JOptionPane.PLAIN_MESSAGE);
-				if (name != null && name.length() > 0)
-				{
+				if (name != null && name.length() > 0) {
 					DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
-					for (int i = 0; i < dlm.getSize(); i++)
-					{
-						if (dlm.get(i).toString().equals(name))
-						{
+					for (int i = 0; i < dlm.getSize(); i++) {
+						if (dlm.get(i).toString().equals(name)) {
 							JOptionPane.showMessageDialog(dialog, "Es existert bereits ein Katalog mit diesem Namen!", "Katalog bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 							actionPerformed(e);
 							return;
 						}
 					}
 					
-					try
-					{
+					try {
 						dlm.addElement(name);
 						JSONObject o = new JSONObject();
 						o.put("name", name);
@@ -105,34 +91,25 @@ public class ChooseCatalogDialog
 						o.put("tags", new JSONArray());
 						data.put(o);
 						Client.currentClient.sendPacket(new Packet0Catalogs(data));
-					}
-					catch (Exception e1)
-					{
+					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 				}
 			}
 		}));
-		mods.add(new JButton(new AbstractAction("-")
-		{
+		mods.add(new JButton(new AbstractAction("-") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (catalogs.getSelectedIndex() != -1)
-				{
-					if (JOptionPane.showConfirmDialog(dialog, "Sind Sie sicher, dass Sie diesen\r\nKatalog unwiderruflich löschen wollen?", "Katalog löschen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-					{
+			public void actionPerformed(ActionEvent e) {
+				if (catalogs.getSelectedIndex() != -1) {
+					if (JOptionPane.showConfirmDialog(dialog, "Sind Sie sicher, dass Sie diesen\r\nKatalog unwiderruflich löschen wollen?", "Katalog löschen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 						DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
 						data.remove(catalogs.getSelectedIndex());
 						dlm.remove(catalogs.getSelectedIndex());
-						try
-						{
+						try {
 							Client.currentClient.sendPacket(new Packet0Catalogs(data));
-						}
-						catch (IOException e1)
-						{
+						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
 					}
@@ -152,34 +129,26 @@ public class ChooseCatalogDialog
 		
 		JPanel buttons = new JPanel(new GridLayout(1, 2));
 		buttons.setPreferredSize(new Dimension(396, 22));
-		buttons.add(new JButton(new AbstractAction("Abbrechen")
-		{
+		buttons.add(new JButton(new AbstractAction("Abbrechen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				Client.currentClient.disconnect();
 				System.exit(0);
 			}
 		}));
-		buttons.add(new JButton(new AbstractAction("Katalog wählen")
-		{
+		buttons.add(new JButton(new AbstractAction("Katalog wählen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (catalogs.getSelectedIndex() != -1)
-				{
-					try
-					{
+			public void actionPerformed(ActionEvent e) {
+				if (catalogs.getSelectedIndex() != -1) {
+					try {
 						Client.currentClient.setCatalog(new Catalog(data.getJSONObject(catalogs.getSelectedIndex())));
 						Client.currentClient.frame.setTitle("- " + Client.currentClient.getCatalog().getName());
 						dialog.dispose();
-					}
-					catch (JSONException e1)
-					{
+					} catch (JSONException e1) {
 						e1.printStackTrace();
 					}
 				}

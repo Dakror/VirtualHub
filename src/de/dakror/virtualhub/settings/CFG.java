@@ -10,8 +10,7 @@ import javax.swing.filechooser.FileSystemView;
 /**
  * @author Dakror
  */
-public class CFG
-{
+public class CFG {
 	// -- UniVersion -- //
 	public static final int VERSION = 2013102617;
 	public static final int PHASE = 2;
@@ -25,8 +24,7 @@ public class CFG
 	
 	public static final Dimension PREVIEWSIZE = new Dimension(244, 183);
 	
-	public static void p(Object... p)
-	{
+	public static void p(Object... p) {
 		if (p.length == 1) System.out.println(p[0]);
 		else System.out.println(Arrays.toString(p));
 	}

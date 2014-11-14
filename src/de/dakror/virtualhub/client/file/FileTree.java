@@ -28,8 +28,7 @@ import de.dakror.virtualhub.util.Assistant;
 /**
  * @author Dakror
  */
-public class FileTree extends JTree implements DropTargetListener, DragSourceListener, DragGestureListener
-{
+public class FileTree extends JTree implements DropTargetListener, DragSourceListener, DragGestureListener {
 	private static final long serialVersionUID = 1L;
 	
 	DropTarget dropTarget = new DropTarget(this, this);
@@ -37,65 +36,52 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 	
 	DropTargetDropEvent dtde;
 	
-	public FileTree(DefaultTreeModel dtm)
-	{
+	public FileTree(DefaultTreeModel dtm) {
 		super(dtm);
 		
 		dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY_OR_MOVE, this);
 	}
 	
 	@Override
-	public void dragGestureRecognized(DragGestureEvent dge)
-	{}
+	public void dragGestureRecognized(DragGestureEvent dge) {}
 	
 	@Override
-	public void dragEnter(DragSourceDragEvent dsde)
-	{}
+	public void dragEnter(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dragOver(DragSourceDragEvent dsde)
-	{}
+	public void dragOver(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dropActionChanged(DragSourceDragEvent dsde)
-	{}
+	public void dropActionChanged(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dragExit(DragSourceEvent dse)
-	{}
+	public void dragExit(DragSourceEvent dse) {}
 	
 	@Override
-	public void dragDropEnd(DragSourceDropEvent dsde)
-	{}
+	public void dragDropEnd(DragSourceDropEvent dsde) {}
 	
 	@Override
-	public void dragEnter(DropTargetDragEvent dtde)
-	{
+	public void dragEnter(DropTargetDragEvent dtde) {
 		dtde.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
 	}
 	
 	@Override
-	public void dragOver(DropTargetDragEvent dtde)
-	{
+	public void dragOver(DropTargetDragEvent dtde) {
 		int row = getRowForLocation(dtde.getLocation().x, dtde.getLocation().y);
 		((FileTreeCellRenderer) getCellRenderer()).highlightedRow = row;
 		repaint();
 	}
 	
 	@Override
-	public void dropActionChanged(DropTargetDragEvent dtde)
-	{}
+	public void dropActionChanged(DropTargetDragEvent dtde) {}
 	
 	@Override
-	public void dragExit(DropTargetEvent dte)
-	{}
+	public void dragExit(DropTargetEvent dte) {}
 	
 	@Override
-	public void drop(DropTargetDropEvent e)
-	{
+	public void drop(DropTargetDropEvent e) {
 		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
-		if (highlightedRow == -1)
-		{
+		if (highlightedRow == -1) {
 			e.rejectDrop();
 			return;
 		}
@@ -103,10 +89,8 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 		dtde = e;
 		
 		Transferable transferable = dtde.getTransferable();
-		if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-		{
-			try
-			{
+		if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+			try {
 				dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 				@SuppressWarnings("unchecked")
 				List<File> selected = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
@@ -117,17 +101,14 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 				boolean copy = dtde.getDropAction() == DnDConstants.ACTION_COPY;
 				
 				new FileMover(Client.currentClient.frame, true, copy, targetFile, selected.toArray(new File[] {}));
-			}
-			catch (Exception e1)
-			{
+			} catch (Exception e1) {
 				e1.printStackTrace();
 				dtde.rejectDrop();
 			}
 		}
 	}
 	
-	public void handleDrop()
-	{
+	public void handleDrop() {
 		int highlightedRow = ((FileTreeCellRenderer) getCellRenderer()).highlightedRow;
 		EticetableTreeNode parent = (EticetableTreeNode) getSelectionPath().getLastPathComponent();
 		
@@ -142,10 +123,8 @@ public class FileTree extends JTree implements DropTargetListener, DragSourceLis
 		((FileTreeCellRenderer) getCellRenderer()).highlightedRow = -1;
 		
 		EticetableTreeNode node = (EticetableTreeNode) path.getParentPath().getLastPathComponent();
-		for (int i = 0; i < node.getChildCount(); i++)
-		{
-			if (((EticetableTreeNode) node.getChildAt(i)).getUserObject().equals(((EticetableTreeNode) path.getLastPathComponent()).getUserObject()))
-			{
+		for (int i = 0; i < node.getChildCount(); i++) {
+			if (((EticetableTreeNode) node.getChildAt(i)).getUserObject().equals(((EticetableTreeNode) path.getLastPathComponent()).getUserObject())) {
 				setSelectionPath(new TreePath(((EticetableTreeNode) node.getChildAt(i)).getPath()));
 				break;
 			}

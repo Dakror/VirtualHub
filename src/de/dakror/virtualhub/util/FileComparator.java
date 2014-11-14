@@ -3,11 +3,9 @@ package de.dakror.virtualhub.util;
 import java.io.File;
 import java.util.Comparator;
 
-public class FileComparator implements Comparator<File>
-{
+public class FileComparator implements Comparator<File> {
 	@Override
-	public int compare(File f1, File f2)
-	{
+	public int compare(File f1, File f2) {
 		String ext1 = Assistant.getFileExtension(f1);
 		String ext2 = Assistant.getFileExtension(f2);
 		

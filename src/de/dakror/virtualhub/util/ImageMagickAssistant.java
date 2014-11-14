@@ -17,32 +17,24 @@ import de.dakror.virtualhub.settings.CFG;
 /**
  * @author Dakror
  */
-public class ImageMagickAssistant
-{
+public class ImageMagickAssistant {
 	public static File dir = new File(Client.dir, "ImageMagick");
 	
-	public static void init()
-	{
-		if (dir.mkdir())
-		{
+	public static void init() {
+		if (dir.mkdir()) {
 			File tmpFile = new File(dir, "tmp.zip");
-			try
-			{
+			try {
 				Assistant.copyInputStream(ImageMagickAssistant.class.getResourceAsStream("/ImageMagick.zip"), new FileOutputStream(tmpFile));
 				ZipAssistant.unzip(tmpFile, dir);
 				tmpFile.delete();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public static BufferedImage getThumbnail(File f)
-	{
-		try
-		{
+	public static BufferedImage getThumbnail(File f) {
+		try {
 			if (f.isDirectory()) return null;
 			
 			String filePath = f.getPath().replace("\\", "/");
@@ -57,8 +49,7 @@ public class ImageMagickAssistant
 			if (JTattooUtilities.isMac()) exec = "/mac/convert.sh";
 			
 			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge -thumbnail " + CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + " \"" + filePath + "\"");
-			else
-			{
+			else {
 				cmds.add("\"" + dir.getPath().replace("\\", "/") + exec + "\"");
 				cmds.add("\"" + f.getPath().replace("\\", "/") + "\"");
 				cmds.add("-layers");
@@ -72,8 +63,7 @@ public class ImageMagickAssistant
 			process.waitFor();
 			
 			File dest = new File(filePath);
-			if (!dest.exists())
-			{
+			if (!dest.exists()) {
 				dest.delete();
 				return null;
 			}
@@ -83,19 +73,15 @@ public class ImageMagickAssistant
 			dest.delete();
 			
 			return image;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		return null;
 	}
 	
-	public static Dimension getSize(File f)
-	{
-		try
-		{
+	public static Dimension getSize(File f) {
+		try {
 			if (f.isDirectory()) return null;
 			
 			ArrayList<String> cmds = new ArrayList<String>();
@@ -107,8 +93,7 @@ public class ImageMagickAssistant
 			if (JTattooUtilities.isMac()) exec = "/mac/identify.sh";
 			
 			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" -format \"%wx%h\" \"" + f.getPath().replace("\\", "/") + "\"");
-			else
-			{
+			else {
 				cmds.add("\"" + dir.getPath().replace("\\", "/") + exec + "\"");
 				cmds.add("-format");
 				cmds.add("\"%wx%h\"");
@@ -129,17 +114,14 @@ public class ImageMagickAssistant
 			d.height = Integer.parseInt(s.substring(s.indexOf("x") + 1));
 			
 			return d;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		return null;
 	}
 	
-	public static String[] getAdditionalParameters()
-	{
+	public static String[] getAdditionalParameters() {
 		if (JTattooUtilities.isMac()) return new String[] { "/bin/sh", "-c" };
 		return new String[] {};
 	}

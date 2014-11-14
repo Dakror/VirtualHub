@@ -5,8 +5,7 @@ import java.awt.Color;
 /**
  * @author Dakror
  */
-public enum Eticet
-{
+public enum Eticet {
 	NULL("null", new Color(150, 100, 50)),
 	NONE("Kein Etikett", new Color(0, 0, 0, 0)),
 	RED("Rot", Color.red),
@@ -20,24 +19,20 @@ public enum Eticet
 	private String name;
 	private Color c;
 	
-	private Eticet(String name, Color c)
-	{
+	private Eticet(String name, Color c) {
 		this.name = name;
 		this.c = c;
 	}
 	
-	public Color getColor()
-	{
+	public Color getColor() {
 		return c;
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 	
-	public static Eticet getByName(String name)
-	{
+	public static Eticet getByName(String name) {
 		for (Eticet e : values())
 			if (e.getName().equals(name)) return e;
 		

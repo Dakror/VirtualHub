@@ -30,15 +30,13 @@ import de.dakror.virtualhub.util.Assistant;
 /**
  * @author Dakror
  */
-public class FileViewPanel extends JPanel implements DropTargetListener, DragSourceListener, DragGestureListener
-{
+public class FileViewPanel extends JPanel implements DropTargetListener, DragSourceListener, DragGestureListener {
 	private static final long serialVersionUID = 1L;
 	
 	public DropTarget dropTarget = new DropTarget(this, this);
 	DragSource dragSource = DragSource.getDefaultDragSource();
 	
-	public FileViewPanel(LayoutManager layout)
-	{
+	public FileViewPanel(LayoutManager layout) {
 		super(layout);
 		
 		dropTarget.setActive(false);
@@ -47,59 +45,45 @@ public class FileViewPanel extends JPanel implements DropTargetListener, DragSou
 	}
 	
 	@Override
-	public void dragGestureRecognized(DragGestureEvent dge)
-	{}
+	public void dragGestureRecognized(DragGestureEvent dge) {}
 	
 	@Override
-	public void dragEnter(DragSourceDragEvent dsde)
-	{}
+	public void dragEnter(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dragOver(DragSourceDragEvent dsde)
-	{}
+	public void dragOver(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dropActionChanged(DragSourceDragEvent dsde)
-	{}
+	public void dropActionChanged(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dragExit(DragSourceEvent dse)
-	{}
+	public void dragExit(DragSourceEvent dse) {}
 	
 	@Override
-	public void dragDropEnd(DragSourceDropEvent dsde)
-	{}
+	public void dragDropEnd(DragSourceDropEvent dsde) {}
 	
 	@Override
-	public void dragEnter(DropTargetDragEvent dtde)
-	{}
+	public void dragEnter(DropTargetDragEvent dtde) {}
 	
 	@Override
-	public void dragOver(DropTargetDragEvent dtde)
-	{}
+	public void dragOver(DropTargetDragEvent dtde) {}
 	
 	@Override
-	public void dropActionChanged(DropTargetDragEvent dtde)
-	{}
+	public void dropActionChanged(DropTargetDragEvent dtde) {}
 	
 	@Override
-	public void dragExit(DropTargetEvent dte)
-	{}
+	public void dragExit(DropTargetEvent dte) {}
 	
 	@Override
-	public void drop(DropTargetDropEvent dtde)
-	{
-		if (getComponentCount() == 0)
-		{
+	public void drop(DropTargetDropEvent dtde) {
+		if (getComponentCount() == 0) {
 			dtde.rejectDrop();
 			return;
 		}
 		
-		try
-		{
+		try {
 			Transferable tr = dtde.getTransferable();
-			if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-			{
+			if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 				dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
 				List<?> fileList = (List<?>) tr.getTransferData(DataFlavor.javaFileListFlavor);
 				
@@ -109,20 +93,14 @@ public class FileViewPanel extends JPanel implements DropTargetListener, DragSou
 				Client.currentClient.frame.directoryLoader.fireUpdate();
 				
 				dtde.getDropTargetContext().dropComplete(true);
-			}
-			else
-			{
+			} else {
 				CFG.p("Rejected");
 				dtde.rejectDrop();
 			}
-		}
-		catch (IOException io)
-		{
+		} catch (IOException io) {
 			io.printStackTrace();
 			dtde.rejectDrop();
-		}
-		catch (UnsupportedFlavorException ufe)
-		{
+		} catch (UnsupportedFlavorException ufe) {
 			ufe.printStackTrace();
 			dtde.rejectDrop();
 		}

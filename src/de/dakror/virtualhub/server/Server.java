@@ -24,8 +24,7 @@ import de.dakror.virtualhub.util.Assistant;
 /**
  * @author Dakror
  */
-public class Server extends Thread
-{
+public class Server extends Thread {
 	public static final int VERSION = 2013123115;
 	public static final int PHASE = 3;
 	
@@ -41,47 +40,37 @@ public class Server extends Thread
 	
 	ServerSocket socket;
 	
-	public Server()
-	{
+	public Server() {
 		currentServer = this;
 		
 		dir = new File(CFG.DIR, "Server");
 		dir.mkdir();
 		
 		frame = new ServerFrame();
-		frame.addWindowListener(new WindowAdapter()
-		{
+		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e)
-			{
+			public void windowClosing(WindowEvent e) {
 				shutdown();
 			}
 		});
 		
-		setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler()
-		{
+		setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
-			public void uncaughtException(Thread t, Throwable e)
-			{
+			public void uncaughtException(Thread t, Throwable e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
 				frame.log("ERROR: " + sw.toString());
 			}
 		});
 		
-		try
-		{
+		try {
 			socket = new ServerSocket(CFG.SERVER_PORT, 0, InetAddress.getLocalHost());
 			frame.log("Starte Server unter " + socket.getInetAddress().getHostAddress() + ":" + socket.getLocalPort());
-		}
-		catch (BindException e)
-		{
+		} catch (BindException e) {
 			frame.log("Es läuft bereits ein Server auf diesem Port!");
 			shutdown();
 			return;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -92,23 +81,17 @@ public class Server extends Thread
 	}
 	
 	@Override
-	public void run()
-	{
-		while (!socket.isClosed())
-		{
+	public void run() {
+		while (!socket.isClosed()) {
 			Socket s = null;
-			try
-			{
+			try {
 				s = socket.accept();
 				handleConnection(s);
-			}
-			catch (IOException e)
-			{}
+			} catch (IOException e) {}
 		}
 	}
 	
-	public void handleConnection(Socket s)
-	{
+	public void handleConnection(Socket s) {
 		frame.log("Client verbunden: " + Assistant.getSocketAddress(s));
 		NetHandler netHandler = new NetHandler(null, s);
 		clients.put(s, netHandler);
@@ -116,29 +99,23 @@ public class Server extends Thread
 		netHandler.start();
 	}
 	
-	public void removeClient(Socket s, String msg)
-	{
+	public void removeClient(Socket s, String msg) {
 		clients.remove(s);
 		frame.log("Client getrennt: " + Assistant.getSocketAddress(s) + ((!msg.equals("Verbindung getrennt")) ? " (" + msg + ")" : ""));
 	}
 	
-	public void shutdown()
-	{
-		try
-		{
+	public void shutdown() {
+		try {
 			
 			if (socket != null) socket.close();
 			frame.save();
 			frame.log("Server geschlossen\r\n");
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		VirtualHub.init();
 		
 		UniVersion.offline = !CFG.INTERNET;

@@ -30,8 +30,7 @@ import de.dakror.virtualhub.util.ImageMagickAssistant;
 /**
  * @author Dakror
  */
-public class Client extends Thread implements PacketHandler
-{
+public class Client extends Thread implements PacketHandler {
 	public static final int VERSION = 2013123115;
 	public static final int PHASE = 3;
 	
@@ -46,8 +45,7 @@ public class Client extends Thread implements PacketHandler
 	
 	public static File dir;
 	
-	public Client()
-	{
+	public Client() {
 		currentClient = this;
 		
 		dir = new File(CFG.DIR, "Client");
@@ -56,11 +54,9 @@ public class Client extends Thread implements PacketHandler
 		ImageMagickAssistant.init();
 		
 		frame = new ClientFrame();
-		frame.addWindowListener(new WindowAdapter()
-		{
+		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e)
-			{
+			public void windowClosing(WindowEvent e) {
 				disconnect();
 			}
 		});
@@ -69,18 +65,13 @@ public class Client extends Thread implements PacketHandler
 		frame.setVisible(true);
 		frame.directoryLoader = new DirectoryLoader();
 		frame.synchronizer = new Synchronizer();
-		try
-		{
+		try {
 			socket = new Socket(InetAddress.getByName(properties.getProperty("server")), CFG.SERVER_PORT);
-		}
-		catch (ConnectException e)
-		{
+		} catch (ConnectException e) {
 			JOptionPane.showMessageDialog(frame, "Kann Server unter " + properties.getProperty("server") + " nicht erreichen!", "Server nicht erreichbar!", JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 			return;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -89,42 +80,34 @@ public class Client extends Thread implements PacketHandler
 	}
 	
 	@Override
-	public void run()
-	{
+	public void run() {
 		netHandler = new NetHandler(this, socket);
 		netHandler.run();
 	}
 	
 	@Override
-	public void parsePacket(byte[] data)
-	{
-		switch (Packet.lookupPacket(data[0]))
-		{
-			case INVALID:
-			{
+	public void parsePacket(byte[] data) {
+		switch (Packet.lookupPacket(data[0])) {
+			case INVALID: {
 				CFG.p("Received invalid packet");
 				break;
 			}
-			case CATALOGS:
-			{
+			case CATALOGS: {
 				Packet0Catalogs p = new Packet0Catalogs(data);
 				ChooseCatalogDialog.show(frame, p.getCatalogs());
 				break;
 			}
-			case ETICET:
-			{
+			case ETICET: {
 				Packet2Eticet p = new Packet2Eticet(data);
 				frame.setFileEticet(p);
 				break;
 			}
-			case TAGS:
-			{
+			case TAGS: {
 				Packet3Tags p = new Packet3Tags(data);
 				frame.setFileTags(p);
 				break;
 			}
-			case ATTRIBUTE:
-			{
+			case ATTRIBUTE: {
 				Packet5Attribute p = new Packet5Attribute(data);
 				if (p.getKey().equals("backup.path")) frame.doBackup(p);
 				
@@ -135,46 +118,35 @@ public class Client extends Thread implements PacketHandler
 		}
 	}
 	
-	public void disconnect()
-	{
+	public void disconnect() {
 		if (socket == null) return;
-		try
-		{
+		try {
 			socket.close();
-		}
-		catch (IOException e1)
-		{
+		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 	}
 	
 	@Override
-	public void sendPacket(Packet p) throws IOException
-	{
-		try
-		{
+	public void sendPacket(Packet p) throws IOException {
+		try {
 			netHandler.sendPacket(p);
-		}
-		catch (SocketException e)
-		{
+		} catch (SocketException e) {
 			JOptionPane.showMessageDialog(frame, "Server unter " + properties.getProperty("server") + " wurde geschlossen!", "Server geschlossen!", JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 	}
 	
-	public Catalog getCatalog()
-	{
+	public Catalog getCatalog() {
 		return catalog;
 	}
 	
-	public void setCatalog(Catalog catalog)
-	{
+	public void setCatalog(Catalog catalog) {
 		this.catalog = catalog;
 		frame.loadCatalog(catalog);
 	}
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		VirtualHub.init();
 		
 		UniVersion.offline = !CFG.INTERNET;

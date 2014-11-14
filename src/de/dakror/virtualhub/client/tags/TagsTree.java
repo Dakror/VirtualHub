@@ -16,24 +16,20 @@ import javax.swing.tree.DefaultTreeModel;
 /**
  * @author Dakror
  */
-public class TagsTree extends JTree implements DragSourceListener, DragGestureListener
-{
+public class TagsTree extends JTree implements DragSourceListener, DragGestureListener {
 	private static final long serialVersionUID = 1L;
 	
 	public DragSource dragSource = DragSource.getDefaultDragSource();
 	
-	public TagsTree(DefaultTreeModel dtm)
-	{
+	public TagsTree(DefaultTreeModel dtm) {
 		super(dtm);
 		
 		dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_LINK, this);
 	}
 	
 	@Override
-	public void dragGestureRecognized(DragGestureEvent dge)
-	{
-		if (getRowForPath(getSelectionPath()) > 0)
-		{
+	public void dragGestureRecognized(DragGestureEvent dge) {
+		if (getRowForPath(getSelectionPath()) > 0) {
 			StringSelection transferable = new StringSelection(getSelectionPath().getLastPathComponent().toString());
 			
 			dge.startDrag(DragSource.DefaultLinkDrop, transferable);
@@ -41,22 +37,17 @@ public class TagsTree extends JTree implements DragSourceListener, DragGestureLi
 	}
 	
 	@Override
-	public void dragEnter(DragSourceDragEvent dsde)
-	{}
+	public void dragEnter(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dragOver(DragSourceDragEvent dsde)
-	{}
+	public void dragOver(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dropActionChanged(DragSourceDragEvent dsde)
-	{}
+	public void dropActionChanged(DragSourceDragEvent dsde) {}
 	
 	@Override
-	public void dragExit(DragSourceEvent dse)
-	{}
+	public void dragExit(DragSourceEvent dse) {}
 	
 	@Override
-	public void dragDropEnd(DragSourceDropEvent dsde)
-	{}
+	public void dragDropEnd(DragSourceDropEvent dsde) {}
 }

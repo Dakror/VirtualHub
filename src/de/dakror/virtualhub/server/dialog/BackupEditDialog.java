@@ -20,10 +20,8 @@ import de.dakror.virtualhub.util.SpringUtilities;
 /**
  * @author Dakror
  */
-public class BackupEditDialog
-{
-	public static void show() throws JSONException
-	{
+public class BackupEditDialog {
+	public static void show() throws JSONException {
 		final JDialog dialog = new JDialog(Server.currentServer.frame, "Backup-Einstellungen", true);
 		dialog.setSize(400, 250);
 		dialog.setLocationRelativeTo(Server.currentServer.frame);
@@ -34,13 +32,11 @@ public class BackupEditDialog
 		JPanel panel = new JPanel();
 		final JTextField path = new JTextField((Server.currentServer.settings.has("backup.path") ? Server.currentServer.settings.getString("backup.path") : ""), 10);
 		panel.add(path);
-		panel.add(new JButton(new AbstractAction("Wählen...")
-		{
+		panel.add(new JButton(new AbstractAction("Wählen...") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser((path.getText().length() > 0 ? new File(path.getText()) : new File(System.getProperty("user.home"))));
 				jfc.setFileHidingEnabled(false);
 				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -55,30 +51,23 @@ public class BackupEditDialog
 		cp.add(new JLabel(""));
 		cp.add(new JLabel(""));
 		
-		cp.add(new JButton(new AbstractAction("Abbrechen")
-		{
+		cp.add(new JButton(new AbstractAction("Abbrechen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				dialog.dispose();
 			}
 		}));
-		cp.add(new JButton(new AbstractAction("Speichern")
-		{
+		cp.add(new JButton(new AbstractAction("Speichern") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
+			public void actionPerformed(ActionEvent e) {
+				try {
 					if (path.getText().length() > 0) Server.currentServer.settings.put("backup.path", path.getText());
 					dialog.dispose();
-				}
-				catch (JSONException e1)
-				{
+				} catch (JSONException e1) {
 					e1.printStackTrace();
 				}
 			}

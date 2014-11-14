@@ -82,8 +82,7 @@ import de.dakror.virtualhub.util.WrapLayout;
 /**
  * @author Dakror
  */
-public class ClientFrame extends JFrame
-{
+public class ClientFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public FileTree catalog;
@@ -103,17 +102,13 @@ public class ClientFrame extends JFrame
 	
 	List<EticetableTreeNode> lastAddedTreeNodes = new ArrayList<EticetableTreeNode>();
 	
-	public ClientFrame()
-	{
+	public ClientFrame() {
 		super("VirtualHub Client (" + UniVersion.prettyVersion() + ")");
 		setSize(1080, 675);
 		setMinimumSize(new Dimension(1080, 675));
-		try
-		{
+		try {
 			setIconImage(ImageIO.read(getClass().getResource("/img/icon.png")));
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
@@ -123,56 +118,41 @@ public class ClientFrame extends JFrame
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
-	public void init()
-	{
+	public void init() {
 		initFiles();
 		initMenu();
 		initComponents();
 	}
 	
-	public void initFiles()
-	{
-		try
-		{
-			if (!new File(Client.dir, "settings.properties").exists())
-			{
+	public void initFiles() {
+		try {
+			if (!new File(Client.dir, "settings.properties").exists()) {
 				// properties file
 				Properties properties = new Properties();
 				properties.put("server", InetAddress.getLocalHost().getHostAddress());
 				Client.currentClient.properties = properties;
 				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software läuft\r\n");
-			}
-			else
-			{
+			} else {
 				Client.currentClient.properties = new Properties();
 				Client.currentClient.properties.load(new FileInputStream(new File(Client.dir, "settings.properties")));
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void initMenu()
-	{
+	public void initMenu() {
 		JMenuBar menubar = new JMenuBar();
 		JMenu menu = new JMenu("Aktionen");
-		menu.add(new JMenuItem(new AbstractAction("Katalog-Backup erstellen", new ImageIcon(getClass().getResource("/img/backup.png")))
-		{
+		menu.add(new JMenuItem(new AbstractAction("Katalog-Backup erstellen", new ImageIcon(getClass().getResource("/img/backup.png"))) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (JOptionPane.showConfirmDialog(ClientFrame.this, "Sind Sie sicher, dass Sie ein Backupdes Katalogs erstellen wollen?\nDieser Vorgang kann einige Zeit in Anspruch nehmen.", "Backup starten?", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION)
-				{
-					try
-					{
+			public void actionPerformed(ActionEvent e) {
+				if (JOptionPane.showConfirmDialog(ClientFrame.this, "Sind Sie sicher, dass Sie ein Backupdes Katalogs erstellen wollen?\nDieser Vorgang kann einige Zeit in Anspruch nehmen.", "Backup starten?", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
+					try {
 						Client.currentClient.sendPacket(new Packet5Attribute("backup.path", ""));
-					}
-					catch (IOException e1)
-					{
+					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
 				}
@@ -183,8 +163,7 @@ public class ClientFrame extends JFrame
 		setJMenuBar(menubar);
 	}
 	
-	public void initComponents()
-	{
+	public void initComponents() {
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, borderColor));
 		
@@ -219,8 +198,7 @@ public class ClientFrame extends JFrame
 		setContentPane(splitPane);
 	}
 	
-	public void initTree()
-	{
+	public void initTree() {
 		EticetableTreeNode root = new EticetableTreeNode("ROOT");
 		DefaultTreeModel dtm = new DefaultTreeModel(root);
 		catalog = new FileTree(dtm);
@@ -228,38 +206,31 @@ public class ClientFrame extends JFrame
 		catalog.setShowsRootHandles(true);
 		catalog.setRootVisible(false);
 		catalog.setCellRenderer(new FileTreeCellRenderer(this));
-		if (catalog.getUI() instanceof BaseTreeUI)
-		{
+		if (catalog.getUI() instanceof BaseTreeUI) {
 			BaseTreeUI ui = (BaseTreeUI) catalog.getUI();
 			ui.paintHorizontalLine = false;
 			ui.paintVerticalLine = false;
 		}
 		
 		final JPopupMenu generalPopupMenu = new JPopupMenu();
-		generalPopupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzufügen")
-		{
+		generalPopupMenu.add(new JMenuItem(new AbstractAction("Quelle hinzufügen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser(System.getProperty("user.home"));
 				jfc.setMultiSelectionEnabled(false);
 				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				jfc.setFileHidingEnabled(false);
 				
-				if (jfc.showOpenDialog(ClientFrame.this) == JFileChooser.APPROVE_OPTION)
-				{
+				if (jfc.showOpenDialog(ClientFrame.this) == JFileChooser.APPROVE_OPTION) {
 					File source = jfc.getSelectedFile();
 					
-					if (Client.currentClient.getCatalog().sources.contains(source))
-					{
+					if (Client.currentClient.getCatalog().sources.contains(source)) {
 						JOptionPane.showMessageDialog(ClientFrame.this, "Dieser Ordner ist bereits eine Quelle in diesem Katalog!", "Bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 						actionPerformed(e);
 						return;
-					}
-					else
-					{
+					} else {
 						Client.currentClient.getCatalog().sources.add(source);
 						DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 						EticetableTreeNode root = (EticetableTreeNode) dtm.getRoot();
@@ -268,12 +239,9 @@ public class ClientFrame extends JFrame
 						dtm.insertNodeInto(dmtn, root, root.getChildCount());
 						loadSubTree(dmtn);
 						
-						try
-						{
+						try {
 							Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
-						}
-						catch (IOException e1)
-						{
+						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
 						
@@ -283,24 +251,19 @@ public class ClientFrame extends JFrame
 			}
 		}));
 		final JPopupMenu sourcePopupMenu = new JPopupMenu();
-		sourcePopupMenu.add(new JMenuItem(new AbstractAction("Quelle entfernen")
-		{
+		sourcePopupMenu.add(new JMenuItem(new AbstractAction("Quelle entfernen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				EticetableTreeNode dmtn = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
 				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
 				
 				Client.currentClient.getCatalog().sources.remove(new File(dmtn.getUserObject().toString()));
 				
-				try
-				{
+				try {
 					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
-				}
-				catch (IOException e1)
-				{
+				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 				
@@ -312,76 +275,61 @@ public class ClientFrame extends JFrame
 			}
 		}));
 		
-		catalog.addMouseListener(new MouseAdapter()
-		{
+		catalog.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseReleased(MouseEvent e)
-			{
-				if (e.getButton() == MouseEvent.BUTTON3)
-				{
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
 					int row = catalog.getRowForLocation(e.getX(), e.getY());
-					if (row != -1)
-					{
+					if (row != -1) {
 						catalog.setSelectionRow(row);
 						EticetableTreeNode dmtn = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
-						if (((EticetableTreeNode) dmtn.getParent()).getUserObject().equals("ROOT"))
-						{
+						if (((EticetableTreeNode) dmtn.getParent()).getUserObject().equals("ROOT")) {
 							sourcePopupMenu.show(e.getComponent(), e.getX(), e.getY());
 						}
-					}
-					else generalPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+					} else generalPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
-		catalog.addTreeWillExpandListener(new TreeWillExpandListener()
-		{
+		catalog.addTreeWillExpandListener(new TreeWillExpandListener() {
 			@Override
-			public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException
-			{
+			public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 				EticetableTreeNode dmtn = (EticetableTreeNode) e.getPath().getLastPathComponent();
 				if (((EticetableTreeNode) dmtn.getChildAt(0)).getUserObject().equals("CONTENT")) loadSubTree(dmtn);
 			}
 			
 			@Override
-			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException
-			{}
+			public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {}
 		});
 	}
 	
-	public void initTags()
-	{
+	public void initTags() {
 		tags = new TagsTree(null);
 		tags.setExpandsSelectedPaths(true);
 		tags.setShowsRootHandles(false);
 		tags.setCellRenderer(new TagsTreeCellRender());
 		tags.setToggleClickCount(0);
-		if (tags.getUI() instanceof BaseTreeUI)
-		{
+		if (tags.getUI() instanceof BaseTreeUI) {
 			BaseTreeUI ui = (BaseTreeUI) tags.getUI();
 			ui.paintHorizontalLine = false;
 			ui.paintVerticalLine = false;
 		}
 		final JPopupMenu generalPopupMenu = new JPopupMenu();
-		generalPopupMenu.add(new JMenuItem(new AbstractAction("Schlüsselwort hinzufügen")
-		{
+		generalPopupMenu.add(new JMenuItem(new AbstractAction("Schlüsselwort hinzufügen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				String name = JOptionPane.showInputDialog(ClientFrame.this, "Bitte geben Sie den Namen des neuen Schlüsselwortes ein.", "Schlüsselwort hinzufügen", JOptionPane.PLAIN_MESSAGE);
 				
 				if (name == null || name.length() == 0) return;
 				
-				if (!name.matches("^[a-zA-Z0-9öäüÖÄÜß ]*$"))
-				{
+				if (!name.matches("^[a-zA-Z0-9öäüÖÄÜß ]*$")) {
 					JOptionPane.showMessageDialog(ClientFrame.this, "Schlüsselwörter dürfen nur Buchstaben,\nZahlen und Leerzeichen enthalten!", "Ungültiges Schlüsselwort", JOptionPane.ERROR_MESSAGE);
 					actionPerformed(e);
 					return;
 				}
 				
-				if (Client.currentClient.getCatalog().tags.contains(name))
-				{
+				if (Client.currentClient.getCatalog().tags.contains(name)) {
 					JOptionPane.showMessageDialog(ClientFrame.this, "Es existiert bereits ein Schlüsselwort mit diesem Namen!", "Schlüsselwort bereits vorhanden!", JOptionPane.ERROR_MESSAGE);
 					actionPerformed(e);
 					return;
@@ -389,34 +337,26 @@ public class ClientFrame extends JFrame
 				
 				Client.currentClient.getCatalog().tags.add(name);
 				updateTags();
-				try
-				{
+				try {
 					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
-				}
-				catch (IOException e1)
-				{
+				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		}));
 		final JPopupMenu tagsPopupMenu = new JPopupMenu();
-		tagsPopupMenu.add(new JMenuItem(new AbstractAction("Schlüsselwort entfernen")
-		{
+		tagsPopupMenu.add(new JMenuItem(new AbstractAction("Schlüsselwort entfernen") {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) tags.getSelectionPath().getLastPathComponent();
 				
 				Client.currentClient.getCatalog().tags.remove(dmtn.getUserObject());
 				
-				try
-				{
+				try {
 					Client.currentClient.sendPacket(new Packet1Catalog(Client.currentClient.getCatalog()));
-				}
-				catch (IOException e1)
-				{
+				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 				
@@ -426,51 +366,39 @@ public class ClientFrame extends JFrame
 			}
 		}));
 		
-		tags.addFocusListener(new FocusListener()
-		{
+		tags.addFocusListener(new FocusListener() {
 			@Override
-			public void focusLost(FocusEvent e)
-			{
+			public void focusLost(FocusEvent e) {
 				if (!generalPopupMenu.isShowing() && !tagsPopupMenu.isShowing()) tags.setSelectionRow(-1);
 			}
 			
 			@Override
-			public void focusGained(FocusEvent e)
-			{}
+			public void focusGained(FocusEvent e) {}
 		});
 		
-		tags.addMouseListener(new MouseAdapter()
-		{
+		tags.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseReleased(MouseEvent e)
-			{
-				if (e.getButton() == MouseEvent.BUTTON1)
-				{
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
 					int row = tags.getRowForLocation(e.getX(), e.getY());
 					if (row > 0) showTagFiles(((DefaultMutableTreeNode) tags.getPathForRow(row).getLastPathComponent()).getUserObject().toString());
-					else
-					{
+					else {
 						showTagFiles(null);
 						tags.setSelectionRow(-1);
 					}
-				}
-				else if (e.getButton() == MouseEvent.BUTTON3)
-				{
+				} else if (e.getButton() == MouseEvent.BUTTON3) {
 					int row = tags.getRowForLocation(e.getX(), e.getY());
-					if (row > 0)
-					{
+					if (row > 0) {
 						tags.setSelectionRow(row);
 						
 						tagsPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-					}
-					else generalPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+					} else generalPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
 	}
 	
-	public JPanel initView()
-	{
+	public JPanel initView() {
 		GridBagLayout gbl = new GridBagLayout();
 		JPanel viewSuper = new JPanel(gbl);
 		
@@ -480,11 +408,9 @@ public class ClientFrame extends JFrame
 		final JHintTextField search = new JHintTextField("Suche im aktuellen Verzeichnis");
 		search.setBorder(BorderFactory.createEmptyBorder());
 		// search.setPreferredSize(new Dimension(200, 26));
-		search.addKeyListener(new KeyAdapter()
-		{
+		search.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e)
-			{
+			public void keyReleased(KeyEvent e) {
 				showSearchFiles(search.getText());
 			}
 		});
@@ -497,13 +423,11 @@ public class ClientFrame extends JFrame
 		fileView = new FileViewPanel(new WrapLayout(FlowLayout.LEFT, gap, gap));
 		
 		final JPopupMenu popup = new JPopupMenu();
-		popup.add(new JMenuItem(new AbstractAction("Neuer Ordner", CFG.FOLDER)
-		{
+		popup.add(new JMenuItem(new AbstractAction("Neuer Ordner", CFG.FOLDER) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				if (catalog.getSelectionPath() == null) return;
 				
 				DefaultTreeModel dtm = (DefaultTreeModel) catalog.getModel();
@@ -527,11 +451,9 @@ public class ClientFrame extends JFrame
 				directoryLoader.fireUpdate();
 			}
 		}));
-		fileView.addMouseListener(new MouseAdapter()
-		{
+		fileView.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseReleased(MouseEvent e)
-			{
+			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3 && catalog.getSelectionPath() != null) popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
@@ -550,8 +472,7 @@ public class ClientFrame extends JFrame
 		return viewSuper;
 	}
 	
-	public void initInfo()
-	{
+	public void initInfo() {
 		GridBagLayout gbl = new GridBagLayout();
 		fileInfo = new JPanel(gbl);
 		
@@ -565,12 +486,10 @@ public class ClientFrame extends JFrame
 		fileInfoName.setForeground(Color.darkGray);
 		fileInfoName.setFont(fileInfoName.getFont().deriveFont(18f));
 		fileInfoName.setEditable(false);
-		fileInfoName.addFocusListener(new FocusListener()
-		{
+		fileInfoName.addFocusListener(new FocusListener() {
 			
 			@Override
-			public void focusLost(FocusEvent e)
-			{
+			public void focusLost(FocusEvent e) {
 				fileInfoName.setEditable(false);
 				fileInfoName.setBorder(null);
 				fileInfoName.setForeground(Color.darkGray);
@@ -578,8 +497,7 @@ public class ClientFrame extends JFrame
 			}
 			
 			@Override
-			public void focusGained(FocusEvent e)
-			{
+			public void focusGained(FocusEvent e) {
 				if (getSelectedFiles().length != 1) return;
 				
 				fileInfoName.setEditable(true);
@@ -588,32 +506,25 @@ public class ClientFrame extends JFrame
 				fileInfoName.setForeground(Color.black);
 			}
 		});
-		fileInfoName.addKeyListener(new KeyAdapter()
-		{
+		fileInfoName.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e)
-			{
+			public void keyPressed(KeyEvent e) {
 				if (!fileInfoName.isEditable() || getSelectedFiles().length == 0) return;
 				
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String newName = fileInfoName.getText();
 					
 					File f = getSelectedFiles()[0];
 					File newFile = new File(f.getParentFile(), newName);
 					boolean dir = f.isDirectory();
-					if (f.renameTo(newFile))
-					{
+					if (f.renameTo(newFile)) {
 						if (dir) loadSubTree((EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent());
 						
 						directoryLoader.fireUpdate();
 						
-						try
-						{
+						try {
 							Client.currentClient.sendPacket(new Packet4Rename(f, newFile));
-						}
-						catch (IOException e1)
-						{
+						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
 						
@@ -622,8 +533,7 @@ public class ClientFrame extends JFrame
 						fileInfoName.setBorder(null);
 						fileInfoName.setForeground(Color.darkGray);
 						fileInfoName.getCaret().setVisible(false);
-					}
-					else JOptionPane.showMessageDialog(ClientFrame.this, (dir ? "Das Verzeichnis" : "Die Datei") + " konnte nicht umbenannt werden!", "Fehler!", JOptionPane.ERROR_MESSAGE);
+					} else JOptionPane.showMessageDialog(ClientFrame.this, (dir ? "Das Verzeichnis" : "Die Datei") + " konnte nicht umbenannt werden!", "Fehler!", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -646,42 +556,35 @@ public class ClientFrame extends JFrame
 		addGridBagLayoutComponent(fileInfo, gbl, fileInfoSize, 2, 2, 1, 1, 1, 1);
 	}
 	
-	public void showSearchFiles(String search)
-	{
+	public void showSearchFiles(String search) {
 		if (!directoryLoader.synced) return;
 		
 		for (Component c : fileView.getComponents())
 			c.setVisible(true);
 		
-		if (search != null && search.length() > 0)
-		{
-			for (Component c : fileView.getComponents())
-			{
+		if (search != null && search.length() > 0) {
+			for (Component c : fileView.getComponents()) {
 				FileButton fb = (FileButton) c;
 				c.setVisible(fb.file.getName().toLowerCase().contains(search.toLowerCase()));
 			}
 		}
 	}
 	
-	public void showTagFiles(String tag)
-	{
+	public void showTagFiles(String tag) {
 		if (!directoryLoader.synced) return;
 		
 		for (Component c : fileView.getComponents())
 			c.setVisible(true);
 		
-		if (tag != null && tag.length() > 0)
-		{
-			for (Component c : fileView.getComponents())
-			{
+		if (tag != null && tag.length() > 0) {
+			for (Component c : fileView.getComponents()) {
 				FileButton fb = (FileButton) c;
 				c.setVisible(fb.tags.contains(tag));
 			}
 		}
 	}
 	
-	public void addGridBagLayoutComponent(Container parent, GridBagLayout gbl, Component c, int x, int y, int width, int height, double wx, double wy)
-	{
+	public void addGridBagLayoutComponent(Container parent, GridBagLayout gbl, Component c, int x, int y, int width, int height, double wx, double wy) {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = x;
@@ -694,17 +597,14 @@ public class ClientFrame extends JFrame
 		parent.add(c);
 	}
 	
-	public void loadCatalog(Catalog catalog)
-	{
+	public void loadCatalog(Catalog catalog) {
 		DefaultTreeModel dtm = (DefaultTreeModel) this.catalog.getModel();
 		EticetableTreeNode root = (EticetableTreeNode) dtm.getRoot();
 		
 		String notFound = "";
 		String sep = ",\r\n ";
-		for (File file : Client.currentClient.getCatalog().sources)
-		{
-			if (!file.exists())
-			{
+		for (File file : Client.currentClient.getCatalog().sources) {
+			if (!file.exists()) {
 				notFound += file.getPath().replace("\\", "/") + sep;
 				continue;
 			}
@@ -713,8 +613,7 @@ public class ClientFrame extends JFrame
 			loadSubTree(dmtn);
 		}
 		
-		if (notFound.length() > 0)
-		{
+		if (notFound.length() > 0) {
 			notFound = notFound.substring(0, notFound.length() - sep.length());
 			JOptionPane.showMessageDialog(this, "Die folgenden Quellordner konnten nicht gefunden werden:\r\n" + notFound, "Quellordner nicht gefunden!", JOptionPane.ERROR_MESSAGE);
 		}
@@ -728,29 +627,23 @@ public class ClientFrame extends JFrame
 		updateTags();
 	}
 	
-	public void loadSubTree(EticetableTreeNode folder)
-	{
+	public void loadSubTree(EticetableTreeNode folder) {
 		File f = new File(Assistant.getNodePath(folder));
 		
 		if (!f.exists()) return;
 		
 		folder.removeAllChildren();
 		
-		for (File file : f.listFiles())
-		{
-			if (file.isDirectory() && !file.isHidden())
-			{
+		for (File file : f.listFiles()) {
+			if (file.isDirectory() && !file.isHidden()) {
 				EticetableTreeNode dmtn = new EticetableTreeNode(file.getName());
 				if (Assistant.hasSubDirectories(file)) dmtn.add(new EticetableTreeNode("CONTENT"));
 				
 				folder.add(dmtn);
 				lastAddedTreeNodes.add(dmtn);
-				try
-				{
+				try {
 					Client.currentClient.sendPacket(new Packet2Eticet(file, Client.currentClient.getCatalog().getName(), Eticet.NULL));
-				}
-				catch (IOException e)
-				{
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -759,57 +652,45 @@ public class ClientFrame extends JFrame
 		((DefaultTreeModel) catalog.getModel()).reload(folder);
 	}
 	
-	public void updateTags()
-	{
+	public void updateTags() {
 		DefaultTreeModel dtm = (DefaultTreeModel) tags.getModel();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) tags.getModel().getRoot();
 		root.removeAllChildren();
 		
 		Collections.sort(Client.currentClient.getCatalog().tags);
-		for (String t : Client.currentClient.getCatalog().tags)
-		{
+		for (String t : Client.currentClient.getCatalog().tags) {
 			root.add(new DefaultMutableTreeNode(t));
 		}
 		
 		dtm.reload();
 	}
 	
-	public void setFileInfo(final FileButton f)
-	{
-		if (f == null)
-		{
+	public void setFileInfo(final FileButton f) {
+		if (f == null) {
 			fileInfoName.setText("");
 			fileInfoType.setText("");
 			fileInfoSize.setText("");
 			fileInfoDetails.setText("");
-		}
-		else
-		{
+		} else {
 			File[] sel = getSelectedFiles();
-			if (sel.length == 1)
-			{
+			if (sel.length == 1) {
 				fileInfoName.setText(f.file.getName());
 				fileInfoType.setText(FileSystemView.getFileSystemView().getSystemTypeDescription(f.file));
 				if (!f.file.isDirectory()) fileInfoSize.setText("Größe: " + Assistant.formatBinarySize(f.file.length(), 2));
 				else fileInfoSize.setText("");
 				
-				new Thread()
-				{
+				new Thread() {
 					@Override
-					public void run()
-					{
+					public void run() {
 						Dimension size = ImageMagickAssistant.getSize(f.file);
 						if (size != null) fileInfoDetails.setText("Abmessungen: " + size.width + " x " + size.height);
-						else
-						{
+						else {
 							fileInfoDetails.setText("");
 							
-							if (f.file.isDirectory())
-							{
+							if (f.file.isDirectory()) {
 								int fl = 0, dir = 0;
 								
-								for (File file : f.file.listFiles())
-								{
+								for (File file : f.file.listFiles()) {
 									if (f.file.isHidden()) continue;
 									
 									if (file.isDirectory()) dir++;
@@ -821,9 +702,7 @@ public class ClientFrame extends JFrame
 						}
 					}
 				}.start();
-			}
-			else
-			{
+			} else {
 				setFileInfo(null);
 				if (sel.length > 0) fileInfoName.setText(sel.length + " Elemente ausgewählt");
 			}
@@ -831,18 +710,14 @@ public class ClientFrame extends JFrame
 	}
 	
 	@Override
-	public void setTitle(String s)
-	{
+	public void setTitle(String s) {
 		super.setTitle("VirtualHub Client (" + UniVersion.prettyVersion() + ") " + s);
 	}
 	
-	public File[] getSelectedFiles()
-	{
+	public File[] getSelectedFiles() {
 		ArrayList<File> files = new ArrayList<File>();
-		for (Component c : fileView.getComponents())
-		{
-			if (c instanceof FileButton)
-			{
+		for (Component c : fileView.getComponents()) {
+			if (c instanceof FileButton) {
 				FileButton fb = (FileButton) c;
 				if (fb.isSelected()) files.add(fb.file);
 			}
@@ -851,13 +726,10 @@ public class ClientFrame extends JFrame
 		return files.toArray(new File[] {});
 	}
 	
-	public FileButton[] getSelectedFileButtons()
-	{
+	public FileButton[] getSelectedFileButtons() {
 		ArrayList<FileButton> files = new ArrayList<FileButton>();
-		for (Component c : fileView.getComponents())
-		{
-			if (c instanceof FileButton)
-			{
+		for (Component c : fileView.getComponents()) {
+			if (c instanceof FileButton) {
 				FileButton fb = (FileButton) c;
 				if (fb.isSelected()) files.add(fb);
 			}
@@ -866,33 +738,25 @@ public class ClientFrame extends JFrame
 		return files.toArray(new FileButton[] {});
 	}
 	
-	public int getFileIndex(File f)
-	{
-		for (int i = 0; i < fileView.getComponentCount(); i++)
-		{
+	public int getFileIndex(File f) {
+		for (int i = 0; i < fileView.getComponentCount(); i++) {
 			if (((FileButton) fileView.getComponent(i)).file.equals(f)) return i;
 		}
 		
 		return -1;
 	}
 	
-	public File getSelectedTreeFile()
-	{
+	public File getSelectedTreeFile() {
 		if (catalog.getSelectionPath() == null) return null;
 		return new File(Assistant.getNodePath((EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent()));
 	}
 	
-	public void setFileEticet(Packet2Eticet packet)
-	{
-		if (fileView.getComponentCount() > 0)
-		{
-			for (Component c : fileView.getComponents())
-			{
-				if (c instanceof FileButton)
-				{
+	public void setFileEticet(Packet2Eticet packet) {
+		if (fileView.getComponentCount() > 0) {
+			for (Component c : fileView.getComponents()) {
+				if (c instanceof FileButton) {
 					FileButton fb = (FileButton) c;
-					if (fb.file.equals(packet.getFile()))
-					{
+					if (fb.file.equals(packet.getFile())) {
 						fb.setEticet(packet.getEticet());
 						fb.repaint();
 						
@@ -903,44 +767,32 @@ public class ClientFrame extends JFrame
 		}
 		
 		EticetableTreeNode found = null;
-		try
-		{
-			for (EticetableTreeNode etn : lastAddedTreeNodes)
-			{
-				if (new File(Assistant.getNodePath(etn)).equals(packet.getFile()))
-				{
+		try {
+			for (EticetableTreeNode etn : lastAddedTreeNodes) {
+				if (new File(Assistant.getNodePath(etn)).equals(packet.getFile())) {
 					found = etn;
 				}
 			}
-		}
-		catch (ConcurrentModificationException e)
-		{
-			try
-			{
+		} catch (ConcurrentModificationException e) {
+			try {
 				Thread.sleep(10);
-			}
-			catch (InterruptedException e1)
-			{
+			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
 			setFileEticet(packet);
 		}
 		
-		if (found != null)
-		{
+		if (found != null) {
 			found.setEticet(packet.getEticet());
 			catalog.repaint();
 			lastAddedTreeNodes.remove(found);
 		}
 		
-		if (catalog.getSelectionPath() != null)
-		{
+		if (catalog.getSelectionPath() != null) {
 			EticetableTreeNode parent = (EticetableTreeNode) catalog.getSelectionPath().getLastPathComponent();
-			for (int i = 0; i < parent.getChildCount(); i++)
-			{
+			for (int i = 0; i < parent.getChildCount(); i++) {
 				EticetableTreeNode etn = (EticetableTreeNode) parent.getChildAt(i);
-				if (etn.getUserObject().equals(packet.getFile().getName()))
-				{
+				if (etn.getUserObject().equals(packet.getFile().getName())) {
 					etn.setEticet(packet.getEticet());
 					catalog.repaint();
 					break;
@@ -949,17 +801,12 @@ public class ClientFrame extends JFrame
 		}
 	}
 	
-	public void setFileTags(Packet3Tags packet)
-	{
-		if (fileView.getComponentCount() > 0)
-		{
-			for (Component c : fileView.getComponents())
-			{
-				if (c instanceof FileButton)
-				{
+	public void setFileTags(Packet3Tags packet) {
+		if (fileView.getComponentCount() > 0) {
+			for (Component c : fileView.getComponents()) {
+				if (c instanceof FileButton) {
 					FileButton fb = (FileButton) c;
-					if (fb.file.equals(packet.getFile()))
-					{
+					if (fb.file.equals(packet.getFile())) {
 						fb.tags = packet.getTags();
 						break;
 					}
@@ -968,8 +815,7 @@ public class ClientFrame extends JFrame
 		}
 	}
 	
-	public void doBackup(Packet5Attribute packet)
-	{
+	public void doBackup(Packet5Attribute packet) {
 		if (packet.getValue().length() == 0) JOptionPane.showMessageDialog(this, "Es wurde noch kein Backupverzeichnis konfiguiert!\nBitte stellen Sie ein solches in der VirtualHub Server Software ein,\n indem Sie unter Aktionen -> Backup-Einstellungen einen Pfad festlegen.\nVersuchen Sie daraufhin erneut, ein Backup zu erstellen.", "Backupverzeichnis nicht konfiguriert!", JOptionPane.ERROR_MESSAGE);
 		else new FileMover(this, false, true, new File(packet.getValue() + "/" + Client.currentClient.getCatalog().getName() + "-Backup " + new SimpleDateFormat("dd.MM.yy HH-mm").format(new Date())), Client.currentClient.getCatalog().sources.toArray(new File[] {}));
 	}

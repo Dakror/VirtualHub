@@ -13,22 +13,17 @@ import de.dakror.virtualhub.util.Assistant;
 /**
  * @author Dakror
  */
-public class VirtualHub
-{
-	public static void init()
-	{
+public class VirtualHub {
+	public static void init() {
 		CFG.INTERNET = Assistant.isInternetReachable();
 		
-		try
-		{
+		try {
 			Properties props = new Properties();
 			props.put("logoString", "");
 			AcrylLookAndFeel.setCurrentTheme(props);
 			UIManager.setLookAndFeel(new AcrylLookAndFeel());
 			UIManager.put("ProgressBar.cycleTime", new Integer(6000));
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

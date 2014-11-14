@@ -3,19 +3,16 @@ package de.dakror.virtualhub.net.packet;
 /**
  * @author Dakror
  */
-public class Packet5Attribute extends Packet
-{
+public class Packet5Attribute extends Packet {
 	String key, value;
 	
-	public Packet5Attribute(String key, Object value)
-	{
+	public Packet5Attribute(String key, Object value) {
 		super(5);
 		this.key = key;
 		this.value = value.toString();
 	}
 	
-	public Packet5Attribute(byte[] data)
-	{
+	public Packet5Attribute(byte[] data) {
 		super(5);
 		String[] parts = readData(data).split("\\[");
 		key = parts[0];
@@ -23,19 +20,16 @@ public class Packet5Attribute extends Packet
 		else value = "";
 	}
 	
-	public String getKey()
-	{
+	public String getKey() {
 		return key;
 	}
 	
-	public String getValue()
-	{
+	public String getValue() {
 		return value;
 	}
 	
 	@Override
-	protected byte[] getPacketData()
-	{
+	protected byte[] getPacketData() {
 		return (key + "[" + value).getBytes();
 	}
 }

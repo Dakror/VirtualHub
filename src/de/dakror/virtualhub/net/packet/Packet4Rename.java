@@ -5,20 +5,17 @@ import java.io.File;
 /**
  * @author Dakror
  */
-public class Packet4Rename extends Packet
-{
+public class Packet4Rename extends Packet {
 	File o, n;
 	
-	public Packet4Rename(File o, File n)
-	{
+	public Packet4Rename(File o, File n) {
 		super(4);
 		
 		this.o = o;
 		this.n = n;
 	}
 	
-	public Packet4Rename(byte[] data)
-	{
+	public Packet4Rename(byte[] data) {
 		super(4);
 		
 		String[] parts = readData(data).split("\\[");
@@ -26,19 +23,16 @@ public class Packet4Rename extends Packet
 		n = new File(parts[1]);
 	}
 	
-	public File getOldFile()
-	{
+	public File getOldFile() {
 		return o;
 	}
 	
-	public File getNewFile()
-	{
+	public File getNewFile() {
 		return n;
 	}
 	
 	@Override
-	protected byte[] getPacketData()
-	{
+	protected byte[] getPacketData() {
 		return (o.getPath().replace("\\", "/") + "[" + n.getPath().replace("\\", "/")).getBytes();
 	}
 	

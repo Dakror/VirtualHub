@@ -32,8 +32,7 @@ import de.dakror.virtualhub.util.FileComparator;
 /**
  * @author Dakror
  */
-public class DirectoryLoader extends Thread
-{
+public class DirectoryLoader extends Thread {
 	static DirectoryLoader loader;
 	
 	private ClientFrame frame;
@@ -42,8 +41,7 @@ public class DirectoryLoader extends Thread
 	
 	boolean synced;
 	
-	public DirectoryLoader()
-	{
+	public DirectoryLoader() {
 		frame = Client.currentClient.frame;
 		setName("DirectoryLoader");
 		
@@ -55,18 +53,13 @@ public class DirectoryLoader extends Thread
 	}
 	
 	@Override
-	public void run()
-	{
-		while (true)
-		{
-			try
-			{
+	public void run() {
+		while (true) {
+			try {
 				Thread.sleep(1);
 				
-				if (frame.catalog.getSelectionPath() == null)
-				{
-					if (selectedNode == null)
-					{
+				if (frame.catalog.getSelectionPath() == null) {
+					if (selectedNode == null) {
 						continue;
 					}
 					frame.fileView.dropTarget.setActive(false);
@@ -78,12 +71,10 @@ public class DirectoryLoader extends Thread
 				}
 				
 				final EticetableTreeNode dmtn = (EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
-				if (selectedNode == null || !dmtn.equals(selectedNode))
-				{
+				if (selectedNode == null || !dmtn.equals(selectedNode)) {
 					selectedNode = dmtn;
 					synced = false;
-				}
-				else continue;
+				} else continue;
 				
 				frame.fileView.dropTarget.setActive(true);
 				frame.fileViewWrap.getVerticalScrollBar().setValue(0);
@@ -95,8 +86,7 @@ public class DirectoryLoader extends Thread
 				List<File> files = Arrays.asList(folder.listFiles());
 				Collections.sort(files, new FileComparator());
 				
-				for (File f : files)
-				{
+				for (File f : files) {
 					if (f.isHidden()) continue;
 					
 					if (frame.catalog.getSelectionPath() == null || !((EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent()).equals(dmtn)) break;
@@ -104,56 +94,44 @@ public class DirectoryLoader extends Thread
 					final FileButton fb = new FileButton(f);
 					
 					final JPopupMenu popup = new JPopupMenu();
-					popup.add(new JMenuItem(new AbstractAction("Löschen")
-					{
+					popup.add(new JMenuItem(new AbstractAction("Löschen") {
 						private static final long serialVersionUID = 1L;
 						
 						@Override
-						public void actionPerformed(ActionEvent e)
-						{
-							if (frame.getSelectedFiles().length < 2)
-							{
-								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-								{
+						public void actionPerformed(ActionEvent e) {
+							if (frame.getSelectedFiles().length < 2) {
+								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 									boolean success = true;
 									boolean directory = fb.file.isDirectory();
 									
-									if (directory)
-									{
+									if (directory) {
 										success = Assistant.deleteDirectory(fb.file);
 										
 										EticetableTreeNode dmtn = (EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
 										frame.loadSubTree(dmtn);
 										
-									}
-									else success = fb.file.delete();
+									} else success = fb.file.delete();
 									
 									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
 									else fireUpdate();
 								}
-							}
-							else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", "Daten löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-							{
+							} else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", "Daten löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 								File[] files = frame.getSelectedFiles();
-								for (File file : files)
-								{
+								for (File file : files) {
 									boolean success = true;
 									boolean directory = file.isDirectory();
 									
-									if (directory)
-									{
+									if (directory) {
 										success = Assistant.deleteDirectory(file);
 										
-										if (success)
-										{
+										if (success) {
 											EticetableTreeNode dmtn = (EticetableTreeNode) frame.catalog.getSelectionPath().getLastPathComponent();
 											for (int i = 0; i < dmtn.getChildCount(); i++)
 												if (((EticetableTreeNode) dmtn.getChildAt(i)).getUserObject().toString().equals(fb.file.getName())) dmtn.remove(i);
 											
 											((DefaultTreeModel) frame.catalog.getModel()).reload(dmtn);
 										}
-									}
-									else success = file.delete();
+									} else success = file.delete();
 									
 									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
 								}
@@ -162,32 +140,24 @@ public class DirectoryLoader extends Thread
 						}
 					}));
 					
-					fb.addActionListener(new ActionListener()
-					{
+					fb.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e)
-						{
+						public void actionPerformed(ActionEvent e) {
 							if (e.getModifiers() == 16) // nothing except click
 							{
-								for (Component c : frame.fileView.getComponents())
-								{
-									if (c instanceof FileButton)
-									{
+								for (Component c : frame.fileView.getComponents()) {
+									if (c instanceof FileButton) {
 										if (!c.equals(fb)) ((FileButton) c).setSelected(false);
 									}
 								}
 								fb.setSelected(fb.isSelected());
-							}
-							else if (e.getModifiers() == 18) // ctrl
+							} else if (e.getModifiers() == 18) // ctrl
 							{
 								fb.setSelected(fb.isSelected());
-							}
-							else if (e.getModifiers() == 17) // shift
+							} else if (e.getModifiers() == 17) // shift
 							{
-								if (frame.getSelectedFiles().length == 2 && fb.isSelected())
-								{
-									for (int i = frame.getFileIndex(frame.getSelectedFiles()[0]); i < frame.fileView.getComponentCount(); i++)
-									{
+								if (frame.getSelectedFiles().length == 2 && fb.isSelected()) {
+									for (int i = frame.getFileIndex(frame.getSelectedFiles()[0]); i < frame.fileView.getComponentCount(); i++) {
 										((FileButton) frame.fileView.getComponent(i)).setSelected(true);
 										if (((FileButton) frame.fileView.getComponent(i)).file.equals(fb.file)) break;
 									}
@@ -198,68 +168,48 @@ public class DirectoryLoader extends Thread
 							frame.setFileInfo(fb);
 						}
 					});
-					fb.addFocusListener(new FocusListener()
-					{
+					fb.addFocusListener(new FocusListener() {
 						
 						@Override
-						public void focusLost(FocusEvent e)
-						{
+						public void focusLost(FocusEvent e) {
 							((TagsTreeCellRender) frame.tags.getCellRenderer()).selectedFile = null;
 							frame.tags.repaint();
 						}
 						
 						@Override
-						public void focusGained(FocusEvent e)
-						{
+						public void focusGained(FocusEvent e) {
 							((TagsTreeCellRender) frame.tags.getCellRenderer()).selectedFile = fb;
 							frame.tags.repaint();
 						}
 					});
-					fb.addMouseListener(new MouseAdapter()
-					{
+					fb.addMouseListener(new MouseAdapter() {
 						@Override
-						public void mousePressed(MouseEvent e)
-						{
-							if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
-							{
-								if (fb.file.isDirectory())
-								{
+						public void mousePressed(MouseEvent e) {
+							if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+								if (fb.file.isDirectory()) {
 									frame.catalog.expandPath(new TreePath(dmtn.getPath()));
-									for (int i = 0; i < dmtn.getChildCount(); i++)
-									{
-										if (((EticetableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName()))
-										{
+									for (int i = 0; i < dmtn.getChildCount(); i++) {
+										if (((EticetableTreeNode) dmtn.getChildAt(i)).getUserObject().equals(fb.file.getName())) {
 											frame.catalog.setSelectionPath(new TreePath(((EticetableTreeNode) dmtn.getChildAt(i)).getPath()));
 										}
 									}
-								}
-								else
-								{
-									if (Desktop.isDesktopSupported())
-									{
-										try
-										{
+								} else {
+									if (Desktop.isDesktopSupported()) {
+										try {
 											Desktop.getDesktop().browse(fb.file.toURI());
-										}
-										catch (IOException e1)
-										{
+										} catch (IOException e1) {
 											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht geöffnet werden!\nMöglicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software.", "Datei konnte nicht geöffnet werden!", JOptionPane.ERROR_MESSAGE);
 										}
 									}
 								}
-							}
-							else if (e.getButton() == MouseEvent.BUTTON3) popup.show(e.getComponent(), e.getX(), e.getY());
+							} else if (e.getButton() == MouseEvent.BUTTON3) popup.show(e.getComponent(), e.getX(), e.getY());
 						}
 					});
-					fb.addKeyListener(new KeyAdapter()
-					{
+					fb.addKeyListener(new KeyAdapter() {
 						@Override
-						public void keyPressed(KeyEvent e)
-						{
-							if (e.getKeyCode() == KeyEvent.VK_A && e.isControlDown())
-							{
-								for (Component c : frame.fileView.getComponents())
-								{
+						public void keyPressed(KeyEvent e) {
+							if (e.getKeyCode() == KeyEvent.VK_A && e.isControlDown()) {
+								for (Component c : frame.fileView.getComponents()) {
 									((FileButton) c).setSelected(!((FileButton) c).isSelected());
 								}
 							}
@@ -279,18 +229,13 @@ public class DirectoryLoader extends Thread
 				System.gc();
 				
 				synced = true;
-			}
-			catch (InterruptedException e)
-			{}
-			catch (Exception e)
-			{
+			} catch (InterruptedException e) {} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void fireUpdate()
-	{
+	public void fireUpdate() {
 		frame.fileView.removeAll();
 		frame.fileView.validate();
 		frame.fileView.repaint();

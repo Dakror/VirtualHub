@@ -12,49 +12,37 @@ import java.util.zip.ZipFile;
 /**
  * @author Dakror
  */
-public class ZipAssistant
-{
+public class ZipAssistant {
 	public static final byte[] BUFFER = new byte[0xFFFF];
 	
-	public static File unzip(File zip, File dest)
-	{
+	public static File unzip(File zip, File dest) {
 		
-		try
-		{
+		try {
 			ZipFile zipFile = new ZipFile(zip);
-			for (ZipEntry entry : Collections.list(zipFile.entries()))
-			{
+			for (ZipEntry entry : Collections.list(zipFile.entries())) {
 				extractEntry(zipFile, entry, dest.getPath().replace("\\", "/"));
 			}
 			zipFile.close();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return zip;
 	}
 	
-	public static void extractEntry(ZipFile zipFile, ZipEntry entry, String destDir) throws IOException
-	{
+	public static void extractEntry(ZipFile zipFile, ZipEntry entry, String destDir) throws IOException {
 		File file = new File(destDir + "/" + entry.getName().replace("\\", "/"));
 		if (entry.isDirectory()) file.mkdirs();
-		else
-		{
+		else {
 			file.getParentFile().mkdirs();
 			InputStream is = null;
 			OutputStream os = null;
-			try
-			{
+			try {
 				is = zipFile.getInputStream(entry);
 				os = new FileOutputStream(file);
-				for (int len; (len = is.read(BUFFER)) != -1;)
-				{
+				for (int len; (len = is.read(BUFFER)) != -1;) {
 					os.write(BUFFER, 0, len);
 				}
-			}
-			finally
-			{
+			} finally {
 				if (os != null) os.close();
 				if (is != null) is.close();
 			}

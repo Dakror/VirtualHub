@@ -28,78 +28,59 @@ import de.dakror.virtualhub.settings.CFG;
 /**
  * @author Dakror
  */
-public class ThumbnailAssistant
-{
-	public static Image scaleImage(Image i)
-	{
+public class ThumbnailAssistant {
+	public static Image scaleImage(Image i) {
 		return scaleImage(i, CFG.PREVIEWSIZE.width, CFG.PREVIEWSIZE.height);
 	}
 	
-	public static Image scaleImage(Image i, double tw, double th)
-	{
-		try
-		{
+	public static Image scaleImage(Image i, double tw, double th) {
+		try {
 			double sw = i.getWidth(null);
 			double sh = i.getHeight(null);
 			double rw = 0;
 			double rh = 0;
 			double tr = tw / th;
 			double sr = sw / sh;
-			if (sr >= tr)
-			{
+			if (sr >= tr) {
 				rw = tw;
 				rh = rw / sr;
-			}
-			else
-			{
+			} else {
 				rh = th;
 				rw = rh * sr;
 			}
 			Image result = i.getScaledInstance((int) Math.round(rw), (int) Math.round(rh), Image.SCALE_SMOOTH);
 			i.flush();
 			return result;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			return null;
 		}
 	}
 	
-	public static Icon getFileSystemIcon(File f)
-	{
-		if (JTattooUtilities.isMac())
-		{
-			try
-			{
+	public static Icon getFileSystemIcon(File f) {
+		if (JTattooUtilities.isMac()) {
+			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				Icon icon = new JFileChooser().getIcon(f);
 				UIManager.setLookAndFeel(new AcrylLookAndFeel());
 				
 				return icon;
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 				
 				return null;
 			}
 		}
-		try
-		{
+		try {
 			ShellFolder shellFolder = ShellFolder.getShellFolder(f);
 			Icon icon = new ImageIcon(shellFolder.getIcon(true));
 			return icon;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			return FileSystemView.getFileSystemView().getSystemIcon(f);
 		}
 	}
 	
-	public static Image readPDF(File f)
-	{
-		try
-		{
+	public static Image readPDF(File f) {
+		try {
 			RandomAccessFile raf = new RandomAccessFile(f, "r");
 			FileChannel channel = raf.getChannel();
 			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
@@ -109,22 +90,17 @@ public class ThumbnailAssistant
 			Image image = page.getImage(rect.width, rect.height, rect, null, true, true);
 			raf.close();
 			return image;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public static Image getThumbnail(File f)
-	{
-		try
-		{
+	public static Image getThumbnail(File f) {
+		try {
 			File tmpFile = new File(f.getParentFile().getPath() + "/" + (!JTattooUtilities.isWindows() ? "." : "") + f.getName() + ".tmp");
 			if (tmpFile.exists()) return ImageIO.read(tmpFile);
-			else
-			{
+			else {
 				BufferedImage thumbnail;
 				if (Assistant.getFileExtension(f).equals("pdf")) thumbnail = Assistant.toBufferedImage(scaleImage(readPDF(f)));
 				else thumbnail = ImageMagickAssistant.getThumbnail(f);
@@ -134,16 +110,13 @@ public class ThumbnailAssistant
 				
 				return thumbnail;
 			}
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public static void createCacheFile(File f, BufferedImage thumbnail) throws IOException
-	{
+	public static void createCacheFile(File f, BufferedImage thumbnail) throws IOException {
 		File file = new File(f.getParentFile().getPath() + "/" + (!JTattooUtilities.isWindows() ? "." : "") + f.getName() + ".tmp");
 		file.createNewFile();
 		file.deleteOnExit();

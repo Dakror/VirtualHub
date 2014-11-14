@@ -30,8 +30,7 @@ import de.dakror.virtualhub.util.Assistant;
 /**
  * @author Dakror
  */
-public class ServerFrame extends JFrame
-{
+public class ServerFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private JTextArea logArea;
@@ -41,17 +40,13 @@ public class ServerFrame extends JFrame
 	JCheckBoxMenuItem packetLogEnabled;
 	JCheckBoxMenuItem logEnabled;
 	
-	public ServerFrame()
-	{
+	public ServerFrame() {
 		super("VirtualHub Server (" + UniVersion.prettyVersion() + ")");
 		setSize(800, 600);
 		setMinimumSize(new Dimension(800, 600));
-		try
-		{
+		try {
 			setIconImage(ImageIO.read(getClass().getResource("/img/icon.png")));
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
@@ -62,8 +57,7 @@ public class ServerFrame extends JFrame
 		setVisible(true);
 	}
 	
-	public void init()
-	{
+	public void init() {
 		initFiles();
 		
 		logArea = new JTextArea();
@@ -79,13 +73,11 @@ public class ServerFrame extends JFrame
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Aktionen");
-		menu.add(new JMenuItem(new AbstractAction("Protokoll leeren", new ImageIcon(getClass().getResource("/img/trash.png")))
-		{
+		menu.add(new JMenuItem(new AbstractAction("Protokoll leeren", new ImageIcon(getClass().getResource("/img/trash.png"))) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				logArea.setText("");
 				log("Protokoll geleert.");
 			}
@@ -93,19 +85,14 @@ public class ServerFrame extends JFrame
 		menu.add(logEnabled = new JCheckBoxMenuItem("Protokoll aktiviert", new ImageIcon(getClass().getResource("/img/log.png")), true));
 		menu.add(packetLogEnabled = new JCheckBoxMenuItem("Paketverkehr protokollieren", new ImageIcon(getClass().getResource("/img/traffic.png")), false));
 		menu.addSeparator();
-		menu.add(new JMenuItem(new AbstractAction("Backup-Einstellungen", new ImageIcon(getClass().getResource("/img/backup_edit.png")))
-		{
+		menu.add(new JMenuItem(new AbstractAction("Backup-Einstellungen", new ImageIcon(getClass().getResource("/img/backup_edit.png"))) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
+			public void actionPerformed(ActionEvent e) {
+				try {
 					BackupEditDialog.show();
-				}
-				catch (JSONException e1)
-				{
+				} catch (JSONException e1) {
 					e1.printStackTrace();
 				}
 			}
@@ -115,38 +102,29 @@ public class ServerFrame extends JFrame
 		setJMenuBar(menuBar);
 	}
 	
-	public void initFiles()
-	{
-		try
-		{
+	public void initFiles() {
+		try {
 			// catalogs file
 			File catalogs = new File(Server.dir, "catalogs.json");
 			
-			if (!catalogs.exists())
-			{
+			if (!catalogs.exists()) {
 				Assistant.setFileContent(catalogs, new JSONArray().toString());
 				Server.currentServer.catalogs = new JSONArray();
-			}
-			else Server.currentServer.catalogs = new JSONArray(Assistant.getFileContent(catalogs));
+			} else Server.currentServer.catalogs = new JSONArray(Assistant.getFileContent(catalogs));
 			
 			File settings = new File(Server.dir, "settings.json");
 			
 			// settings file
-			if (!settings.exists())
-			{
+			if (!settings.exists()) {
 				Assistant.setFileContent(settings, new JSONObject().toString());
 				Server.currentServer.settings = new JSONObject();
-			}
-			else Server.currentServer.settings = new JSONObject(Assistant.getFileContent(settings));
-		}
-		catch (JSONException e)
-		{
+			} else Server.currentServer.settings = new JSONObject(Assistant.getFileContent(settings));
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void save()
-	{
+	public void save() {
 		File catalogs = new File(Server.dir, "catalogs.json");
 		Assistant.setFileContent(catalogs, Server.currentServer.catalogs.toString());
 		
@@ -154,13 +132,11 @@ public class ServerFrame extends JFrame
 		Assistant.setFileContent(settings, Server.currentServer.settings.toString());
 	}
 	
-	public void plog(String line)
-	{
+	public void plog(String line) {
 		if (packetLogEnabled.isSelected()) log(line);
 	}
 	
-	public void log(String line)
-	{
+	public void log(String line) {
 		if (!logEnabled.isSelected()) return;
 		
 		logArea.append("[" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "]: " + line + "\r\n");

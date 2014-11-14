@@ -3,33 +3,25 @@ package de.dakror.virtualhub.client;
 /**
  * @author Dakror
  */
-public class Synchronizer extends Thread
-{
+public class Synchronizer extends Thread {
 	ClientFrame frame;
 	
-	public Synchronizer()
-	{
+	public Synchronizer() {
 		frame = Client.currentClient.frame;;
 		
 		// start();
 	}
 	
 	@Override
-	public void run()
-	{
-		while (true)
-		{
+	public void run() {
+		while (true) {
 			// check sync if fileView
-			if (frame.getSelectedTreeFile() != null)
-			{
+			if (frame.getSelectedTreeFile() != null) {
 				// if (frame.fileView.getComponentCount() != Assistant.getLegitFileCount(frame.getSelectedTreeFile()) && frame.directoryLoader.synced) frame.directoryLoader.fireUpdate();
 			}
-			try
-			{
+			try {
 				Thread.sleep(1000);
-			}
-			catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
