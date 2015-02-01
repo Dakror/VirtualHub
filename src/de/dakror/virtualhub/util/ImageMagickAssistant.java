@@ -48,7 +48,9 @@ public class ImageMagickAssistant {
 			if (JTattooUtilities.isWindows()) exec = "/windows/convert.exe";
 			if (JTattooUtilities.isMac()) exec = "/mac/convert.sh";
 			
-			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" \"" + f.getPath().replace("\\", "/") + "\" -layers merge -thumbnail " + CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + " \"" + filePath + "\"");
+			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/")
+					+ "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" \""
+					+ f.getPath().replace("\\", "/") + "\" -layers merge -thumbnail " + CFG.PREVIEWSIZE.width + "x" + CFG.PREVIEWSIZE.height + " \"" + filePath + "\"");
 			else {
 				cmds.add("\"" + dir.getPath().replace("\\", "/") + exec + "\"");
 				cmds.add("\"" + f.getPath().replace("\\", "/") + "\"");
@@ -92,7 +94,9 @@ public class ImageMagickAssistant {
 			if (JTattooUtilities.isWindows()) exec = "/windows/identify.exe";
 			if (JTattooUtilities.isMac()) exec = "/mac/identify.sh";
 			
-			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/") + "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" -format \"%wx%h\" \"" + f.getPath().replace("\\", "/") + "\"");
+			if (JTattooUtilities.isMac()) cmds.add("export MAGICK_HOME=\"" + dir.getPath().replace("\\", "/")
+					+ "/mac\"; export PATH=\"$MAGICK_HOME:$PATH\"; export DYLD_LIBRARY_PATH=\"$MAGICK_HOME/\"; \"" + dir.getPath().replace("\\", "/") + exec + "\" -format \"%wx%h\" \""
+					+ f.getPath().replace("\\", "/") + "\"");
 			else {
 				cmds.add("\"" + dir.getPath().replace("\\", "/") + exec + "\"");
 				cmds.add("-format");

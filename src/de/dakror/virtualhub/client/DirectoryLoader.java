@@ -100,7 +100,9 @@ public class DirectoryLoader extends Thread {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							if (frame.getSelectedFiles().length < 2) {
-								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei") + " unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei") + " löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+								if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie diese" + (fb.file.isDirectory() ? "s Verzeichnis und alle enthaltenen Dateien\n" : " Datei")
+										+ " unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", (fb.file.isDirectory() ? "Verzeichnis" : "Datei")
+										+ " löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 									boolean success = true;
 									boolean directory = fb.file.isDirectory();
 									
@@ -112,10 +114,13 @@ public class DirectoryLoader extends Thread {
 										
 									} else success = fb.file.delete();
 									
-									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
+									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei")
+											+ " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
 									else fireUpdate();
 								}
-							} else if (JOptionPane.showConfirmDialog(frame, "Sind Sie sicher, dass Sie die Daten unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.", "Daten löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+							} else if (JOptionPane.showConfirmDialog(	frame,
+																												"Sind Sie sicher, dass Sie die Daten unwiderruflich löschen wollen?\nSie sollten von wichtigen Daten Backups machen, bevor Sie sie löschen.",
+																												"Daten löschen", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 								File[] files = frame.getSelectedFiles();
 								for (File file : files) {
 									boolean success = true;
@@ -133,7 +138,9 @@ public class DirectoryLoader extends Thread {
 										}
 									} else success = file.delete();
 									
-									if (!success) JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei") + " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
+									if (!success)
+										JOptionPane.showMessageDialog(frame, (directory ? "Das Verzeichnis" : "Die Datei")
+												+ " konnte nicht gelöscht werden, da sie in einem anderen Programm geöffnet ist.", "Löschen nicht möglich", JOptionPane.ERROR_MESSAGE);
 								}
 								fireUpdate();
 							}
@@ -198,7 +205,8 @@ public class DirectoryLoader extends Thread {
 										try {
 											Desktop.getDesktop().browse(fb.file.toURI());
 										} catch (IOException e1) {
-											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht geöffnet werden!\nMöglicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software.", "Datei konnte nicht geöffnet werden!", JOptionPane.ERROR_MESSAGE);
+											JOptionPane.showMessageDialog(frame, "Die Datei konnte nicht geöffnet werden!\nMöglicherweise fehlt Ihnen eine mit diesem Dateityp assozierte Software.",
+																										"Datei konnte nicht geöffnet werden!", JOptionPane.ERROR_MESSAGE);
 										}
 									}
 								}

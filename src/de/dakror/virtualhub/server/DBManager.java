@@ -40,13 +40,16 @@ public class DBManager {
 	public static Eticet eticet(File f, String catalog, Eticet e) {
 		try {
 			if (e == Eticet.NULL) {
-				ResultSet rs = connection.createStatement().executeQuery("SELECT ETICET FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
+				ResultSet rs = connection.createStatement().executeQuery(	"SELECT ETICET FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog
+																																			+ "\"");
 				if (!rs.next()) return Eticet.NONE;
 				
 				return Eticet.values()[rs.getInt(1)];
 			} else {
-				if (e == Eticet.NONE) connection.createStatement().executeUpdate("DELETE FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
-				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO ETICETS VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ") AND CATALOG = \"" + catalog + "\"");
+				if (e == Eticet.NONE) connection.createStatement().executeUpdate(	"DELETE FROM ETICETS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog
+																																							+ "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO ETICETS VALUES(\"" + f.getPath().replace("\\", "/") + "\"," + e.ordinal() + ") AND CATALOG = \""
+																														+ catalog + "\"");
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -62,8 +65,10 @@ public class DBManager {
 				
 				return new Tags(rs.getString(1).split(", "));
 			} else {
-				if (t.getTags().length == 0) connection.createStatement().executeUpdate("DELETE FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \"" + catalog + "\"");
-				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO TAGS VALUES(\"" + f.getPath().replace("\\", "/") + "\", \"" + catalog + "\", \"" + t.serialize() + "\")");
+				if (t.getTags().length == 0) connection.createStatement().executeUpdate("DELETE FROM TAGS WHERE PATH = \"" + f.getPath().replace("\\", "/") + "\" AND CATALOG = \""
+																																										+ catalog + "\"");
+				else connection.createStatement().executeUpdate("INSERT OR REPLACE INTO TAGS VALUES(\"" + f.getPath().replace("\\", "/") + "\", \"" + catalog + "\", \"" + t.serialize()
+																														+ "\")");
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -88,8 +93,10 @@ public class DBManager {
 	
 	public static void rename(Packet4Rename packet) {
 		try {
-			connection.createStatement().executeUpdate("UPDATE ETICETS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \"" + packet.getOldFile().getPath().replace("\\", "/") + "\"");
-			connection.createStatement().executeUpdate("UPDATE TAGS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \"" + packet.getOldFile().getPath().replace("\\", "/") + "\"");
+			connection.createStatement().executeUpdate(	"UPDATE ETICETS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \""
+																											+ packet.getOldFile().getPath().replace("\\", "/") + "\"");
+			connection.createStatement().executeUpdate(	"UPDATE TAGS SET PATH = \"" + packet.getNewFile().getPath().replace("\\", "/") + "\" WHERE PATH = \""
+																											+ packet.getOldFile().getPath().replace("\\", "/") + "\"");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

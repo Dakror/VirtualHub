@@ -72,18 +72,24 @@ public class FileMover extends Thread {
 			monitor.setNote("Datei: " + files[i].getName());
 			
 			if (Assistant.isDeepChild(files[i], target)) {
-				JOptionPane.showMessageDialog(Client.currentClient.frame, "Hierhin kann nicht verschoben werden.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(Client.currentClient.frame, "Hierhin kann nicht verschoben werden.", (files[i].isDirectory() ? "Verzeichnis" : "Datei")
+						+ (copy ? " kopieren" : " verschieben"), JOptionPane.ERROR_MESSAGE);
 				canceled = true;
 				break;
 			}
 			
 			if (files[i].equals(target.getParentFile())) {
-				if (JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Quell- und Zielverzeichnis" : "Die Quell- und Zieldatei") + " sind identisch.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.CANCEL_OPTION) break;
+				if (JOptionPane.showConfirmDialog(Client.currentClient.frame,
+																					(files[i].isDirectory() ? "Das Quell- und Zielverzeichnis" : "Die Quell- und Zieldatei") + " sind identisch.", (files[i].isDirectory()
+																							? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.CANCEL_OPTION)
+					break;
 				continue;
 			}
 			
 			if (target.exists()) {
-				int response = JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Zielverzeichnis" : "Die Zieldatei") + " existiert bereits. Überschreiben?\r\nBei \"Nein\" wird " + (files[i].isDirectory() ? "das Verzeichnis" : "die Datei") + " übersprungen.", (files[i].isDirectory() ? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				int response = JOptionPane.showConfirmDialog(Client.currentClient.frame, (files[i].isDirectory() ? "Das Zielverzeichnis" : "Die Zieldatei")
+						+ " existiert bereits. Überschreiben?\r\nBei \"Nein\" wird " + (files[i].isDirectory() ? "das Verzeichnis" : "die Datei") + " übersprungen.", (files[i].isDirectory()
+						? "Verzeichnis" : "Datei") + (copy ? " kopieren" : " verschieben"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (response == JOptionPane.NO_OPTION) continue;
 				if (response == JOptionPane.CANCEL_OPTION) {
 					canceled = true;

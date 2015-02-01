@@ -103,7 +103,8 @@ public class ChooseCatalogDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (catalogs.getSelectedIndex() != -1) {
-					if (JOptionPane.showConfirmDialog(dialog, "Sind Sie sicher, dass Sie diesen\r\nKatalog unwiderruflich löschen wollen?", "Katalog löschen", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+					if (JOptionPane.showConfirmDialog(dialog, "Sind Sie sicher, dass Sie diesen\r\nKatalog unwiderruflich löschen wollen?", "Katalog löschen",
+																						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 						DefaultListModel dlm = (DefaultListModel) catalogs.getModel();
 						data.remove(catalogs.getSelectedIndex());
 						dlm.remove(catalogs.getSelectedIndex());

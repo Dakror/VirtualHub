@@ -131,7 +131,8 @@ public class ClientFrame extends JFrame {
 				Properties properties = new Properties();
 				properties.put("server", InetAddress.getLocalHost().getHostAddress());
 				Client.currentClient.properties = properties;
-				properties.store(new FileOutputStream(new File(Client.dir, "settings.properties")), "VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software läuft\r\n");
+				properties.store(	new FileOutputStream(new File(Client.dir, "settings.properties")),
+													"VirtualHub Client Einstellungen\r\n\r\n  server = Die IP des Servers, auf dem die VirtualHub Server Software läuft\r\n");
 			} else {
 				Client.currentClient.properties = new Properties();
 				Client.currentClient.properties.load(new FileInputStream(new File(Client.dir, "settings.properties")));
@@ -149,7 +150,9 @@ public class ClientFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (JOptionPane.showConfirmDialog(ClientFrame.this, "Sind Sie sicher, dass Sie ein Backupdes Katalogs erstellen wollen?\nDieser Vorgang kann einige Zeit in Anspruch nehmen.", "Backup starten?", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
+				if (JOptionPane.showConfirmDialog(ClientFrame.this,
+																					"Sind Sie sicher, dass Sie ein Backupdes Katalogs erstellen wollen?\nDieser Vorgang kann einige Zeit in Anspruch nehmen.",
+																					"Backup starten?", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
 					try {
 						Client.currentClient.sendPacket(new Packet5Attribute("backup.path", ""));
 					} catch (IOException e1) {
@@ -319,12 +322,14 @@ public class ClientFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String name = JOptionPane.showInputDialog(ClientFrame.this, "Bitte geben Sie den Namen des neuen Schlüsselwortes ein.", "Schlüsselwort hinzufügen", JOptionPane.PLAIN_MESSAGE);
+				String name = JOptionPane.showInputDialog(ClientFrame.this, "Bitte geben Sie den Namen des neuen Schlüsselwortes ein.", "Schlüsselwort hinzufügen",
+																									JOptionPane.PLAIN_MESSAGE);
 				
 				if (name == null || name.length() == 0) return;
 				
 				if (!name.matches("^[a-zA-Z0-9öäüÖÄÜß ]*$")) {
-					JOptionPane.showMessageDialog(ClientFrame.this, "Schlüsselwörter dürfen nur Buchstaben,\nZahlen und Leerzeichen enthalten!", "Ungültiges Schlüsselwort", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(ClientFrame.this, "Schlüsselwörter dürfen nur Buchstaben,\nZahlen und Leerzeichen enthalten!", "Ungültiges Schlüsselwort",
+																				JOptionPane.ERROR_MESSAGE);
 					actionPerformed(e);
 					return;
 				}
@@ -816,7 +821,10 @@ public class ClientFrame extends JFrame {
 	}
 	
 	public void doBackup(Packet5Attribute packet) {
-		if (packet.getValue().length() == 0) JOptionPane.showMessageDialog(this, "Es wurde noch kein Backupverzeichnis konfiguiert!\nBitte stellen Sie ein solches in der VirtualHub Server Software ein,\n indem Sie unter Aktionen -> Backup-Einstellungen einen Pfad festlegen.\nVersuchen Sie daraufhin erneut, ein Backup zu erstellen.", "Backupverzeichnis nicht konfiguriert!", JOptionPane.ERROR_MESSAGE);
-		else new FileMover(this, false, true, new File(packet.getValue() + "/" + Client.currentClient.getCatalog().getName() + "-Backup " + new SimpleDateFormat("dd.MM.yy HH-mm").format(new Date())), Client.currentClient.getCatalog().sources.toArray(new File[] {}));
+		if (packet.getValue().length() == 0) JOptionPane.showMessageDialog(	this,
+																																				"Es wurde noch kein Backupverzeichnis konfiguiert!\nBitte stellen Sie ein solches in der VirtualHub Server Software ein,\n indem Sie unter Aktionen -> Backup-Einstellungen einen Pfad festlegen.\nVersuchen Sie daraufhin erneut, ein Backup zu erstellen.",
+																																				"Backupverzeichnis nicht konfiguriert!", JOptionPane.ERROR_MESSAGE);
+		else new FileMover(this, false, true, new File(packet.getValue() + "/" + Client.currentClient.getCatalog().getName() + "-Backup "
+				+ new SimpleDateFormat("dd.MM.yy HH-mm").format(new Date())), Client.currentClient.getCatalog().sources.toArray(new File[] {}));
 	}
 }
